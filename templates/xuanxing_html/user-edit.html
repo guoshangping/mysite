@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+    {% csrf_token %}
+    <input style="display: none" id="userid" value="{{ user_msg.uid }}">
+    <div class="layui-form-item">
+        <label for="username" class="layui-form-label">
+            <span class="x-red">*</span>姓名
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" name="username" required=""
+                   autocomplete="off" class="layui-input" id="username" value="{{ user_msg.username }}">
+        </div>
+
+    </div>
+    <div class="layui-form-item">
+        <label for="phone" class="layui-form-label">
+            手机
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" id="phone_num" name="phone" required="" lay-verify="phone"
+                   autocomplete="off" class="layui-input" value="{{ user_msg.user_mobile }}">
+        </div>
+        <div class="layui-form-mid layui-word-aux">
+            手机号
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label for="L_email" class="layui-form-label">
+            邮箱
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" id="email_addr" name="email" required="" lay-verify="email"
+                   autocomplete="off" class="layui-input" value="{{ user_msg.user_email }}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label for="L_email" class="layui-form-label">
+            员工id
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" id="work_id" name="email" required=""
+                   autocomplete="off" class="layui-input" value="{{ user_msg.user_workid }}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label for="L_pass" class="layui-form-label">
+            <span class="x-red">*</span>密码
+        </label>
+        <div class="layui-input-inline">
+            <input type="password" id="first_pwd" class="layui-input" value="{{ user_msg.user_pwd }}">
+        </div>
+        <div class="layui-form-mid layui-word-aux">
+            6到16个字符
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red">*</span>确认密码
+        </label>
+        <div class="layui-input-inline">
+            <input type="password" id="re_pwd" class="layui-input" value="{{ user_msg.user_pwd }}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>入职日期
+        </label>
+        <div class="layui-input-inline">
+            <input class="layui-input" placeholder="入职日期" name="start" id="ruzhi_time"
+                   autocomplete="off" value="{{ user_msg.rz_time }}">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <button class="layui-btn" id="user_modify">
+            修改
+        </button>
+        <button class="layui-btn" id="user_cancel">
+            取消
+        </button>
+    </div>
+</div>
+
+<script>
+    layui.use('laydate', function () {
+        let laydate = layui.laydate;
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#ruzhi_time' //指定元素
+        });
+    });
+    $("#user_modify").click(function () {
+        let usr_name = $("#username").val().replace(/(^\s*)|(\s*$)/g, "");
+        if (!usr_name) {
+            layer.msg("用户名为空");
+            return false;
+        }
+        let phone_num = $("#phone_num").val().replace(/(^\s*)|(\s*$)/g, "");
+        let reg_Phone = /^1\d{10}$/;
+        if (phone_num != "") {
+            if (!reg_Phone.test(phone_num)) {
+                layer.msg("请输入正确的手机号");
+                return false;
+            }
+        }
+
+        let email = $("#email_addr").val().replace(/(^\s*)|(\s*$)/g, "");
+        let regEmail = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if (email != "") {
+            if (!regEmail.test(email)) {
+                layer.msg("请输入正确邮箱地址");
+                return false;
+            }
+        }
+
+        let work_id = $("#work_id").val();
+        let first_pwd = $("#first_pwd").val().replace(/(^\s*)|(\s*$)/g, "");
+        let pwd = $("#re_pwd").val().replace(/(^\s*)|(\s*$)/g, "");
+        if(pwd == "" || first_pwd == ""){
+            layer.msg("密码不能为空");
+            return false;
+        }
+        if (first_pwd != pwd) {
+            layer.msg("两次密码不一致");
+            return false;
+        }
+
+        let join_time = $("#ruzhi_time").val();
+        let uid = $("#userid").val();
+        $.ajax({
+            url: '/xuanxing/user_edit/',
+            type: 'post',
+            async: false,
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "uid": uid,
+                "username": usr_name,
+                "pwd": pwd,
+                "phone_num": phone_num,
+                "email": email,
+                "work_id": work_id,
+                "join_time": join_time,
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.alert("修改成功", {icon: 6}, function () {
+                        // 获得frame索引
+                        let index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                    return false;
+                } else if (ReState["code"] == "0001") {
+                    layer.msg("用户名或密码为空");
+                    return false;
+                } else if (ReState["code"] == "0002") {
+                    layer.msg("用户不存在");
+                    return false;
+                }
+                else if (ReState["code"] == "0003") {
+                    layer.msg("请求参数错误");
+                    return false;
+                }
+                else if (ReState["code"] == "0004") {
+                    layer.msg("用户名已存在");
+                    return false;
+                }
+            }
+        });
+    });
+    $("#user_cancel").click(function () {
+        let index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+    });
+
+</script>
+
+</body>
+
+</html>

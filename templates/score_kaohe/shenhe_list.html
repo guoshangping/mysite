@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+<div>
+    <br><br>
+    <label class="layui-form-label" style="width: 100px">请选择季度</label>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <select style="height: 30px;width: 180px;border: 1px solid deepskyblue;direction: ltr;"
+            id="quarter_select">
+        <option value="">请选择季度</option>
+        {% for qa in quarter_all %}
+                <option value="">{{ qa }}</option>
+        {% endfor %}
+
+    </select>
+</div>
+<hr>
+<br><br>
+
+<div id="score_sys">
+    {% csrf_token %}
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">选型测试</div>
+        {% for xx_item in xx_all %}
+            <div>
+                <div style="display: inline;">
+                    <span>事项名称: </span>
+                    <span style="color:deepskyblue">{{ xx_item.0 }}</span>
+                </div>
+                <span>|</span>
+                <div style="display: inline">
+                    <span>事项总分:</span>
+                    <span style="color:deepskyblue">{{ xx_item.1 }}</span>
+                </div>
+                <span>|</span>
+                <div style="display: inline">
+                    <span>我的得分:</span>
+                    <span style="color:deepskyblue">{{ xx_item.2 }}</span>
+                </div>
+            </div>
+        {% endfor %}
+        <hr>
+
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">专项工作</div>
+        {% for zx_item in zx_all %}
+            <div>
+                <div style="display: inline">
+                    <span>事项名称:</span>
+                    <span style="color:deepskyblue">{{ zx_item.0 }}</span>
+                </div>
+                <span>|</span>
+                <div style="display: inline">
+                    <span>事项总分:</span>
+                    <span style="color:deepskyblue">{{ zx_item.1 }}</span>
+                </div>
+                <span>|</span>
+                <div style="display: inline">
+                    <span>我的得分:</span>
+                    <span style="color:deepskyblue">{{ zx_item.2 }}</span>
+                </div>
+            </div>
+        {% endfor %}
+        <hr>
+
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">对处室的贡献</div>
+        {% for cs_item in cs_all %}
+            <div>
+                <div style="display: inline">
+                    <span>事项名称:</span>
+                    <span style="color:deepskyblue">{{ cs_item.0 }}</span>
+                </div>
+                <span>|</span>
+                <div style="display: inline">
+                    <span>事项总分:</span>
+                    <span style="color:deepskyblue">{{ cs_item.1 }}</span>
+                </div>
+                <span>|</span>
+                <div style="display: inline">
+                    <span>我的得分:</span>
+                    <span style="color:deepskyblue">{{ cs_item.2 }}</span>
+                </div>
+            </div>
+        {% endfor %}
+        <hr>
+
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">加分项</div>
+        {% for ad_item in ad_all %}
+            <div>
+                <div style="display: inline">
+                    <span>事项名称:</span>
+                    <span style="color:deepskyblue">{{ ad_item.0 }}</span>
+                </div>
+                <span>|</span>
+                <div style="display: inline">
+                    <span>事项总分:</span>
+                    <span style="color:deepskyblue">{{ ad_item.1 }}</span>
+                </div>
+                <span>|</span>
+                <div style="display: inline">
+                    <span>我的得分:</span>
+                    <span style="color:deepskyblue">{{ ad_item.2 }}</span>
+                </div>
+            </div>
+        {% endfor %}
+                <hr>
+
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">扣分项</div>
+        {% for ad_item in mi_all %}
+            <div>
+                <div style="display: inline">
+                    <span>事项名称:</span>
+                    <span style="color:deepskyblue">{{ ad_item.0 }}</span>
+                </div>
+                <span>|</span>
+                <div style="display: inline">
+                    <span>事项总分:</span>
+                    <span style="color:deepskyblue">{{ ad_item.1 }}</span>
+                </div>
+                <span>|</span>
+                <div style="display: inline">
+                    <span>我的得分:</span>
+                    <span style="color:deepskyblue">{{ ad_item.2 }}</span>
+                </div>
+            </div>
+        {% endfor %}
+        <hr>
+    </div>
+</div>
+<script>
+$("#quarter_select").bind("change", function () {
+    let quarter = $(this).find("option:selected").text();
+    window.location.href = "/xuanxing/shenhe_list?date="+ quarter
+})
+
+</script>
+
+
+</body>
+</html>

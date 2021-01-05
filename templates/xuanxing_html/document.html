@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js"></script>
+
+
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <![endif]-->
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #imgdiv img {
+            width: 100px;
+            margin: 0 150px;
+        }
+
+        #imgdiv1 img {
+            width: 100px;
+            margin: 0 150px;
+        }
+
+        #bigimg {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            background: rgba(0, 0, 0, .3);
+            top: 0;
+            display: none;
+        }
+
+        #bigimg1 {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            background: rgba(0, 0, 0, .3);
+            top: 0;
+            display: none;
+        }
+
+        #bigimg img {
+            width: 600px;
+        {#margin:auto;#} position: fixed;
+            left: 700px;
+            right: 0;
+            top: 80px;
+            cursor: pointer;
+        }
+
+        #bigimg1 img {
+            width: 600px;
+        {#margin:auto;#} position: fixed;
+            left: 700px;
+            right: 0;
+            top: 80px;
+            cursor: pointer;
+        }
+
+        .layui-table img {
+            max-width: 500px;
+        }
+    </style>
+
+    <script src="/static/js/echarts.min.js"></script>
+</head>
+
+<body>
+
+<div class="x-body">
+    <div>
+        <button type="button" class="layui-btn layui-btn-radius score_button" style="display: inline-block;float: left"
+                id="ess_button">
+            厂商必要文件
+        </button>
+        <button type="button" class="layui-btn layui-btn-radius score_button" style="display: inline-block"
+                id="pub_button">
+            公司公共文件
+        </button>
+        <button type="button" class="layui-btn layui-btn-radius score_button" style="display: inline-block" id="ret">
+            返回
+        </button>
+    </div>
+    <hr>
+
+    <div id="mymain" style="width: 700px;height:500px;display: inline-block"></div>
+    <div id="bar" style="width: 500px;height:450px;display: inline-block;"></div>
+
+    <div id="ess_file" style="display: none">
+        <h1 style="display: inline-block">必要文件:</h1>
+
+        &nbsp; <span style="font-size: 20px;text-align: center">请选择项目</span>
+
+        <div class="layui-input-inline">
+
+            <select id="pro" name="pro_name" class="pro" style="height: 35px;">
+
+                <option value="">请选择</option>
+                {% for pro in pro_obj %}
+                    <option value="{{ pro.id }}">{{ pro.project_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        &nbsp;&nbsp;
+        <span style="font-size: 20px;text-align: center">请选择厂商</span>
+
+        <div class="layui-input-inline">
+
+            <select id="ven" name="venv_name" class="pro" style="height: 35px;">
+
+            </select>
+        </div>
+        <hr>
+        {#  <xblock>#}
+        <a href="/xuanxing/doc_add/" id="">
+            <button class="layui-btn"><i class="layui-icon"></i>添加</button>
+        </a>
+        <button class="layui-btn" id="sh">校验</button>
+        {# </xblock>#}
+        {#<form enctype="multipart/form-data" action="" >#}
+        {% csrf_token %}
+
+        <table class="layui-table">
+
+            <colgroup>
+                <col width="120">
+                <col width="120">
+                <col width="80">
+                <col width="60">
+                <col width="80">
+                <col width="30">
+                <col width="30">
+            </colgroup>
+
+            <thead>
+            <tr>
+                <th>文件名称</th>
+                <th>上传文件名称</th>
+                <th>文件大小</th>
+                <th style="text-align: center">上传</th>
+                <th>状态</th>
+                <th>备注</th>
+                <th>操作</th>
+
+            </tr>
+            </thead>
+            <tbody id="ps_table">
+
+            {% for i in ess_obj %}
+                <tr>
+                    <td>{{ i.filename }}</td>
+                    <td>百度-{{ i.filename }}.pdf</td>
+
+                    <td id="myup"></td>
+
+                    <td>
+                        {#      <input id="file" class="filepath" name="myfile" type="file" onchange="changepic(this)" accept="image/png, image/jpeg, image/gif,image/jpg,application/pdf,.ppt,.pptx" style="display: inline-block">#}
+                        <input type="file" id="myfile" name="myfile" autocomplete="off"
+                               style="width: 300px;display: inline-block; float: left" onchange="changepic(this)">
+                        <div id="imgdiv" style="width: 300px;display: inline-block; float: left">
+
+                            <img src="" id="show" class="myimg" onclick="imgbig();">
+                        </div>
+
+                        <!-- 放大遮罩层 -->
+                        <div id="bigimg" onclick="closeimg();" style="z-index:8"></div>
+
+                        <button type="submit" class="layui-btn layui-btn-radius score_button"
+                                style="display: inline-block" id="upload_file">上传
+                        </button>
+                        <button type="submit" class="layui-btn layui-btn-radius score_button"
+                                style="display: inline-block" id="download_file">下载
+                        </button>
+                    </td>
+                    {#  <td style="text-align: center"> <div class="layui-unselect  layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div></td>#}
+
+                    <td>
+                        <select name="" id=""
+                                style="width: 100%; height:100%;padding: 0; margin:0; border: none;text-align:center;">
+
+                            <option>{{ i.get_status_display }}</option>
+                            {% for j in i.stat %}
+                                <option value="{{ forloop.counter }}">{{ j.1 }}</option>
+                            {% endfor %}
+
+                        </select>
+                    </td>
+
+                    <td></td>
+                    <td class="td-opt">
+                        <a title="编辑" href="/xuanxing/doc_edit/?id=1" onclick="chageVal()" class="pj_edit">
+                            <i class="layui-icon">&#xe642;</i>
+                        </a>
+                        <a title="删除" onclick="del_option(this)" href="javascript:;">
+                            <i class="layui-icon">&#xe640;</i>
+                        </a>
+                    </td>
+
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div>
+
+    <div id="pub_file" style="display: none">
+        <h1 style="display: inline-block">公共文件:</h1>
+
+        &nbsp; <span style="font-size: 20px;text-align: center">请选择项目</span>
+
+        <div class="layui-input-inline">
+
+            <select id="pj_role" name="shipping" class="valid" style="height: 35px;">
+
+                <option value="">请选择</option>
+                {% for pro in pro_obj %}
+                    <option value="{{ pro.id }}">{{ pro.project_name }}</option>
+                {% endfor %}
+            </select>
+
+        </div>
+        <hr>
+
+        <a href="/xuanxing/doc_add/" id="" style="display: block">
+            <button class="layui-btn"><i class="layui-icon"></i>添加</button>
+        </a>
+
+
+        <table class="layui-table">
+
+            <colgroup>
+                <col width="120">
+                <col width="120">
+                <col width="80">
+                <col width="60">
+                <col width="80">
+                <col width="30">
+                <col width="30">
+            </colgroup>
+
+            <thead>
+            <tr>
+                <th>文件名称</th>
+                <th>上传文件名称</th>
+                <th>文件大小</th>
+
+                <th>上传</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="pj_table">
+            {% for j in comp_list %}
+                <tr>
+                    <td>{{ j }}</td>
+                    <td>百度-{{ j }}.pdf</td>
+                    <td></td>
+                    <td>
+                        <input type="file" id="myfile1" name="myfile" autocomplete="off"
+                               style="width: 300px;display: inline-block; float: left" onchange="changepic1(this)">
+
+                        <div id="imgdiv1" style="width: 300px;display: inline-block; float: left" class="img_show">
+                            {#        <img src="xue.jpg" id="imgsrc" />#}
+                            <img src="" id="show1" class="pic_show" onclick="imgbig1();">
+                        </div>
+
+                        <!-- 放大遮罩层 -->
+                        <div id="bigimg1" onclick="closeimg1();" style="z-index:8"></div>
+
+                        <button type="submit" class="layui-btn layui-btn-radius score_button"
+                                style="display: inline-block" id="upload_file">上传
+                        </button>
+                        <button type="submit" class="layui-btn layui-btn-radius score_button"
+                                style="display: inline-block" id="download_file">下载
+                        </button>
+
+                    </td>
+                    <td style="text-align: center">
+                        <div class="layui-unselect  layui-form-checkbox" lay-skin="primary"><i
+                                class="layui-icon">&#xe642;</i></div>
+
+                    </td>
+
+                    <td class="td-opt">
+
+                        <a title="编辑" href="/xuanxing/doc_edit/?id=1" onclick="chageVal()" class="pj_edit">
+                            <i class="layui-icon">&#xe642;</i>
+                        </a>
+
+                        <a title="删除" onclick="del_option(this)" href="javascript:;">
+                            <i class="layui-icon">&#xe640;</i>
+                        </a>
+
+                        <a title="添加" onclick="add_option(this, '添加权限')" href="javascript:;">
+                            <i class="layui-icon">&#xe654;</i>
+                        </a>
+
+                    </td>
+
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+    <div id="other_file" style="display: none">
+
+        <h2>其他补充材料</h2>
+
+        <table class="layui-table">
+
+            <colgroup>
+                <col width="120">
+                <col width="120">
+                <col width="80">
+                <col width="60">
+                <col width="80">
+                <col width="30">
+                <col width="30">
+            </colgroup>
+            <thead>
+            <tr>
+
+                <th>文件名称</th>
+                <th>上传文件名称</th>
+                <th>文件大小</th>
+                <th>上传</th>
+                <th>状态</th>
+                <th>操作</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>补充材料</td>
+                <td></td>
+                <td>32k</td>
+                <td><input type="file" multiple="multiple">
+
+                    <button type="submit" class="layui-btn layui-btn-radius score_button" style="display: inline-block"
+                            id="upload_file">上传
+                    </button>
+                    <button type="submit" class="layui-btn layui-btn-radius score_button" style="display: inline-block"
+                            id="download_file">下载
+                    </button>
+                </td>
+                <td style="text-align: center">
+                    <div class="layui-unselect  layui-form-checkbox" lay-skin="primary"><i
+                            class="layui-icon">&#xe605;</i></div>
+                </td>
+
+
+                <td class="td-opt">
+                    <a title="编辑" href="/xuanxing/doc_edit/?id=1" onclick="chageVal()" class="pj_edit">
+                        <i class="layui-icon">&#xe642;</i>
+                    </a>
+
+                    <a title="删除" onclick="del_option(this)" href="javascript:;">
+                        <i class="layui-icon">&#xe640;</i>
+                    </a>
+
+                    <a title="添加" onclick="add_option(this, '添加权限')" href="javascript:;">
+                        <i class="layui-icon">&#xe654;</i>
+                    </a>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    {# 联动#}
+    $("#pro").change(function () {
+        var options = $("#pro option:selected"); //获取选中的项
+        var pro_id = options.val(); //获取选中的值
+
+        // 选择id=pro_id的元素时触发该ajax请求，调用接口
+        $.ajax({
+            url: '/xuanxing/get_ven',
+            data: {"pro_id": pro_id},
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var content = '';
+                $.each(data, function (i, pro) {
+                    // 调用接口后返回list数据[u'account_role', u'account_user'],循环遍历该list拼接选项的内容
+                    content += '<option value=' + pro.vend_prod + '>' + pro.vend_prod__vend_name + '</option>'
+                });
+                // 将拼接好的内容作为id=pro_id这个select元素的内容
+                $('#ven').html(content)
+            },
+        })
+    });
+
+
+    {#上传文件#}
+    $("#upload_file").click(function () {
+        {#let myfile=$("#myfile").val();#}
+        let formdata = new FormData();
+        formdata.append("myfile", $("#myfile")[0].files[0]);
+        formdata.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        {#$("#myup").text("20kb");#}
+        $.ajax({
+            url: "/xuanxing/upload_file/",
+            type: "post",
+            // 不设置请求体数据格式类型
+            contentType: false,
+            // 不处理数据，直接源数据发送
+            processData: false,
+            data: formdata,
+            success: function (resize) {
+                {#let ReState = eval("(" + JSON.stringify(msg) + ")");#}
+                {#let ReState = msg;#}
+                let ReSize = resize;
+                {#console.log(ReState["code"]);#}
+                console.log(ReSize["code"]);
+
+                if (ReSize["code"]) {
+                    {#if (ReSize["filesize"] == "0009") {#}
+                    layer.msg("上传成功");
+                    {#window.location.href = "/xuanxing/document/";#}
+                    $("#myup").html(ReSize["code"]);
+                    return false;
+                }
+            }
+        });
+    });
+
+
+    $("#download_file").click(function () {
+        window.location.href = "/xuanxing/download_file/"
+    });
+
+    $(function () {
+        $("#ess_button").click(function () {
+            $("#ess_file").show();
+            $("#pub_file").hide();
+            $("#mymain").hide();
+            $("#bar").hide();
+            $("#other_file").show();
+        });
+
+        $("#pub_button").click(function () {
+            $("#ess_file").hide();
+            $("#mymain").hide();
+            $("#bar").hide();
+            $("#pub_file").show();
+            $("#other_file").hide();
+        });
+
+        $("#ret").click(function () {
+            $("#ess_file").hide();
+            $("#mymain").show();
+            $("#bar").show();
+            $("#pub_file").hide();
+            $("#other_file").hide();
+        });
+    });
+
+
+    function changepic(obj) {
+        //console.log(obj.files[0]);//这里可以获取上传文件的name
+        var newsrc = getObjectURL(obj.files[0]);
+        {#document.getElementById('show').src = newsrc;#}
+        {#document.getElementsByClassName('myimg').src=newsrc;#}
+        $(obj).siblings(".img_show").children(".pic_show").attr('src',newsrc);
+    }
+
+    //建立一個可存取到該file的url
+    {#function getObjectURL(file) {#}
+    {#    var url = null ;#}
+    {#    // 下面函数执行的效果是一样的，只是需要针对不同的浏览器执行不同的 js 函数而已#}
+    {#    if (window.createObjectURL!=undefined) { // basic#}
+    {#        url = window.createObjectURL(file) ;#}
+    {#    } else if (window.URL!=undefined) { // mozilla(firefox)#}
+    {#        url = window.URL.createObjectURL(file) ;#}
+    {#     } else if (window.URL!=undefined) { // webkit or chrome#}
+    {#        url = window.URL.createObjectURL(file) ;#}
+    {#     }#}
+    {#    return url;#}
+    {# }#}
+
+    function changepic1(obj) {
+        //console.log(obj.files[0]);//这里可以获取上传文件的name
+        let newsrc = getObjectURL(obj.files[0]);
+        let ob = $(obj).siblings(".img_show").children(".pic_show").attr('src',newsrc);
+
+        //document.getElementById('show1').src = newsrc;
+    }
+
+
+    function getObjectURL(file) {
+        var url = null;
+        // 下面函数执行的效果是一样的，只是需要针对不同的浏览器执行不同的 js 函数而已
+        if (window.createObjectURL != undefined) { // basic
+            url = window.createObjectURL(file);
+        } else if (window.URL != undefined) { // mozilla(firefox)
+            url = window.URL.createObjectURL(file);
+        } else if (window.webkitURL != undefined) { // webkit or chrome
+            url = window.webkitURL.createObjectURL(file);
+        }
+        return url;
+    }
+
+    {#公共#}
+
+    function imgbig1() {
+        var imgsrc = $('#show1').attr('src');
+        $("#bigimg1").css("display", "block");
+        $("#bigimg1").html("<img src=" + imgsrc + " />");
+    }
+
+    function closeimg1() {
+        $("#bigimg1").css("display", "none");
+    }
+
+    {# 必要#}
+
+    function imgbig() {
+        var imgsrc = $('#show').attr('src');
+        $("#bigimg").css("display", "block");
+        $("#bigimg").html("<img src=" + imgsrc + " />");
+    }
+
+    function closeimg() {
+        $("#bigimg").css("display", "none");
+    }
+
+
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('mymain'));
+
+    myChart.setOption({
+        series: [
+            {
+                name: '访问来源',
+                type: 'pie',    // 设置图表类型为饼图
+                radius: '65%',  // 饼图的半径，外半径为可视区尺寸（容器高宽中较小一项）的 55% 长度。
+                data: [          // 数据数组，name 为数据项名称，value 为数据项值
+                    {value: 235, name: '公司营业执照'},
+                    {value: 274, name: '法人代表授权书'},
+                    {value: 310, name: '公司承诺与声明'},
+                    {value: 335, name: '参测产品承诺书'},
+                    {value: 400, name: '公司承诺书'}
+                ]
+            }
+        ]
+    });
+
+    var myChart1 = echarts.init(document.getElementById('bar'));
+
+    // 指定图表的配置项和数据
+    var option = {
+        title: {
+            text: '资料核对'
+        },
+        tooltip: {},
+        legend: {
+            data: ['数量']
+        },
+        xAxis: {
+            data: ["联想", "百度", "惠普", "小米", "戴尔", "宏基"]
+        },
+        yAxis: {},
+        series: [{
+            name: '数量',
+            type: 'bar',
+            data: [2, 5, 8, 10, 7, 15]
+        }]
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart1.setOption(option);
+
+</script>
+
+</body>
+
+</html>
+

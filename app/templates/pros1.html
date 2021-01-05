@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>最高权限用户项目看板页面</title>
+    <style>
+    .a{
+        width:20px;
+        height: 20px;
+        border:1px solid #5494F3;
+        cursor:pointer;
+        display: inline-block;
+        text-align: center;
+        line-height: 20px;
+    }
+    .b{
+        border:0;
+        width:20px;
+        height: 20px;
+        cursor:pointer;
+        display: inline-block;
+        text-align: center;
+        line-height: 20px;
+    }
+    a{
+        text-decoration:none;
+    }
+
+</style>
+</head>
+<body>
+    <h3 style="text-align:center;background: #74A8F5">项目看板</h3>
+    <h3 style="text-align:right">您好 {{ username }}</h3>
+    <input type="hidden" id="lianhenian" value="{{ year }}">
+    <input type="hidden" id="lianheyue" value="{{ yue }}">
+    <input type="hidden" id="lianhechar" value="{{ char }}">
+    <input type="hidden" id="lianhepar" value="{{ par }}">
+    <input type="hidden" id="lianhejd" value="{{ lianhexmjd }}">
+    <input type="hidden" id="loguser" name="loguser" value="{{ username }}">
+    <input type="hidden" id="userclass" name="userclass" value="{{ userclass }}">
+    <input type="hidden" id="userid" name="userid" value="{{ userid }}">
+    <input type="hidden" id="flag" value="{{ flag }}">
+    <input type="hidden" id="cretime" value="{{ time }}">
+    <input type="hidden" id="creuser" value="{{ creatuser }}">
+    <input type="hidden" id="proxmjd" value="{{ xmjd }}">
+    <input type="hidden" id="procharperson" value="{{ charperson }}">
+    <input type="hidden" id="proparticipant" value="{{ participant }}">
+    <input type="hidden" id="pronameinput" value="{{ proname }}">
+    <input type="hidden" id="mohuproname" value="{{ proname }}">
+{#    <div id="lianhe" style="float: right;border: #5494F3 solid">#}
+{#        <h4 style="background: #74A8F5;text-align: center">联合查询</h4>#}
+{#        <input type="text" id="nian" name="lianheyear" value="请选择年份"><select name="" id="" onclick="lianheproyear()"></select><br>#}
+{#        <div id="lianheyeardiv" style="display: none;background: #74A8F5">#}
+{#            <input type="radio" name="protime" value="">2022 <br>#}
+{#            <input type="button" value="确定" > <br>#}
+{#        </div>#}
+{#        <input type="text" id="yue" name="lianheyue" value="请选择月份"><select name="" id="" onclick="lianheproyue()"></select><br>#}
+{#        <div id="lianheyuediv" style="display: none;background: #74A8F5">#}
+{#            <input type="radio" name="protime" value="">2022 <br>#}
+{#            <input type="button" value="确定" > <br>#}
+{#        </div>#}
+{#        <input type="text" id="char" name="lianhechar" value="请选择负责人"><select name="" id="" onclick="lianheprochar()"></select><br>#}
+{#        <div id="lianhechardiv" style="display: none;background: #74A8F5">#}
+{#            <input type="radio" name="protime" value="">2022 <br>#}
+{#            <input type="button" value="确定" > <br>#}
+{#        </div>#}
+{#        <input type="text" id="par" name="lianhepar" value="请选择参与人"><select name="" id="" onclick="lianhepropar()"></select><br>#}
+{#        <div id="lianhepardiv" style="display: none;background: #74A8F5">#}
+{#            <input type="radio" name="protime" value="">2022 <br>#}
+{#            <input type="button" value="确定" > <br>#}
+{#        </div>#}
+{#        <input type="text" id="lianhexmjd" name="lianhexmjd" value="请选择项目进度"><select name="" id="" onclick="lianheproxmjd()"></select><br>#}
+{#        <div id="lianhexmjddiv" style="display: none;background: #74A8F5">#}
+{#            <input type="radio" name="protime" value="">2022 <br>#}
+{#            <input type="button" value="确定" > <br>#}
+{#        </div>#}
+{#        <input type="button" style="background: #5494F3" value="筛选" onclick="lianhechaxun()">#}
+{#    </div>#}
+    <div id="pro" style="width: auto;float: left">
+{#    可选择年份查询项目<input id="time" type="date" name="time"><input type="button" value="查询" onclick="pro()">#}
+    {% if userclass  == 'True' %}
+        <input style="background: #74A8F5;font-size: 20px;" type="button" onclick="crepro()" value="创建项目"><input type="text" id="mohucha" value="根据项目名称查询" onclick="qingchu()" onblur="xianshi()"><input type="button" style="background: #74A8F5" value="筛选" onclick="mohuchaxun()">&nbsp;<a onclick="getValues()" href="" class="btn btn-danger input-sm">批量删除/删除</a>
+        <br>
+    {% endif %}
+        <input type="text" id="nian" name="lianheyear" value="请选择年份"><select name="" id="" onclick="lianheproyear()"></select>
+        <div id="lianheyeardiv" style="display: none;background: #74A8F5">
+            <input type="radio" name="protime" value="">2022 <br>
+            <input type="button" value="确定" > <br>
+        </div>
+         <input type="text" id="yue" name="lianheyue" value="请选择月份"><select name="" id="" onclick="lianheproyue()"></select>
+        <div id="lianheyuediv" style="display: none;background: #74A8F5">
+            <input type="radio" name="protime" value="">2022 <br>
+            <input type="button" value="确定" > <br>
+        </div>
+        <input type="text" id="char" name="lianhechar" value="请选择负责人"><select name="" id="" onclick="lianheprochar()"></select>
+        <div id="lianhechardiv" style="display: none;background: #74A8F5">
+            <input type="radio" name="protime" value="">2022 <br>
+            <input type="button" value="确定" > <br>
+        </div>
+        <input type="text" id="par" name="lianhepar" value="请选择参与人"><select name="" id="" onclick="lianhepropar()"></select>
+        <div id="lianhepardiv" style="display: none;background: #74A8F5">
+            <input type="radio" name="protime" value="">2022 <br>
+            <input type="button" value="确定" > <br>
+        </div>
+        <input type="text" id="lianhexmjd" name="lianhexmjd" value="请选择项目进度"><select name="" id="" onclick="lianheproxmjd()"></select>
+        <div id="lianhexmjddiv" style="display: none;background: #74A8F5">
+            <input type="radio" name="protime" value="">2022 <br>
+            <input type="button" value="确定" > <br>
+        </div>
+        <input type="button" style="background: #5494F3" value="筛选" onclick="lianhechaxun()">
+
+
+        {% if page %}
+              <table id="table" border="1" cellspacing="0"  style="text-align: center">
+            <thead >
+
+                <tr>
+                    <th width="70"><input type="checkbox" id="checkAll"  onclick="checkAll()">ID</th>
+
+                    <th style="position: relative;width: 100px;height: 25px">项目名称
+{#                        <select name="" id="" onclick="pro_name()"></select>#}
+                        <div id="pronamediv" style="display: none;position: absolute;background: #74A8F5" onblur="yicang()">
+{#                            <input type="checkbox" name="proname" value="">2022 <br>#}
+{#                            <input type="button" value="点击筛选" onclick="pro_proname()"> <br>#}
+                        </div>
+                    </th>
+                    <th id="time"  style="position: relative">项目创建时间 <select name="" id="" onclick="pro_time()"></select>
+                        <div id="timediv" style="display: none;position: absolute;background: #74A8F5">
+{#                            <input type="checkbox" name="protime" value="">2022 <br>#}
+{#                            <input type="button" value="点击筛选" onclick="pro_cretime()"> <br>#}
+                        </div>
+                    </th>
+                    <th id="person"  style="position: relative">处理人 <select name="" id="" onclick="pro_person()"></select>
+                        <div id="persondiv" style="display: none;position: absolute;background: #74A8F5">
+{#                            <input type="checkbox" name="properson" value="">2022 <br>#}
+{#                            <input type="button" value="点击筛选" onclick="pro_cretuser()"> <br>#}
+                        </div>
+                    </th>
+                    <th id="charperson"  style="position: relative" >负责人 <select name="" id="" onclick="pro_charperson()"></select>
+                        <div id="charpersondiv" style="display: none;position: absolute;background: #74A8F5">
+{#                            <input type="checkbox" name="properson" value="">2022 <br>#}
+{#                            <input type="button" value="点击筛选" onclick="pro_charperson()"> <br>#}
+                        </div>
+                    </th>
+                    <th id="participant" style="position: relative" >参与人 <select name="" id="" onclick="pro_participant()"></select>
+                        <div id="participantdiv" style="display: none;position: absolute;background: #74A8F5">
+                            {# <input type="checkbox" name="properson" value="">2022 <br>#}
+{#                            <input type="button" value="点击筛选" onclick="pro_charperson()"> <br>#}
+                        </div>
+                    </th>
+                    <th id="xmjd"  style="position: relative" colspan="7">项目进度 <select name="" id="" onclick="pro_jd()"></select>
+                        <div id="xmjddiv" style="display: none;position: absolute;background: #74A8F5;width: auto">
+{#                            <input type="checkbox" name="proxmjd" value="">2022 <br>#}
+{#                            <input type="button" value="点击筛选" onclick="pro_xmjd()"> <br>#}
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                 {% for pro in page.object_list %}
+                <tr>
+                    <td style="width: 30px"><input type="checkbox" onclick="checkOne()" value="{{pro.id}}" name="item">{{ forloop.counter }}</td>
+                    <td style="height: 25px;width: 100px"><a style="color: #74A8F5" href="/ap/superconfigpro/?proname={{ pro.proname }}&proid={{ pro.id }}&username={{ username }}&userclass={{ userclass }}&userid={{ userid }}" >{{ pro.proname }}</a></td>
+                    <td>{{ pro.createtime }}</td>
+                    <td>{{ pro.createprouser }}</td>
+                    <td>{{ pro.chargeperson }}</td>
+                    <td>{{ pro.participant }}</td>
+                    <td>{{ pro.prostatus }}</td>
+                    {% if pro.prostatus == '未启动' %}
+                        <td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td>
+                    {% elif pro.prostatus == '需求整理' %}
+                        <td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td>
+                     {% elif pro.prostatus == '测试方案准备' %}
+                      <td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td>
+                     {% elif pro.prostatus == '测试环境准备' %}
+                        <td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td>
+                     {% elif pro.prostatus == '测试中' %}
+                     <td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td>
+                     {% elif pro.prostatus == '准备测试报告' %}
+                        <td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#ADADAD" style="width:10px"></td>
+                      {% else %}
+                        <td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td><td bgcolor="#53FF53" style="width:10px"></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    {% if page %}
+        {% if page.has_previous %} {# 是否有上一页 #}
+        {% if flag == 1 %}
+            <a href="/ap/pro_page/?num={{ page.previous_page_number }}&userid={{ userid }}&username={{ username }}&userclass={{ userclass }}&ts={{ ts }}">上一页</a>
+            {% elif flag == 2 %}
+            <a href="/ap/pro_chaxun_bycretime/?num={{ page.previous_page_number }}&userid={{ userid }}&username={{ username }}&time={{ time }}&userclass={{ userclass }}&ts={{ ts }}">上一页</a>
+            {% elif flag == 3 %}
+            <a href="/ap/pro_chaxun_bycretuser/?num={{ page.previous_page_number }}&userid={{ userid }}&username={{ username }}&creatuser={{ creatuser }}&userclass={{ userclass }}&ts={{ ts }}">上一页</a>
+            {% elif flag == 4 %}
+            <a href="/ap/pro_chaxun_byxmjd/?num={{ page.previous_page_number }}&userid={{ userid }}&username={{ username }}&xmjd={{ xmjd }}&userclass={{ userclass }}&ts={{ ts }}">上一页</a>
+            {% elif flag == 5 %}
+            <a href="/ap/pro_chaxun_bychargeperson/?num={{ page.previous_page_number }}&userid={{ userid }}&username={{ username }}&charperson={{ charperson }}&userclass={{ userclass }}&ts={{ ts }}">上一页</a>
+            {% elif flag == 6 %}
+             <a href="/ap/pro_chaxun_byparticipant/?num={{ page.previous_page_number }}&userid={{ userid }}&username={{ username }}&participant={{ participant }}&userclass={{ userclass }}&ts={{ ts }}">上一页</a>
+            {% elif flag == 7 %}
+             <a href="/ap/pro_chaxun_byproname/?num={{ page.previous_page_number }}&userid={{ userid }}&username={{ username }}&proname={{ proname }}&userclass={{ userclass }}&ts={{ ts }}">上一页</a>
+            {% elif flag == 8 %}
+            <a href="/ap/pro_chaxun_mohu/?num={{ page.previous_page_number }}&userid={{ userid }}&username={{ username }}&proname={{ proname }}&userclass={{ userclass }}&ts={{ ts }}">上一页</a>
+            {% elif flag == 9 %}
+            <a href="/ap/lianhe_query/?num={{ page.previous_page_number }}&userid={{ userid }}&username={{ username }}&proname={{ proname }}&userclass={{ userclass }}&ts={{ ts }}&year={{ year }}&yue={{ yue }}&char={{ char }}&par={{ par }}&xmjd={{ lianhexmjd }}">上一页</a>
+         {% endif %}
+    {% endif %}
+    {% for num in page.paginator.page_range %}
+        {% if flag == 1 %}
+            <a href="/ap/pro_page/?num={{ num }}&userid={{ userid }}&username={{ username }}&userclass={{ userclass }}&ts={{ ts }}">
+                {% if num == page.number %}
+                    <span class="a">{{ num }}</span>
+                    {% else %}
+                    <span class="b">{{ num }}</span>
+                {% endif %}
+            </a>
+            {% elif flag == 2 %}
+            <a href="/ap/pro_chaxun_bycretime/?num={{ num }}&userid={{ userid }}&username={{ username }}&time={{ time }}&userclass={{ userclass }}&ts={{ ts }}">
+                {% if num == page.number %}
+                    <span class="a">{{ num }}</span>
+                    {% else %}
+                    <span class="b">{{ num }}</span>
+                {% endif %}
+            </a>
+            {% elif flag == 3 %}
+            <a href="/ap/pro_chaxun_bycretuser/?num={{ num }}&userid={{ userid }}&username={{ username }}&creatuser={{ creatuser }}&userclass={{ userclass }}&ts={{ ts }}">
+            {% if num == page.number %}
+                    <span class="a">{{ num }}</span>
+                    {% else %}
+                    <span class="b">{{ num }}</span>
+                {% endif %}
+            </a>
+            {% elif flag == 4 %}
+            <a href="/ap/pro_chaxun_byxmjd/?num={{ num }}&userid={{ userid }}&username={{ username }}&xmjd={{ xmjd }}&userclass={{ userclass }}&ts={{ ts }}">
+            {% if num == page.number %}
+                    <span class="a">{{ num }}</span>
+                    {% else %}
+                    <span class="b">{{ num }}</span>
+                {% endif %}
+            </a>
+            {% elif flag == 5 %}
+            <a href="/ap/pro_chaxun_bychargeperson/?num={{ num }}&userid={{ userid }}&username={{ username }}&charperson={{ charperson }}&userclass={{ userclass }}&ts={{ ts }}">
+                {% if num == page.number %}
+                    <span class="a">{{ num }}</span>
+                    {% else %}
+                    <span class="b">{{ num }}</span>
+                {% endif %}
+            </a>
+             {% elif flag == 6 %}
+            <a href="/ap/pro_chaxun_byparticipant/?num={{ num }}&userid={{ userid }}&username={{ username }}&participant={{ participant }}&userclass={{ userclass }}&ts={{ ts }}">
+                {% if num == page.number %}
+                    <span class="a">{{ num }}</span>
+                    {% else %}
+                    <span class="b">{{ num }}</span>
+                {% endif %}
+            </a>
+             {% elif flag == 7 %}
+            <a href="/ap/pro_chaxun_byproname/?num={{ num }}&userid={{ userid }}&username={{ username }}&proname={{ proname }}&userclass={{ userclass }}&ts={{ ts }}">
+                {% if num == page.number %}
+                    <span class="a">{{ num }}</span>
+                    {% else %}
+                    <span class="b">{{ num }}</span>
+                {% endif %}
+            </a>
+            {% elif flag == 8 %}
+            <a href="/ap/pro_chaxun_mohu/?num={{ num }}&userid={{ userid }}&username={{ username }}&proname={{ proname }}&userclass={{ userclass }}&ts={{ ts }}">
+                {% if num == page.number %}
+                    <span class="a">{{ num }}</span>
+                    {% else %}
+                    <span class="b">{{ num }}</span>
+                {% endif %}
+            </a>
+            {% elif flag == 9 %}
+            <a href="/ap/lianhe_query/?num={{ num }}&userid={{ userid }}&username={{ username }}&proname={{ proname }}&userclass={{ userclass }}&ts={{ ts }}&year={{ year }}&yue={{ yue }}&char={{ char }}&par={{ par }}&xmjd={{ lianhexmjd }}">
+                {% if num == page.number %}
+                    <span class="a">{{ num }}</span>
+                    {% else %}
+                    <span class="b">{{ num }}</span>
+                {% endif %}
+            </a>
+        {% endif %}
+    {% endfor %}
+    {% if page.has_next %}{# 是否有下一页 #}
+        {% if flag == 1 %}
+            <a href="/ap/pro_page/?num={{ page.next_page_number }}&userid={{ userid }}&username={{ username }}&userclass={{ userclass }}&ts={{ ts }}">下一页</a> &nbsp;&nbsp;<span>共有{{ page.paginator.count }}条数据</span>&nbsp;&nbsp;指定每页显示条数<input type="text" id="tiaoshu" name="tiaoshu" value="{{ ts }}"><input type="button" value="确定" onclick="ts()">
+        {% elif flag == 2 %}
+            <a href="/ap/pro_chaxun_bycretime/?num={{ page.next_page_number }}&userid={{ userid }}&username={{ username }}&time={{ time }}&userclass={{ userclass }}&ts={{ ts }}">下一页</a>&nbsp;&nbsp;<span>共有{{ page.paginator.count }}条数据</span>&nbsp;&nbsp;指定每页显示条数<input type="text" id="tiaoshu" name="tiaoshu" value="{{ ts }}"><input type="button" value="确定" onclick="ts()">
+            {% elif flag == 3 %}
+            <a href="/ap/pro_chaxun_bycretuser/?num={{ page.next_page_number }}&userid={{ userid }}&username={{ username }}&creatuser={{ creatuser }}&userclass={{ userclass }}&ts={{ ts }}">下一页</a>&nbsp;&nbsp;<span>共有{{ page.paginator.count }}条数据</span>&nbsp;&nbsp;指定每页显示条数<input type="text" id="tiaoshu" name="tiaoshu" value="{{ ts }}"><input type="button" value="确定" onclick="ts()">
+            {% elif flag == 4 %}
+            <a href="/ap/pro_chaxun_byxmjd/?num={{ page.next_page_number }}&userid={{ userid }}&username={{ username }}&xmjd={{ xmjd }}&userclass={{ userclass }}&ts={{ ts }}">下一页</a>&nbsp;&nbsp;<span>共有{{ page.paginator.count }}条数据</span>&nbsp;&nbsp;指定每页显示条数<input type="text" id="tiaoshu" name="tiaoshu" value="{{ ts }}"><input type="button" value="确定" onclick="ts()">
+            {% elif flag == 5 %}
+            <a href="/ap/pro_chaxun_bychargeperson/?num={{ page.next_page_number }}&userid={{ userid }}&username={{ username }}&charperson={{ charperson }}&userclass={{ userclass }}&ts={{ ts }}">下一页</a>&nbsp;&nbsp;<span>共有{{ page.paginator.count }}条数据</span>&nbsp;&nbsp;指定每页显示条数<input type="text" id="tiaoshu" name="tiaoshu" value="{{ ts }}"><input type="button" value="确定" onclick="ts()">
+            {% elif flag == 6 %}
+            <a href="/ap/pro_chaxun_byparticipant/?num={{ page.next_page_number }}&userid={{ userid }}&username={{ username }}&participant={{ participant }}&userclass={{ userclass }}&ts={{ ts }}">下一页</a>&nbsp;&nbsp;<span>共有{{ page.paginator.count }}条数据</span>&nbsp;&nbsp;指定每页显示条数<input type="text" id="tiaoshu" name="tiaoshu" value="{{ ts }}"><input type="button" value="确定" onclick="ts()">
+            {% elif flag == 7 %}
+            <a href="/ap/pro_chaxun_byproname/?num={{ page.next_page_number }}&userid={{ userid }}&username={{ username }}&proname={{ proname }}&userclass={{ userclass }}&ts={{ ts }}">下一页</a>&nbsp;&nbsp;<span>共有{{ page.paginator.count }}条数据</span>&nbsp;&nbsp;指定每页显示条数<input type="text" id="tiaoshu" name="tiaoshu" value="{{ ts }}"><input type="button" value="确定" onclick="ts()">
+            {% elif flag == 8 %}
+            <a href="/ap/pro_chaxun_mohu/?num={{ page.next_page_number }}&userid={{ userid }}&username={{ username }}&proname={{ proname }}&userclass={{ userclass }}&ts={{ ts }}">下一页</a>&nbsp;&nbsp;<span>共有{{ page.paginator.count }}条数据</span>&nbsp;&nbsp;指定每页显示条数<input type="text" id="tiaoshu" name="tiaoshu" value="{{ ts }}"><input type="button" value="确定" onclick="ts()">
+            {% elif flag == 9 %}
+            <a href="/ap/lianhe_query/?num={{ page.next_page_number }}&userid={{ userid }}&username={{ username }}&proname={{ proname }}&userclass={{ userclass }}&ts={{ ts }}&year={{ year }}&yue={{ yue }}&char={{ char }}&par={{ par }}&xmjd={{ lianhexmjd }}">下一页</a>&nbsp;&nbsp;<span>共有{{ page.paginator.count }}条数据</span>&nbsp;&nbsp;指定每页显示条数<input type="text" id="tiaoshu" name="tiaoshu" value="{{ ts }}"><input type="button" value="确定" onclick="ts()">
+        {% endif %}
+    {% else %}
+        <span>共有{{ page.paginator.count }}条数据</span>&nbsp;&nbsp;指定每页显示条数<input type="text" id="tiaoshu" name="tiaoshu" value="{{ ts }}"><input type="button" value="确定" onclick="ts()">
+    {% endif %}
+    {% endif %}
+
+    </div>
+</body>
+</html>
+<script src="{% static 'js/jquery-1.11.1.js' %}"></script>
+<script src="{% static 'js/jquery-1.9.1.min.js' %}"></script>
+<script type="text/javascript">
+
+    $.ajaxSetup({
+            data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
+        })
+
+    function checkAll() {
+    var all = document.getElementById("checkAll");
+
+    if (all.checked == true) {
+        var ones = document.getElementsByName("item");
+        for (var i = 0; i <= ones.length; i++) {
+            ones[i].checked = true;
+        }
+    } else {
+        var ones = document.getElementsByName("item");
+        for (var i = 0; i <= ones.length; i++) {
+            ones[i].checked = false;
+        }
+    }
+}
+
+function checkOne() {
+    var one=document.getElementsByName("item");
+    one.checked=true;
+}
+
+function getValues() {
+    var valArr=[];
+    var ones=document.getElementsByName('item');
+    for (var i=0;i<ones.length;i++){
+        if (ones[i].checked==true){
+            valArr[i]=ones[i].value
+        }
+    }
+    if (valArr.length!=0){
+        $.ajax({
+            url:"{% url 'app:delete_all' %}",
+            type:'POST',
+            contenType:'application/json',
+            traditional:true,
+            async: false,
+            data:{
+                'vals':valArr,
+            },
+            success:function(data){
+                if (data == '1'){
+                    alert("删除成功");
+                    var loguser=$('#loguser').val();
+                    var userclass = $('#userclass').val();
+                    var userid = $('#userid').val();
+                    location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+                }else {
+                   alert("删除失败");
+                }
+            },
+        })
+    }
+    else {
+        var error_m="请选择数据";
+        alert(error_m);
+    }
+}
+    
+    function lianhechaxun() {
+        var year = $('#nian').val();
+        var yue = $('#yue').val();
+        var char = $('#char').val();
+        var par = $('#par').val();
+        var xmjd =$('#lianhexmjd').val();
+        var loguser=$('#loguser').val();
+        var userclass = $('#userclass').val();
+        var userid = $('#userid').val();
+        console.log(year,yue,char,par,xmjd,loguser,userclass,userid);
+        location.href="/ap/lianhe_query/?year="+year+"&yue="+yue+"&char="+char+"&par="+par+"&xmjd="+xmjd+"&username="+loguser+"&userclass="+userclass+"&userid="+userid
+    }
+
+    function lianheproxmjd() {
+        $('#lianhexmjddiv').empty();
+         if($('#lianhexmjddiv').css("display")=="none"){
+            $('#lianhexmjddiv').show();
+            $.ajax({
+            type:'get',
+            url:'{% url 'app:query_proxmjd' %}',
+            success:function (data) {
+                console.log(data['xmjd']);
+                if (data){
+                    {#$('#participantdiv').show()#}
+                    data = data['xmjd'];
+                    for (i=0;i<data.length;i++){
+                        var t = data[i];
+                        $('#lianhexmjddiv').append('<input type="radio" name="lianhexmjd" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#lianhexmjddiv').append('<input type="button" value="确定" onclick="inputlianhexmjd()">')
+                }
+            }
+        })
+        }else{
+            $('#lianhexmjddiv').hide();
+        }
+    }
+
+    function inputlianhexmjd() {
+        var lianhexmjd = $('#lianhexmjddiv input[type="radio"]:checked').val();
+        console.log(lianhexmjd);
+        if (lianhexmjd==undefined){
+            alert('请选择进度再点击确定')
+        }else{
+            $('#lianhexmjd').attr('value',lianhexmjd);
+            $('#lianhexmjddiv').hide();
+        }
+    }
+
+    function lianhepropar() {
+        $('#lianhepardiv').empty();
+         if($('#lianhepardiv').css("display")=="none"){
+            $('#lianhepardiv').show();
+            $.ajax({
+            type:'get',
+            url:'{% url 'app:query_participant' %}',
+            success:function (data) {
+                console.log(data['participant']);
+                if (data){
+                    {#$('#participantdiv').show()#}
+                    data = data['participant'];
+                    for (i=0;i<data.length;i++){
+                        var t = data[i];
+                        $('#lianhepardiv').append('<input type="radio" name="participant" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#lianhepardiv').append('<input type="button" value="确定" onclick="inputlianhepar()">')
+                }
+            }
+        })
+        }else{
+            $('#lianhepardiv').hide();
+        }
+    }
+
+    function inputlianhepar() {
+        var lianhepar = $('#lianhepardiv input[type="radio"]:checked').val();
+        console.log(lianhepar);
+        if (lianhepar==undefined){
+            alert('请先选择参与人再点击确定')
+        }else{
+            $('#par').attr('value',lianhepar);
+            $('#lianhepardiv').hide();
+        }
+    }
+
+    function lianheprochar() {
+        $('#lianhechardiv').empty();
+        if($('#lianhechardiv').css("display")=="none"){
+            $('#lianhechardiv').show();
+            $.ajax({
+            type:'get',
+            url:'{% url 'app:query_charperson' %}',
+            success:function (data) {
+                console.log(data['charperson']);
+                if (data){
+                    {#$('#charpersondiv').show();#}
+                    data = data['charperson'];
+                    for (i=0;i<data.length;i++){
+                        var t = data[i];
+                        $('#lianhechardiv').append('<input type="radio" name="lianheprochar" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#lianhechardiv').append('<input type="button" value="确定" onclick="inputlianhechar()">')
+                }
+            }
+        })
+        }else{
+            $('#lianhechardiv').hide();
+        }
+    }
+
+    function inputlianhechar() {
+        var lianhechar = $('#lianhechardiv input[type="radio"]:checked').val();
+        console.log(lianhechar);
+        if (lianhechar==undefined){
+            alert('请选择负责人再点击确定')
+        }else{
+            $('#char').attr('value',lianhechar);
+            $('#lianhechardiv').hide();
+        }
+    }
+
+    function lianheproyue() {
+        var lianheyear = $('#nian').val();
+        if (lianheyear=='请选择年份'){
+            alert('请先选择年份')
+        }else{
+           $('#lianheyuediv').empty();
+        if($('#lianheyuediv').css("display")=="none"){
+            $('#lianheyuediv').show();
+            $.ajax({
+            data:'year='+lianheyear,
+            type:'get',
+            url:'{% url 'app:query_protime_yue' %}',
+            success:function (data) {
+                console.log(data['yue']);
+                if (data){
+                    {#$('#timediv').show();#}
+                    data = data['yue'];
+                    for (i=0;i<data.length;i++){
+                        var t= data[i];
+                        $('#lianheyuediv').append('<input type="radio" name="lianheprotimeyue" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#lianheyuediv').append('<input type="button" value="确定" onclick="inputlianheyue()">')
+
+                }
+            }
+        })
+        }else{
+            $('#lianheyuediv').hide();
+        }
+        }
+    }
+
+    function inputlianheyue() {
+        var lianheyue = $('#lianheyuediv input[type="radio"]:checked').val();
+        console.log(lianheyue);
+        if (lianheyue==undefined){
+            alert('请选择月份再点击确定')
+        }else{
+            $('#yue').attr('value',lianheyue);
+            $('#lianheyuediv').hide();
+        }
+    }
+
+    function lianheproyear() {
+        $('#lianheyeardiv').empty();
+        if($('#lianheyeardiv').css("display")=="none"){
+            $('#lianheyeardiv').show();
+            $.ajax({
+            type:'get',
+            url:'{% url 'app:query_protime' %}',
+            success:function (data) {
+                console.log(data['time']);
+                if (data){
+                    {#$('#timediv').show();#}
+                    data = data['time'];
+                    for (i=0;i<data.length;i++){
+                        var t= data[i];
+                        $('#lianheyeardiv').append('<input type="radio" name="lianheprotimeyear" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#lianheyeardiv').append('<input type="button" value="确定" onclick="inputlianheyear()">')
+
+                }
+            }
+        })
+        }else{
+            $('#lianheyeardiv').hide();
+        }
+    }
+
+    function inputlianheyear() {
+        var lianheyear = $('#lianheyeardiv input[type="radio"]:checked').val()
+        console.log(lianheyear);
+        if (lianheyear==undefined){
+            alert('请选择年份再点击确定')
+        }else{
+            $('#nian').attr('value',lianheyear)
+            $('#lianheyeardiv').hide();
+        }
+    }
+
+    function xianshi() {
+        $('#mohucha').attr('value','根据项目名称查询')
+    }
+
+    function qingchu() {
+        $('#mohucha').attr('value','')
+    }
+
+    function mohuchaxun() {
+         $('#table tbody').empty();
+        var time = $('#time').val();
+        var userclass = $('#userclass').val();
+        var userid = $('#userid').val();
+        var username = $('#loguser').val();
+       var proname = $('#mohucha').val();
+        if(proname==''){
+            location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+        }else if (proname == '根据项目名称查询'){
+            location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+        }else {
+            location.href="/ap/pro_chaxun_mohu/?proname="+proname+"&userclass="+userclass+"&username="+username
+        }
+    }
+
+    function ts() {
+        var ts = parseInt($('#tiaoshu').val());
+        var flag = $('#flag').val();
+        var username = $('#loguser').val();
+        var userid = $('#userid').val();
+        var userclass = $('#userclass').val();
+        console.log(ts,flag,typeof ts,username,userid,userclass);
+        if (ts==''){
+            alert('请输入每页展示的条数')
+        }else if (ts>=30){
+            alert('每页展示的条数过多，请减少数目')
+        }else {
+            if (flag=='1'){
+                location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass+"&ts="+ts
+            }else if (flag=='2'){
+                var time = $('#cretime').val();
+                location.href="/ap/pro_chaxun_bycretime/?userid="+userid+"&username="+username+"&userclass="+userclass+"&ts="+ts+"&time="+time
+            }else if (flag=='3'){
+                var creatuser=$('#creuser').val();
+                location.href="/ap/pro_chaxun_bycretuser/?userid="+userid+"&username="+username+"&userclass="+userclass+"&ts="+ts+"&creatuser="+creatuser
+            }else if (flag=='4'){
+                var xmjd = $('#proxmjd').val();
+                location.href="/ap/pro_chaxun_byxmjd/?userid="+userid+"&username="+username+"&userclass="+userclass+"&ts="+ts+"&xmjd="+xmjd
+            }else if (flag=='5'){
+                var charperson=$('#procharperson').val();
+                location.href="/ap/pro_chaxun_bychargeperson/?userid="+userid+"&username="+username+"&userclass="+userclass+"&ts="+ts+"&charperson="+charperson
+            }else if (flag=='6'){
+                var participant=$('#proparticipant').val();
+                location.href="/ap/pro_chaxun_byparticipant/?userid="+userid+"&username="+username+"&userclass="+userclass+"&ts="+ts+"&participant="+participant
+            }else if (flag=='7'){
+                var proname = $('#pronameinput').val();
+                location.href="/ap/pro_chaxun_byproname/?userid="+userid+"&username="+username+"&userclass="+userclass+"&ts="+ts+"&proname="+proname
+            }else if (flag=='8'){
+                var proname = $('#mohuproname').val();
+                location.href="/ap/pro_chaxun_mohu/?userid="+userid+"&username="+username+"&userclass="+userclass+"&ts="+ts+"&proname="+proname
+            }else if (flag == '9'){
+                var year = $('#lianhenian').val();
+                var yue = $('#lianheyue').val();
+                var char = $('#lianhechar').val();
+                var par = $('#lianhepar').val();
+                var xmjd=$('#lianhejd').val();
+                location.href="/ap/lianhe_query/?year="+year+"&yue="+yue+"&char="+char+"&par="+par+"&xmjd="+xmjd+"&username="+loguser+"&userclass="+userclass+"&userid="+userid+"&ts="+ts
+            }
+        }
+    }
+
+    function pro_name() {
+        $('#pronamediv').empty();
+         if($('#pronamediv').css("display")=="none"){
+            $('#pronamediv').show();
+            $.ajax({
+            type:'get',
+            url:'{% url 'app:query_proname' %}',
+            success:function (data) {
+                console.log(data['proname'])
+                if (data){
+                    {#$('#pronamediv').show()#}
+                    data = data['proname']
+                    for (i=0;i<data.length;i++){
+                        var t = data[i]
+                        $('#pronamediv').append('<input type="checkbox" name="proname" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#pronamediv').append('<input type="button" value="筛选" onclick="pro_proname()">')
+                }
+
+            }
+        })
+        }else{
+            $('#pronamediv').hide();
+        }
+
+    }
+
+    function pro_jd() {
+        $('#xmjddiv').empty();
+         if($('#xmjddiv').css("display")=="none"){
+            $('#xmjddiv').show();
+            $.ajax({
+            type:'get',
+            url:'{% url 'app:query_proxmjd' %}',
+            success:function (data) {
+                console.log(data['xmjd'])
+                if (data){
+                    {#$('#xmjddiv').show()#}
+                    data = data['xmjd']
+                    for (i=0;i<data.length;i++){
+                        var t = data[i]
+                        $('#xmjddiv').append('<input type="checkbox" name="proxmjd" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#xmjddiv').append('<input type="button" value="筛选" onclick="pro_xmjd()">')
+                }
+            }
+        })
+        }else{
+            $('#xmjddiv').hide();
+        }
+
+    }
+
+    function pro_participant() {
+         $('#participantdiv').empty();
+         if($('#participantdiv').css("display")=="none"){
+            $('#participantdiv').show();
+            $.ajax({
+            type:'get',
+            url:'{% url 'app:query_participant' %}',
+            success:function (data) {
+                console.log(data['participant']);
+                if (data){
+                    {#$('#participantdiv').show()#}
+                    data = data['participant'];
+                    for (i=0;i<data.length;i++){
+                        var t = data[i];
+                        $('#participantdiv').append('<input type="checkbox" name="participant" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#participantdiv').append('<input type="button" value="筛选" onclick="pro_byparticipant()">')
+                }
+            }
+        })
+        }else{
+            $('#participantdiv').hide();
+        }
+
+    }
+
+    function pro_charperson() {
+        $('#charpersondiv').empty();
+        if($('#charpersondiv').css("display")=="none"){
+            $('#charpersondiv').show();
+            $.ajax({
+            type:'get',
+            url:'{% url 'app:query_charperson' %}',
+            success:function (data) {
+                console.log(data['charperson']);
+                if (data){
+                    {#$('#charpersondiv').show();#}
+                    data = data['charperson'];
+                    for (i=0;i<data.length;i++){
+                        var t = data[i];
+                        $('#charpersondiv').append('<input type="checkbox" name="charperson" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#charpersondiv').append('<input type="button" value="筛选" onclick="pro_bycharperson()">')
+                }
+            }
+        })
+        }else{
+            $('#charpersondiv').hide();
+        }
+
+    }
+
+    function pro_person() {
+        $('#persondiv').empty();
+        if($('#persondiv').css("display")=="none"){
+            $('#persondiv').show();
+            $.ajax({
+            type:'get',
+            url:'{% url 'app:query_properson' %}',
+            success:function (data) {
+                console.log(data['person']);
+                if (data){
+                    {#$('#persondiv').show();#}
+                    data = data['person'];
+                    for (i=0;i<data.length;i++){
+                        var t = data[i];
+                        $('#persondiv').append('<input type="checkbox" name="properson" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#persondiv').append('<input type="button" value="筛选" onclick="pro_cretuser()">')
+                }
+            }
+        })
+        }else{
+            $('#persondiv').hide();
+        }
+
+    }
+
+     function pro_time() {
+        $('#timediv').empty();
+        if($('#timediv').css("display")=="none"){
+            $('#timediv').show();
+            $.ajax({
+            type:'get',
+            url:'{% url 'app:query_protime' %}',
+            success:function (data) {
+                console.log(data['time']);
+                if (data){
+                    {#$('#timediv').show();#}
+                    data = data['time'];
+                    for (i=0;i<data.length;i++){
+                        var t= data[i];
+                        $('#timediv').append('<input type="checkbox" name="protime" value="'+t+'">'+t+' <br>')
+                    }
+                    $('#timediv').append('<input type="button" value="筛选" onclick="pro_cretime()">')
+
+                }
+            }
+        })
+        }else{
+            $('#timediv').hide();
+        }
+
+}
+
+function pro_proname() {
+     $('#table tbody').empty();
+    var time = $('#time').val();
+    var userclass = $('#userclass').val();
+    var username = $('#loguser').val();
+    var userid = $('#userid').val();
+   var proname = $('#pronamediv input[type="checkbox"]:checked').map(function (index, elem) {
+        return $(elem).val()
+    }).get().join(',');
+    if (proname){
+        var loguser = $('#loguser').val();
+        location.href="/ap/pro_chaxun_byproname/?proname="+proname+"&userclass="+userclass+"&username="+username
+    }else {
+        alert('请选择项目');
+        location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+    }
+}
+
+function pro_byparticipant() {
+     $('#table tbody').empty();
+    var time = $('#time').val();
+    var userclass = $('#userclass').val();
+    var username = $('#loguser').val();
+    var userid = $('#userid').val();
+   var participant = $('#participantdiv input[type="checkbox"]:checked').map(function (index, elem) {
+        return $(elem).val()
+    }).get().join(',');
+    if (participant){
+        var loguser = $('#loguser').val();
+        location.href="/ap/pro_chaxun_byparticipant/?participant="+participant+"&userclass="+userclass+"&username="+username
+    }else {
+        alert('请选择参与人');
+        location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+    }
+}
+
+function pro_bycharperson() {
+     $('#table tbody').empty();
+    var time = $('#time').val();
+    var userclass = $('#userclass').val();
+    var username = $('#loguser').val();
+    var userid = $('#userid').val();
+   var charperson = $('#charpersondiv input[type="checkbox"]:checked').map(function (index, elem) {
+        return $(elem).val()
+    }).get().join(',');
+   if (charperson){
+        var loguser = $('#loguser').val();
+        location.href="/ap/pro_chaxun_bychargeperson/?charperson="+charperson+"&userclass="+userclass+"&username="+username
+   }else {
+       alert('请选择负责人');
+       location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+   }
+}
+
+function pro_xmjd() {
+    $('#table tbody').empty();
+    var time = $('#time').val();
+    var userclass = $('#userclass').val();
+    var username = $('#loguser').val();
+    var userid = $('#userid').val();
+    var xmjd = $('#xmjddiv input[type="checkbox"]:checked').map(function (index, elem) {
+        return $(elem).val()
+    }).get().join(',');
+    if (xmjd){
+        var loguser = $('#loguser').val();
+        location.href = "/ap/pro_chaxun_byxmjd/?xmjd=" + xmjd + "&userclass=" + userclass+"&username="+username
+    }else {
+        alert('请选择项目进度');
+        location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+    }
+}
+
+function pro_cretuser() {
+    $('#table tbody').empty();
+    $('#timediv ').empty();
+    var time = $('#time').val();
+     var userclass = $('#userclass').val();
+     var username = $('#loguser').val();
+     var userid = $('#userid').val();
+    var person = $('#persondiv input[type="checkbox"]:checked').map(function (index, elem) {
+        return $(elem).val()
+    }).get().join(',');
+    if (person){
+        var loguser = $('#loguser').val();
+        location.href="/ap/pro_chaxun_bycretuser/?creatuser="+person+"&userclass="+userclass+"&username="+username
+    }else{
+        alert('请选择处理人');
+        location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+    }
+}
+
+function pro_cretime() {
+    $('#table tbody').empty();
+    $('#persondiv').empty();
+    var userclass = $('#userclass').val();
+    var username = $('#loguser').val();
+    var userid = $('#userid').val();
+     var time = $('#timediv input[type="checkbox"]:checked').map(function (index,elem) {
+            return $(elem).val()
+        }).get().join(',');
+     if (time){
+         location.href="/ap/pro_chaxun_bycretime/?time="+time+"&userclass="+userclass+"&username="+username
+     }else {
+         alert('请选择创建时间');
+         location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+     }
+}
+
+function crepro() {
+    var userclass = $('#userclass').val();
+    var username = $('#loguser').val();
+    var userid = $('#userid').val();
+    console.log(userclass,username,userid);
+    if (userclass==='True'){
+        location.href="/ap/create_pro_page/?username="+username+"&userclass="+userclass+"&userid="+userid
+    }else{
+        alert('您没有权限创建项目')
+    }
+}
+</script>

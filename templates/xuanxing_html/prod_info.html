@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+    <div>
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>厂商明细显示</legend>
+        </fieldset>
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品类型</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" disabled="value" autocomplete="off" placeholder=""
+                           class="layui-input" id="pd_type" value="{{ product_info.0 }}">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">产品子类</label>
+                <div class="layui-input-block">
+                    <input type="tel" name="phone" disabled="value" autocomplete="off" class="layui-input"
+                           id="pd_sm_cls" value="{{ product_info.1 }}">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">产品名称</label>
+                <div class="layui-input-block">
+                    <input type="tel" name="phone" autocomplete="off" class="layui-input"
+                           id="pd_name" value="{{ product_info.3 }}">
+                </div>
+            </div>
+
+            <div class="layui-form-item" style="margin-top: 15px">
+                <label class="layui-form-label">厂商名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="username" placeholder=""
+                           autocomplete="off" class="layui-input" id="vend_name" value="{{ product_info.2 }}">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">厂商策略</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder=""
+                           class="layui-input" id="vend_strategy" value="{{ product_info.4 }}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">主要技术指标</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder=""
+                           class="layui-input" id="main_index" value="{{ product_info.7 }}">
+                </div>
+            </div>
+{#            <div class="layui-form-item">#}
+{#                <label class="layui-form-label">应用场景</label>#}
+{#                <div class="layui-input-block">#}
+{#                    <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder=""#}
+{#                           class="layui-input" id="apply_scene" value="{{ product_info.8 }}">#}
+{#                </div>#}
+{#            </div>#}
+
+
+{#            <div class="layui-inline">#}
+{#                <label class="layui-form-label">性能分类</label>#}
+{#                <div class="layui-input-inline">#}
+{#                    <input type="text" name="email" autocomplete="off" class="layui-input"#}
+{#                           id="performance_type" value="{{ product_info.6 }}">#}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="layui-inline">#}
+{#                <label class="layui-form-label">建议生产环境使用年限</label>#}
+{#                <div class="layui-input-inline">#}
+{#                    <input type="text" name="email" lay-verify="email" autocomplete="off" class="layui-input"#}
+{#                           id="work_years" value="{{ product_info.10 }}">#}
+{#                </div>#}
+{#            </div>#}
+
+
+{#            <div class="layui-form-item">#}
+{#                <div class="layui-inline">#}
+{#                    <label class="layui-form-label">生命周期状态</label>#}
+{#                    <div class="layui-input-inline">#}
+{#                        <input type="text" name="number" lay-verify="required|number" autocomplete="off"#}
+{#                               class="layui-input" id="lifecycle" value="{{ product_info.5 }}">#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div class="layui-inline">#}
+{#                    <label class="layui-form-label">部署范围</label>#}
+{#                    <div class="layui-input-inline">#}
+{#                        <input type="text" name="date" lay-verify="date" placeholder="" autocomplete="off"#}
+{#                               class="layui-input" id="work_scope" value="{{ product_info.9 }}">#}
+{#                    </div>#}
+{#                </div>#}
+
+{#            </div>#}
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <input type="text" name="identity" placeholder="" autocomplete="off"
+                           class="layui-input" id="mark_info" value="{{ product_info.11 }}">
+                </div>
+            </div>
+
+        </form>
+
+        <input type="text" value="{{ obj_id }}" id="obj_id" style="display: none">
+        <input type="text" value="{{ big_cls }}" id="big_cls" style="display: none">
+
+        <button type="button" class="layui-btn layui-btn-radius score_button layui-bg-black"
+                style="display: inline-block; margin-left: 30px" id="save_prod_info">
+            保存
+        </button>
+    </div>
+</div>
+
+<script>
+    $("#save_prod_info").click(function () {
+
+        $.post("/xuanxing/prod_save/", {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            pd_name: $("#pd_name").val(),
+            vend_name: $("#vend_name").val(),
+            vend_strategy: $("#vend_strategy").val(),
+            main_index: $("#main_index").val(),
+            // apply_scene: $("#apply_scene").val(),
+            //performance_type: $("#performance_type").val(),
+            //work_years: $("#work_years").val(),
+            //lifecycle: $("#lifecycle").val(),
+            //work_scope: $("#work_scope").val(),
+            mark_info: $("#mark_info").val(),
+            obj_id: $("#obj_id").val(),
+            big_cls: $("#big_cls").val()
+
+        }, function (res) {
+            if (res["code"] == "0000") {
+                layer.alert("操作成功", {icon: 6}, function () {
+                    // 获得frame索引
+                    let index = parent.layer.getFrameIndex(window.name);
+                    //关闭当前frame
+                    parent.layer.close(index);
+                });
+            }
+        })
+    })
+</script>
+
+</body>
+
+</html>

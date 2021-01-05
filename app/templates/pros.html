@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h3 style="text-align:left;background: #74A8F5">项目看板</h3>
+<input type="hidden" id="loguser" name="loguser" value="{{ username }}">
+<input type="hidden" id="userclass" name="userclass" value="{{ userclass }}">
+<input type="hidden" id="userid" name="userid" value="{{ userid }}">
+<div id="pro" style="width: auto;float: left">
+    {#    可选择年份查询项目<input id="time" type="date" name="time"><input type="button" value="查询" onclick="pro()">#}
+    {% if userclass  == '1' %}
+        <input style="background: #74A8F5;font-size: 20px;" type="button" onclick="crepro()" value="创建项目">
+    {% endif %}
+
+    <table id="table" border="1" cellspacing="0" style="text-align: center;display:none">
+        <thead>
+
+        <tr>
+            <td>项目名称</td>
+            <td id="time" style="position: relative">项目创建时间 <select name="" id="" onclick="pro_time()"></select>
+                <div id="timediv" style="display: none;position: absolute;background: #74A8F5">
+                    {#                            <input type="checkbox" name="protime" value="">2022 <br>#}
+                    {#                            <input type="button" value="点击筛选" onclick="pro_cretime()"> <br>#}
+                </div>
+            </td>
+            <td id="person" style="position: relative">处理人 <select name="" id="" onclick="pro_person()"></select>
+                <div id="persondiv" style="display: none;position: absolute;background: #74A8F5">
+                    {#                            <input type="checkbox" name="properson" value="">2022 <br>#}
+                    {#                            <input type="button" value="点击筛选" onclick="pro_cretuser()"> <br>#}
+                </div>
+            </td>
+            <td id="charperson" style="position: relative">负责人 <select name="" id=""
+                                                                       onclick="pro_charperson()"></select>
+                <div id="charpersondiv" style="display: none;position: absolute;background: #74A8F5">
+                    {#                            <input type="checkbox" name="properson" value="">2022 <br>#}
+                    {#                            <input type="button" value="点击筛选" onclick="pro_charperson()"> <br>#}
+                </div>
+            </td>
+            <td>参与人</td>
+            <td id="xmjd" style="position: relative">项目进度 <select name="" id="" onclick="pro_jd()"></select>
+                <div id="xmjddiv" style="display: none;position: absolute;background: #74A8F5;width: auto">
+                    {#                            <input type="checkbox" name="proxmjd" value="">2022 <br>#}
+                    {#                            <input type="button" value="点击筛选" onclick="pro_xmjd()"> <br>#}
+                </div>
+            </td>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        {% for user in Users %}
+            <tr>
+                {#                <td>时间：{{ user.input_set.all.0.pub_date }} 项目名称：{{ user.input_set.all.0.mark }} 编辑人：{{ user.username }}</td>#}
+                <td>{{ user.input_set.all.0.pub_date }}</td>
+                <td>{{ user.input_set.all.0.mark }} </td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.username }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{#    <div>#}
+{#        <input style="background: #74A8F5;font-size: 20px;float: left" type="button" onclick="crepro()" value="创建项目">#}
+{#    </div>#}
+
+</body>
+<script src="{% static 'js/jquery-1.11.1.js' %}"></script>
+<script type="text/javascript">
+
+    function pro_charperson() {
+        $('#charpersondiv').empty()
+        $.ajax({
+            type: 'get',
+            url: '{% url 'app:query_charperson' %}',
+            success: function (data) {
+                console.log(data['charperson'])
+                if (data) {
+                    $('#charpersondiv').show()
+                    data = data['charperson']
+                    for (i = 0; i < data.length; i++) {
+                        var t = data[i]
+                        $('#charpersondiv').append('<input type="checkbox" name="charperson" value="' + t + '">' + t + ' <br>')
+                    }
+                    $('#charpersondiv').append('<input type="button" value="点击筛选" onclick="pro_charperson()">')
+                }
+            }
+        })
+    }
+
+    function pro_jd() {
+        $('#xmjddiv').empty()
+        $.ajax({
+            type: 'get',
+            url: '{% url 'app:query_proxmjd' %}',
+            success: function (data) {
+                console.log(data['xmjd'])
+                if (data) {
+                    $('#xmjddiv').show()
+                    data = data['xmjd']
+                    for (i = 0; i < data.length; i++) {
+                        var t = data[i]
+                        $('#xmjddiv').append('<input type="checkbox" name="proxmjd" value="' + t + '">' + t + ' <br>')
+                    }
+                    $('#xmjddiv').append('<input type="button" value="点击筛选" onclick="pro_xmjd()">')
+                }
+            }
+        })
+    }
+
+    function pro_person() {
+        $('#persondiv').empty()
+        $.ajax({
+            type: 'get',
+            url: '{% url 'app:query_properson' %}',
+            success: function (data) {
+                console.log(data['person'])
+                if (data) {
+                    $('#persondiv').show();
+                    data = data['person']
+                    for (i = 0; i < data.length; i++) {
+                        var t = data[i]
+                        $('#persondiv').append('<input type="checkbox" name="properson" value="' + t + '">' + t + ' <br>')
+                    }
+                    $('#persondiv').append('<input type="button" value="点击筛选" onclick="pro_cretuser()">')
+                }
+            }
+        })
+    }
+
+    function pro_time() {
+        $('#timediv').empty()
+        $.ajax({
+            type: 'get',
+            url: '{% url 'app:query_protime' %}',
+            success: function (data) {
+                console.log(data['time'])
+                if (data) {
+                    $('#timediv').show();
+                    data = data['time']
+                    for (i = 0; i < data.length; i++) {
+                        var t = data[i]
+                        $('#timediv').append('<input type="checkbox" name="protime" value="' + t + '">' + t + ' <br>')
+                    }
+                    $('#timediv').append('<input type="button" value="点击筛选" onclick="pro_cretime()">')
+
+                }
+            }
+        })
+
+    }
+
+
+    function crepro() {
+        var userclass = $('#userclass').val();
+        var username = $('#loguser').val();
+        console.log(userclass, username);
+        if (userclass === '1') {
+            location.href = "/ap/create_pro_page/?username=" + username
+        } else {
+            alert('您没有权限创建项目')
+        }
+    }
+
+
+    function pro_cretime() {
+        $('#table tbody').empty();
+        $('#persondiv').empty();
+        let time = $('#timediv input[type="checkbox"]:checked').map(function (index, elem) {
+            return $(elem).val()
+        }).get().join(',');
+        alert('您选中的年份是：' + time);
+        let loguser = $('#loguser').val();
+
+        $.ajax({
+            type: 'get',
+            url: '{% url 'app:pro_chaxun_bycretime' %}',
+            data: 'time=' + time,
+            dataType: 'json',
+            success: function (data) {
+                if (data === 0) {
+                    alert('根据输入的年份没有查询到信息')
+                } else {
+                    var data = data['pros'];
+                    console.log(data.length, data);
+                    for (i = 0; i < data.length; i++) {
+                        for (a = 0; a < data[i].length; a++) {
+                            var uname = data[i][a]['chargeperson'];
+                            var participant = data[i][a]['participant'];
+                            var mark = data[i][a]['proname'];
+                            var reg = /-/g;
+                            var pud_date = data[i][a]['createtime'];
+                            pud_date = pud_date.replace(reg, '.');
+                            var xmjd = data[i][a]['prostatus'];
+                            var userid = $('#userid').val();
+                            var proid = data[i][a]['id'];
+                            var creatuser = data[i][a]['createprouser'];
+                            var userclass = $('#userclass').val();
+                            console.log(uname, mark, pud_date, xmjd, userid, proid, creatuser, userclass);
+                            {#$('#table').append("<tr><td>时间："+pud_date+" 项目名称："+mark+" 编辑人："+uname+"项目进度："+xmjd+"</td></tr>")#}
+                            if (userclass == '1') {
+                                if (xmjd == '未启动') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '需求整理') {
+                                    $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试方案准备') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试环境准备') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试中') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</a></td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '准备测试报告') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td></tr>")
+                                }
+                            } else {
+                                if (uname.indexOf(loguser) == -1 && participant.indexOf(loguser) == -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#'style=\"color: #6C6C6C\" >" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#'style=\"color: #6C6C6C\" >" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    }
+                                } else if (uname.indexOf(loguser) != -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + " ' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    }
+                                } else if (uname.indexOf(loguser) == -1 && participant.indexOf(loguser) != -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + " ' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+        });
+        $('#timediv ').empty()
+    }
+
+    function pro_cretuser() {
+        $('#table tbody').empty();
+        $('#timediv ').empty();
+        let time = $('#time').val();
+        let person = $('#persondiv input[type="checkbox"]:checked').map(function (index, elem) {
+            return $(elem).val()
+        }).get().join(',');
+        alert('您选中的处理人是：' + person);
+        let loguser = $('#loguser').val();
+        $.ajax({
+            type: 'get',
+            url: '{% url 'app:pro_chaxun_bycretuser' %}',
+            data: 'cretuser=' + person,
+            dataType: 'json',
+            success: function (data) {
+                if (data === 0) {
+                    alert('根据创建人没有查询到信息')
+                } else {
+                    var data = eval(data)['pros'];
+                    console.log(data);
+                    for (i = 0; i < data.length; i++) {
+                        for (a = 0; a < data[i].length; a++) {
+                            var uname = data[i][a]['chargeperson'];
+                            var participant = data[i][a]['participant'];
+                            var mark = data[i][a]['proname'];
+                            var reg = /-/g;
+                            var pud_date = data[i][a]['createtime'];
+                            pud_date = pud_date.replace(reg, '.');
+                            var xmjd = data[i][a]['prostatus'];
+                            var userid = $('#userid').val();
+                            var proid = data[i][a]['id'];
+                            var creatuser = data[i][a]['createprouser'];
+                            var userclass = $('#userclass').val();
+                            console.log(uname, mark, pud_date, xmjd, userid, proid, creatuser, userclass);
+                            {#$('#table').append("<tr><td>时间："+pud_date+" 项目名称："+mark+" 编辑人："+uname+"项目进度："+xmjd+"</td></tr>")#}
+                            if (userclass == '1') {
+                                if (xmjd == '未启动') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '需求整理') {
+                                    $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试方案准备') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试环境准备') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试中') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</a></td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '准备测试报告') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td></tr>")
+                                }
+                            } else {
+                                if (uname.indexOf(loguser) == -1 && participant.indexOf(loguser) == -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#'style=\"color: #6C6C6C\" >" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#'style=\"color: #6C6C6C\" >" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    }
+                                } else if (uname.indexOf(loguser) != -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + " ' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    }
+                                } else if (uname.indexOf(loguser) == -1 && participant.indexOf(loguser) != -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + " ' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+        });
+        $('#persondiv').empty()
+    }
+
+    function pro_xmjd(a) {
+        $('#table tbody').empty();
+        var time = $('#time').val();
+        var xmjd = $('#xmjddiv input[type="checkbox"]:checked').map(function (index, elem) {
+            return $(elem).val()
+        }).get().join(',');
+        alert('您选中的项目进度是：' + xmjd);
+        var loguser = $('#loguser').val();
+        $.ajax({
+            type: 'get',
+            url: '{% url 'app:pro_chaxun_byxmjd' %}',
+            data: 'xmjd=' + xmjd,
+            dataType: 'json',
+            success: function (data) {
+                if (data === 0) {
+                    alert('根据项目进度没有查询到信息')
+                } else {
+                    var data = eval(data)['pros'];
+                    console.log(data);
+                    for (i = 0; i < data.length; i++) {
+                        for (a = 0; a < data[i].length; a++) {
+                            var uname = data[i][a]['chargeperson'];
+                            var participant = data[i][a]['participant'];
+                            var mark = data[i][a]['proname'];
+                            var reg = /-/g;
+                            var pud_date = data[i][a]['createtime'];
+                            pud_date = pud_date.replace(reg, '.');
+                            var xmjd = data[i][a]['prostatus'];
+                            var userid = $('#userid').val();
+                            var proid = data[i][a]['id'];
+                            var creatuser = data[i][a]['createprouser'];
+                            var userclass = $('#userclass').val();
+                            console.log(uname, mark, pud_date, xmjd, userid, proid, creatuser, userclass);
+                            {#$('#table').append("<tr><td>时间："+pud_date+" 项目名称："+mark+" 编辑人："+uname+"项目进度："+xmjd+"</td></tr>")#}
+                            if (userclass == '1') {
+                                if (xmjd == '未启动') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '需求整理') {
+                                    $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试方案准备') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试环境准备') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试中') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</a></td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '准备测试报告') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td></tr>")
+                                }
+                            } else {
+                                if (uname.indexOf(loguser) == -1 && participant.indexOf(loguser) == -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#'style=\"color: #6C6C6C\" >" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#'style=\"color: #6C6C6C\" >" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    }
+                                } else if (uname.indexOf(loguser) != -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + " ' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    }
+                                } else if (uname.indexOf(loguser) == -1 && participant.indexOf(loguser) != -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + " ' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    }
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+            }
+
+        })
+        $('#xmjddiv').empty()
+    }
+
+    window.onload = function () {
+        $('#table tbody').empty();
+        {#var myDate = new Date();#}
+        {#var year=myDate.getFullYear();#}
+        {#console.log(year);#}
+        $.ajax({
+            type: 'get',
+            url: '{% url 'app:pro_chaxun_bycretime' %}',
+            {#data:'time='+year,#}
+            dataType: 'json',
+            success: function (data) {
+                if (data === 0) {
+                    alert('没有查询到信息')
+                } else {
+                    $('#table').css("display", "block");
+                    var data = eval(data)['pros'];
+                    console.log(data);
+                    for (i = 0; i < data.length; i++) {
+                        for (a = 0; a < data[i].length; a++) {
+                            var uname = data[i][a]['chargeperson'];
+                            var participant = data[i][a]['participant'];
+                            var mark = data[i][a]['proname'];
+                            var reg = /-/g;
+                            var pud_date = data[i][a]['createtime'];
+                            pud_date = pud_date.replace(reg, '.');
+                            {#var date= new Date(Date.parse(pud_date.replace(/-/g,  ".")));#}
+                            var xmjd = data[i][a]['prostatus'];
+                            var proid = data[i][a]['id'];
+                            var userid = $('#userid').val();
+                            var loguser = $('#loguser').val();
+                            var creatuser = data[i][a]['createprouser'];
+                            var userclass = $('#userclass').val();
+                            console.log(uname, typeof participant, participant, mark, typeof pud_date, pud_date, xmjd, userid, proid, loguser, userclass);
+                            if (userclass == '1') {
+                                if (xmjd == '未启动') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '需求整理') {
+                                    $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试方案准备') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试环境准备') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '测试中') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</a></td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else if (xmjd == '准备测试报告') {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td></tr>")
+                                } else {
+                                    $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td></tr>")
+                                }
+                            } else {
+                                if (uname.indexOf(loguser) == -1 && participant.indexOf(loguser) == -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='#' style=\"color: #6C6C6C\">" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#'style=\"color: #6C6C6C\" >" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='#'style=\"color: #6C6C6C\" >" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='' style=\"color: #6C6C6C\">进入测试报告系统</a></td></tr>")
+                                    }
+                                } else if (uname.indexOf(loguser) != -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + " ' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td><a href='/ap/update_pro_page/?proname=" + mark + "&status=" + xmjd + "&loguser=" + loguser + "' style=\"color: #00BB00\">" + xmjd + "</a></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='/ap/configpro/?proname=" + mark + "&loguser=" + loguser + "' style=\"color: #00BB00\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    }
+                                } else if (uname.indexOf(loguser) == -1 && participant.indexOf(loguser) != -1) {
+                                    if (xmjd == '未启动') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + " ' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '需求整理') {
+                                        $('#table tbody').append("<tr><td>" + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试方案准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试环境准备') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '测试中') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td> <td>" + creatuser + "</td><td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else if (xmjd == '准备测试报告') {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#ADADAD\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    } else {
+                                        $('#table tbody').append("<tr><td> " + mark + "</td><td>" + pud_date + "</td><td>" + creatuser + "</td> <td>" + uname + "</td><td>" + participant + "</td><td>" + xmjd + "</td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td bgcolor=\"#53FF53\" style=\"width:10px\"></td><td><a href='' style=\"color: #6C6C6C\">配置项目</a></td><td><a href='/ap/select/?userid=" + userid + "&proid=" + proid + "&proname=" + mark + "' style=\"color: #00BB00\">进入测试报告系统</a></td></tr>")
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        {#$.ajax({#}
+        {#        type:'get',#}
+        {#        url:{% url 'query_pro' %},#}
+        {#        success:function (data) {#}
+        {#            if (data){#}
+        {#                var data = eval(data)['pros'];#}
+        {#                for (i=0;i<data.length;i++){#}
+        {#                    var proname = data[i]['proname'];#}
+        {#                    console.log(proname);#}
+        {#                    $('#itemlist').append('<option>'+proname+'</option>')#}
+        {#                }#}
+        {#            }#}
+        {#        }#}
+        {#    })#}
+    }
+
+
+</script>
+</html>

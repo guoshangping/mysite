@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件上传页面</title>
+</head>
+<body>
+<form action='/download/' enctype="multipart/form-data" method='POST'  target="uploader1" >
+    {% csrf_token %}
+    {{ form }}
+    <input type='file' name="file">
+<button>提交</button>
+</form>
+<iframe name='upload' id='uploader1'></iframe>
+</body>
+</html>

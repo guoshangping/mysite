@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<style>
+    .xuanxing_button {
+        height: 30px;
+        text-align: center;
+        line-height: 30px
+    }
+
+</style>
+<style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+</style>
+
+<body>
+
+<div>
+    <br><br>
+    <label class="layui-form-label" style="width: 100px">请选择季度</label>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <select style="height: 30px;width: 180px;border: 1px solid deepskyblue;direction: ltr;"
+            class="quarter_select">
+        {% for qa in quarter_all %}
+            <option value="">{{ qa }}</option>
+        {% endfor %}
+
+    </select>
+
+    <button type="button" class="layui-btn layui-btn-radius"
+            style="display: inline-block; background-color: deepskyblue;margin-left: 20px;" id="download_score_excel">下载评分结果表</button>
+
+</div>
+
+
+<div>
+    <br><br>
+    <label class="layui-form-label" style="width: 100px">请选择事项类型</label>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block; background-color: deepskyblue"
+            id="xuanxing_test">选型测试
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block; background-color: deepskyblue" id="work">专项工作
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block; background-color: deepskyblue"
+            id="contribution">对处室的贡献
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block;background-color: deepskyblue" id="add_score">
+        加分项
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block;background-color: deepskyblue"
+            id="minus_score">扣分项
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block;background-color: deepskyblue"
+            id="show_all">显示全部
+    </button>
+</div>
+<hr>
+<br><br>
+<div id="score_sys">
+    {% csrf_token %}
+    <div style="margin-bottom: 50px;">
+        <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">最终分数</span>
+        <span style="display: inline-block;margin-left: 190px;">戴路</span>
+        <span class="score"
+              style="color:deepskyblue;width: 45px;border: 1px solid deepskyblue;display: inline-block;margin-right: 5px;">{{ sum_score_list.0 }}</span>
+        <span style="display: inline-block;">张勇</span>
+        <span class="score"
+              style="color:deepskyblue;width: 45px;border: 1px solid deepskyblue;display: inline-block;margin-right: 5px;">{{ sum_score_list.1 }}</span>
+        <span style="display: inline-block;">倪海波</span>
+        <span class="score"
+              style="color:deepskyblue;width: 45px;border: 1px solid deepskyblue;display: inline-block;margin-right: 5px;">{{ sum_score_list.2 }}</span>
+        <span style="display: inline-block;">姜炜</span>
+        <span class="score"
+              style="color:deepskyblue;width: 45px;border: 1px solid deepskyblue;display: inline-block;margin-right: 5px;">{{ sum_score_list.3 }}</span>
+        <span style="display: inline-block;">王超</span>
+        <span class="score"
+              style="color:deepskyblue;width: 45px;border: 1px solid deepskyblue;display: inline-block;margin-right: 5px;">{{ sum_score_list.4 }}</span>
+        <span style="display: inline-block;">杨博</span>
+        <span class="score"
+              style="color:deepskyblue;width: 45px;border: 1px solid deepskyblue;display: inline-block;margin-right: 5px;">{{ sum_score_list.5 }}</span>
+        {#        <button type="button" class="layui-btn layui-btn-radius"#}
+        {#                style="display: inline-block; background-color: deepskyblue;height: 30px;"#}
+        {#                onclick="save_final_score(this)">保存#}
+        {#        </button>#}
+        {#        <button type="button" class="layui-btn layui-btn-radius"#}
+        {#                style="display: inline-block; background-color: deepskyblue;height: 30px;" id="clear_final">清空#}
+        {#        </button>#}
+        <button type="button" class="layui-btn layui-btn-radius"
+                style="display: inline-block; background-color: deepskyblue;height: 30px;" id="flush_pj">刷新
+        </button>
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">选型测试</div>
+        {% for xx_item in xuanxing_list %}
+            <div class="xuanxing_normal" style="margin-bottom: 50px;">
+                <div class="layui-input-inline jichu">
+                    <span style="width: 100px;font-size: 20px;color: #01AAED;margin-left: 35px;">{{ xx_item.1 }}</span>
+                    <div class="layui-input-inline jichu_score">
+                        <span style="width: 120px;display: inline-block;margin-left: 40px;">测试环境复杂系数(</span>
+                        <span class="hj_score">{{ xx_item.2 }}</span>
+                        <span style="margin-right: 40px;">)</span>
+                        <span style="width: 100px;display: inline-block">测试案例系数(</span>
+                        <span class="anli_score">{{ xx_item.3 }}</span>
+                        <span style="margin-right: 40px;">)</span>
+                        <span style="width: 100px;display: inline-block">测试规模系数(</span>
+                        <span class="guimo_score">{{ xx_item.4 }}</span>
+                        <span style="margin-right: 40px;">)</span>
+                        {% for xxx in xx_item.9 %}
+                            <span style="color: dodgerblue">{{ xxx.0 }}(</span>
+                            <span class="join_percent">{{ xxx.1 }}</span> <span>%)</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <br><br>
+                <div class="layui-input-inline zhiliang">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">质量</span>
+                    <span style="width: 85px;display: inline-block">上报分(10)</span>
+                    <span style="width: 100px;display: inline-block"></span>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">戴路</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.0.0 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">张勇</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.0.1 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">倪海波</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.0.2 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">姜炜</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.0.3 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">王超</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.0.4 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">杨博</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.0.5 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <span style="display: inline-block;margin-left: 5px;width: 100px;">平均分：{{ xx_item.6.0.6 }}</span>
+
+                    <div style="display: inline-block;border: 1px solid deepskyblue; margin: 0px -25px 0px 35px"
+                         class="lingdao" onmouseleave="xuanxing_calc(this)">
+                        <span style="color:deepskyblue">领导</span>
+                        <input type="text" style="width: 60px;border: none; text-align: center" placeholder="输入分数"
+                               class="score" value="{{ xx_item.10.0 }}">
+                        &nbsp;&nbsp;
+                    </div>
+                </div>
+
+                <div class="layui-input-inline xiaolv">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">效率</span>
+                    <span style="width: 85px;display: inline-block">上报分(10)</span>
+                    <span style="width: 100px;display: inline-block"></span>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">戴路</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.1.0 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">张勇</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.1.1 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">倪海波</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.1.2 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">姜炜</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.1.3 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">王超</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.1.4 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">杨博</span>
+                        <span type="text"
+                              style="width: 45px;border: none; text-align: center">{{ xx_item.6.1.5 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <span style="display: inline-block;margin-left: 5px;width: 100px;">平均分：{{ xx_item.6.1.6 }}</span>
+
+                    <div style="display: inline-block;border: 1px solid deepskyblue; margin: 0px -25px 0px 35px"
+                         class="lingdao" onmouseleave="xuanxing_calc(this)">
+                        <span style="color:deepskyblue">领导</span>
+                        <input type="text" style="width: 60px;border: none; text-align: center" placeholder="输入分数"
+                               class="score" value="{{ xx_item.10.1 }}">
+                        &nbsp;&nbsp;
+                    </div>
+                </div>
+                {% if xx_item.5 == '1' %}
+                    <div class="layui-input-inline shanghui">
+                        <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">上会效果</span>
+                        <span style="width: 85px;display: inline-block">上报分(10)</span>
+                        <span style="width: 100px;display: inline-block"></span>
+                        <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                            <span style="color:deepskyblue">戴路</span>
+                            <span type="text"
+                                  style="width: 45px;border: none; text-align: center">{{ xx_item.6.2.0 }}</span>
+                            &nbsp;&nbsp;
+                        </div>
+                        <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                            <span style="color:deepskyblue">张勇</span>
+                            <span type="text"
+                                  style="width: 45px;border: none; text-align: center">{{ xx_item.6.2.1 }}</span>
+                            &nbsp;&nbsp;
+                        </div>
+                        <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                            <span style="color:deepskyblue">倪海波</span>
+                            <span type="text"
+                                  style="width: 45px;border: none; text-align: center">{{ xx_item.6.2.2 }}</span>
+                            &nbsp;&nbsp;
+                        </div>
+                        <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                            <span style="color:deepskyblue">姜炜</span>
+                            <span type="text"
+                                  style="width: 45px;border: none; text-align: center">{{ xx_item.6.2.3 }}</span>
+                            &nbsp;&nbsp;
+                        </div>
+                        <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                            <span style="color:deepskyblue">王超</span>
+                            <span type="text"
+                                  style="width: 45px;border: none; text-align: center">{{ xx_item.6.2.4 }}</span>
+                            &nbsp;&nbsp;
+                        </div>
+                        <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                            <span style="color:deepskyblue">杨博</span>
+                            <span type="text"
+                                  style="width: 45px;border: none; text-align: center">{{ xx_item.6.2.5 }}</span>
+                            &nbsp;&nbsp;
+                        </div>
+                        <span style="display: inline-block;margin-left: 5px;width: 100px;">平均分：{{ xx_item.6.2.6 }}</span>
+
+                        <div style="display: inline-block;border: 1px solid deepskyblue; margin: 0px -25px 0px 35px"
+                             class="lingdao" onmouseleave="xuanxing_calc(this)">
+                            <span style="color:deepskyblue">领导</span>
+                            <input type="text" style="width: 60px;border: none; text-align: center" placeholder="输入分数"
+                                   class="score" value="{{ xx_item.10.2 }}">
+                            &nbsp;&nbsp;
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="xuanxing_final">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">该事项总分</span>
+                    <span style="display: none" class="hp_score">{{ xx_item.11 }}</span>
+                    <span style="width: 85px;display: inline-block;margin-right: 104px;"
+                          class="show_score">{{ xx_item.7 }}</span>
+                    {% for xx_per in xx_item.8 %}
+                        <div style="display: inline-block; margin-right: 12px;width: 75px;text-align: left"
+                             class="percent">
+                            {% if "0" != xx_per %}
+                                <span>{{ xx_per.index }}</span>
+                                <span style="color:deepskyblue;width: 100%;border: 1px solid deepskyblue;display: inline-block"
+                                      class="per">{{ xx_per }}</span>
+                            {% else %}
+                                <span style="color:deepskyblue;width: 100%;border: 1px solid deepskyblue;display: none"></span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div style="display: inline-block;margin-left: 50px;" class="xuanxing_calc">
+                        <button type="button" class="layui-btn layui-btn-radius calc"
+                                style="display: none; background-color: deepskyblue;height: 30px;"
+                                onclick="calc_final(this, 'xx')">计算
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-radius save"
+                                style="display: none; background-color: deepskyblue;height: 30px;"
+                                onclick="save_score(this, 'xx', '{{ xx_item.0 }}')">保存
+                        </button>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <hr>
+        {% endfor %}
+
+
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">专项工作</div>
+        {% for zx_item in zhuanxiang_list %}
+            <div class="zhuanxiang_normal" style="margin-bottom: 50px;">
+                <div class="layui-input-inline jichu">
+                    <span style="width: 200px;font-size: 20px;color: #01AAED;margin-left: 35px;">{{ zx_item.1 }}</span>
+                    <span style="width: 200px;font-size: 15px;color: red;margin-left: 35px;">({{ zx_item.7 }})</span>
+                    {% for foo in zx_item.8 %}
+                        <span style="color: dodgerblue">{{ foo.0 }}(</span>
+                        <span class="join_percent">{{ foo.1 }}</span> <span>%)</span>
+                    {% endfor %}
+
+                </div>
+                <br><br>
+                <div>
+                    <span style="width: 85px;display: inline-block;margin-left: 35px;">描述</span>
+                    <textarea cols="100" rows="5"
+                              style="border: 1px solid deepskyblue;margin-left: 35px;">{{ zx_item.2 }}</textarea>
+                </div>
+                <br>
+                <div class="layui-input-inline score_params">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">打分</span>
+                    <span style="width: 85px;display: inline-block">上报分({{ zx_item.6 }})</span>
+                    <span style="width: 100px;display: inline-block"></span>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">戴路</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.0 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">张勇</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.1 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">倪海波</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.2 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">姜炜</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.3 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">王超</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.4 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">杨博</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.5 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <span style="display: inline-block;margin-left: 5px;">平均分：{{ zx_item.10 }}</span>
+
+                    <div style="display: inline-block;border: 1px solid deepskyblue;width: 123px; margin: 0px -25px 0px 35px"
+                         class="lingdao" onmouseleave="xuanxing_calc(this)">
+                        <span style="color:deepskyblue">领导</span>
+                        <input type="text" style="width: 60px;border: none; text-align: center" placeholder="输入分数"
+                               class="score" value="{{ zx_item.9 }}">
+                        &nbsp;&nbsp;
+                    </div>
+                </div>
+                <br>
+                <div class="xuanxing_final">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">该事项总分</span>
+                    <span style="display: none" class="hp_score">{{ zx_item.10 }}</span>
+                    <span style="width: 85px;display: inline-block;margin-right: 104px;"
+                          class="show_score">{{ zx_item.4 }}</span>
+                    {% for xx_per in zx_item.5 %}
+                        <div style="display: inline-block; margin-right: 12px;width: 75px;text-align: left"
+                             class="percent">
+                            {% if "0" != xx_per %}
+                                <span style="color:deepskyblue;width: 100%;border: 1px solid deepskyblue;display: inline-block"
+                                      class="per">{{ xx_per }}</span>
+                            {% else %}
+                                <span style="color:deepskyblue;width: 100%;border: 1px solid deepskyblue;display: none"></span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div style="display: inline-block;margin-left: 50px;" class="xuanxing_calc">
+                        <button type="button" class="layui-btn layui-btn-radius calc"
+                                style="display: none; background-color: deepskyblue;height: 30px;"
+                                onclick="calc_final(this, 'zx')">计算
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-radius save"
+                                style="display: none; background-color: deepskyblue;height: 30px;"
+                                onclick="save_score(this, 'zx', '{{ zx_item.0 }}')">保存
+                        </button>
+                    </div>
+
+
+                </div>
+                <br>
+            </div>
+            <hr>
+        {% endfor %}
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">对处室的贡献</div>
+        {% for zx_item in chushi_list %}
+            <div class="zhuanxiang_normal" style="margin-bottom: 50px;">
+                <div class="layui-input-inline jichu">
+                    <span style="width: 200px;font-size: 20px;color: #01AAED;margin-left: 35px;">{{ zx_item.1 }}</span>
+                    {% for foo in zx_item.7 %}
+                        <span style="color: dodgerblue">{{ foo.0 }}(</span>
+                        <span class="join_percent">{{ foo.1 }}</span>
+                        <span>%)</span>
+                    {% endfor %}
+                </div>
+                <br><br>
+                <div>
+                    <span style="width: 85px;display: inline-block;margin-left: 35px;">描述</span>
+                    <textarea cols="100" rows="5"
+                              style="border: 1px solid deepskyblue;margin-left: 35px;">{{ zx_item.2 }}</textarea>
+                </div>
+                <br>
+                <div class="layui-input-inline score_params">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">打分</span>
+                    <span style="width: 85px;display: inline-block">上报分({{ zx_item.6 }})</span>
+                    <span style="width: 100px;display: inline-block"></span>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">戴路</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.0 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">张勇</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.1 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">倪海波</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.2 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">姜炜</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.3 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">王超</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.4 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">杨博</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.5 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <span style="display: inline-block;margin-left: 5px;">平均分：{{ zx_item.9 }}</span>
+
+                    <div style="display: inline-block;border: 1px solid deepskyblue;width: 123px; margin: 0px -25px 0px 35px"
+                         class="lingdao" onmouseleave="xuanxing_calc(this)">
+                        <span style="color:deepskyblue">领导</span>
+                        <input type="text" style="width: 60px;border: none; text-align: center" placeholder="输入分数"
+                               class="score" value="{{ zx_item.8 }}">
+                        &nbsp;&nbsp;
+                    </div>
+                </div>
+                <br>
+                <div class="xuanxing_final">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">该事项总分</span>
+                    <span style="display: none;" class="hp_score">{{ zx_item.9 }}</span>
+                    <span style="width: 85px;display: inline-block;margin-right: 104px;"
+                          class="show_score">{{ zx_item.4 }}</span>
+                    {% for xx_per in zx_item.5 %}
+                        <div style="display: inline-block; margin-right: 12px;width: 75px;text-align: left"
+                             class="percent">
+                            {% if "0" != xx_per %}
+                                <span style="color:deepskyblue;width: 100%;border: 1px solid deepskyblue;display: inline-block"
+                                      class="per">{{ xx_per }}</span>
+                            {% else %}
+                                <span style="color:deepskyblue;width: 100%;border: 1px solid deepskyblue;display: none"></span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div style="display: inline-block;margin-left: 50px;" class="xuanxing_calc">
+                        <button type="button" class="layui-btn layui-btn-radius calc"
+                                style="display: none; background-color: deepskyblue;height: 30px;"
+                                onclick="calc_final(this, 'cs')">计算
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-radius save"
+                                style="display: none; background-color: deepskyblue;height: 30px;"
+                                onclick="save_score(this, 'cs', '{{ zx_item.0 }}')">保存
+                        </button>
+                    </div>
+
+
+                </div>
+                <br>
+
+            </div>
+            <hr>
+        {% endfor %}
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">加分项</div>
+        {% for zx_item in add_list %}
+            <div class="zhuanxiang_normal" style="margin-bottom: 50px;">
+                <div class="layui-input-inline jichu">
+                    <span style="width: 200px;font-size: 20px;color: #01AAED;margin-left: 35px;">{{ zx_item.1 }}</span>
+                    {% for foo in zx_item.7 %}
+                        <span style="color: dodgerblue">{{ foo.0 }}(</span>
+                        <span class="join_percent">{{ foo.1 }}</span><span>%)</span>
+                    {% endfor %}
+                </div>
+                <br><br>
+                <div>
+                    <span style="width: 85px;display: inline-block;margin-left: 35px;">描述</span>
+                    <textarea cols="100" rows="5"
+                              style="border: 1px solid deepskyblue;margin-left: 35px;">{{ zx_item.2 }}</textarea>
+                </div>
+                <br>
+                <div class="layui-input-inline score_params">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">打分</span>
+                    <span style="width: 85px;display: inline-block">上报分({{ zx_item.6 }})</span>
+                    <span style="width: 100px;display: inline-block"></span>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">戴路</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.0 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">张勇</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.1 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">倪海波</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.2 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">姜炜</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.3 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">王超</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.4 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">杨博</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.5 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <span style="display: inline-block;margin-left: 5px;">平均分：{{ zx_item.9 }}</span>
+
+                    <div style="display: inline-block;border: 1px solid deepskyblue;width: 123px; margin: 0px -25px 0px 35px"
+                         class="lingdao" onmouseleave="xuanxing_calc(this)">
+                        <span style="color:deepskyblue">领导</span>
+                        <input type="text" style="width: 60px;border: none; text-align: center" placeholder="输入分数"
+                               class="score" value="{{ zx_item.8 }}">
+                        &nbsp;&nbsp;
+                    </div>
+                </div>
+                <br>
+                <div class="xuanxing_final">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">该事项总分</span>
+                    <span style="display: none" class="hp_score">{{ zx_item.9 }}</span>
+                    <span style="width: 85px;display: inline-block;margin-right: 104px;"
+                          class="show_score">{{ zx_item.4 }}</span>
+                    {% for xx_per in zx_item.5 %}
+                        <div style="display: inline-block; margin-right: 12px;width: 75px;text-align: left"
+                             class="percent">
+                            {% if "0" != xx_per %}
+                                <span style="color:deepskyblue;width: 100%;border: 1px solid deepskyblue;display: inline-block"
+                                      class="per">{{ xx_per }}</span>
+                            {% else %}
+                                <span style="color:deepskyblue;width: 100%;border: 1px solid deepskyblue;display: none"></span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div style="display: inline-block;margin-left: 50px;" class="xuanxing_calc">
+                        <button type="button" class="layui-btn layui-btn-radius calc"
+                                style="display: none; background-color: deepskyblue;height: 30px;"
+                                onclick="calc_final(this,'ad')">计算
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-radius save"
+                                style="display: none; background-color: deepskyblue;height: 30px;"
+                                onclick="save_score(this, 'ad', '{{ zx_item.0 }}')">保存
+                        </button>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <hr>
+        {% endfor %}
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">扣分项</div>
+        {% for zx_item in minus_list %}
+            <div class="zhuanxiang_normal" style="margin-bottom: 50px;">
+                <div class="layui-input-inline jichu">
+                    <span style="width: 200px;font-size: 20px;color: #01AAED;margin-left: 35px;">{{ zx_item.1 }}</span>
+                    {% for foo in zx_item.7 %}
+                        <span style="color: dodgerblue">{{ foo.0 }}(</span>
+                        <span class="join_percent">{{ foo.1 }}</span>
+                        <span>%)</span>
+                    {% endfor %}
+                </div>
+                <br><br>
+                <div>
+                    <span style="width: 85px;display: inline-block;margin-left: 35px;">描述</span>
+                    <textarea cols="100" rows="5"
+                              style="border: 1px solid deepskyblue;margin-left: 35px;">{{ zx_item.2 }}</textarea>
+                </div>
+                <br>
+                <div class="layui-input-inline score_params">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">打分</span>
+                    <span style="width: 85px;display: inline-block">上报分({{ zx_item.6 }})</span>
+                    <span style="width: 100px;display: inline-block"></span>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">戴路</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.0 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">张勇</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.1 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 80px;margin-right: 10px;">
+                        <span style="color:deepskyblue">倪海波</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.2 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">姜炜</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.3 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">王超</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.4 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <div style="display: inline-block; width: 75px;margin-right: 10px;">
+                        <span style="color:deepskyblue">杨博</span>
+                        <span type="text" style="width: 45px;border: none; text-align: center">{{ zx_item.3.5 }}</span>
+                        &nbsp;&nbsp;
+                    </div>
+                    <span style="display: inline-block;margin-left: 5px;">平均分：{{ zx_item.9 }}</span>
+
+                    <div style="display: inline-block;border: 1px solid deepskyblue;width: 123px; margin: 0px -25px 0px 35px"
+                         class="lingdao" onmouseleave="xuanxing_calc(this)">
+                        <span style="color:deepskyblue">领导</span>
+                        <input type="text" style="width: 60px;border: none; text-align: center" placeholder="输入分数"
+                               class="score" value="{{ zx_item.8 }}">
+                        &nbsp;&nbsp;
+                    </div>
+                </div>
+                <br>
+                <div class="xuanxing_final">
+                    <span style="margin: 0px 10px 0px 35px;width: 120px;display: inline-block">该事项总分</span>
+                    <span style="display: none" class="hp_score">{{ zx_item.9 }}</span>
+                    <span style="width: 85px;display: inline-block;margin-right: 104px;"
+                          class="show_score">{{ zx_item.4 }}</span>
+                    {% for xx_per in zx_item.5 %}
+                        <div style="display: inline-block; margin-right: 12px;width: 75px;text-align: left"
+                             class="percent">
+                            {% if "0" != xx_per %}
+                                <span style="color:deepskyblue;width: 100%;border: 1px solid deepskyblue;display: inline-block"
+                                      class="per">{{ xx_per }}</span>
+                            {% else %}
+                                <span style="color:deepskyblue;width: 100%;border: 1px solid deepskyblue;display: none"></span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div style="display: inline-block;margin-left: 50px;" class="xuanxing_calc">
+                        <button type="button" class="layui-btn layui-btn-radius calc"
+                                style="display: none; background-color: deepskyblue;height: 30px;"
+                                onclick="calc_final(this, 'mi')">计算
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-radius save"
+                                style="display: none; background-color: deepskyblue;height: 30px;"
+                                onclick="save_score(this, 'mi', '{{ zx_item.0 }}')">保存
+                        </button>
+                    </div>
+                </div>
+                <br>
+
+            </div>
+            <hr>
+        {% endfor %}
+    </div>
+</div>
+<br>
+<hr>
+<div style="text-align: center;font-size: 17px;font-weight: bold">德能勤打分</div>
+<br><br>
+
+
+<div style="margin-left: 30px;">
+    <span>德</span>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;margin-left: 10px;">
+        <span style="color:deepskyblue">戴路</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">张勇</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 120px;margin-right: 10px;">
+        <span style="color:deepskyblue">倪海波</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">姜炜</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">王超</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">杨博</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+</div>
+<br>
+<div style="margin-left: 30px;">
+    <span>能</span>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;margin-left: 10px;">
+        <span style="color:deepskyblue">戴路</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">张勇</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 120px;margin-right: 10px;">
+        <span style="color:deepskyblue">倪海波</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">姜炜</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">王超</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">杨博</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+</div>
+<br>
+<div style="margin-left: 30px;">
+    <span>勤</span>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;margin-left: 10px;">
+        <span style="color:deepskyblue">戴路</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">张勇</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 120px;margin-right: 10px;">
+        <span style="color:deepskyblue">倪海波</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">姜炜</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">王超</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+    <div style="display: inline-block; width: 100px;margin-right: 10px;">
+        <span style="color:deepskyblue">杨博</span>
+        <input type="text" style="width: 45px;border: 1px solid deepskyblue;">
+        &nbsp;&nbsp;
+    </div>
+</div>
+
+<br><br>
+<script>
+    let input_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        //el: "#xuanxing",
+        el: "#score_sys",
+        data: {
+            member_list: ["戴路", "张勇", "倪海波", "姜炜", "王超", "杨博"],
+            xuanxing_list: ["质量", "效率", "上会效果", "测试环境复杂系数", "测试案例系数", "测试规模系数"],
+            xuanxing_num: 1,
+            zhuanxiang_num: 1,
+            chushi_num: 1,
+            ad_num: 1,
+            minus_num: 1,
+            test_list: ["戴路", "姜炜"],
+            test_item: ["质量", "效率", "上会效果",],
+        }
+    });
+
+    $(".xuanxing_button").click(function () {
+        let bt_name = $(this).text().replace(/(^\s*)|(\s*$)/g, "");
+        $(".big_select").each(function () {
+            if ($(this).children(".bt_name").text().replace(/(^\s*)|(\s*$)/g, "") == bt_name) {
+                $(this).show();
+                $(this).siblings(".big_select").hide();
+            }
+        })
+    });
+
+    $("#show_all").click(function () {
+        $(".big_select").show()
+    });
+
+    function calc_final(obj, type_name) {
+        if (type_name == "xx") {
+            let zl_score = $(obj).parent().parent().siblings(".zhiliang").children(".lingdao").children(".score").val();
+            let xl_score = $(obj).parent().parent().siblings(".xiaolv").children(".lingdao").children(".score").val();
+            let sh_score = $(obj).parent().parent().siblings(".shanghui").html();
+            if (zl_score == "" || xl_score == "" || sh_score == "") {
+                layer.msg("输入参数不全");
+                return false;
+            }
+            let sum_score = parseInt(zl_score) + parseInt(xl_score);
+            if (!sh_score) {
+            }
+            else {
+                sh_score = $(obj).parent().parent().siblings(".shanghui").children(".lingdao").children(".score").val();
+                sum_score = parseInt(zl_score) + parseInt(xl_score) + parseInt(sh_score);
+            }
+            let hp_score = $(obj).parent().siblings(".hp_score").html(); //同事互评得到的总分
+            let hj_score = $(obj).parent().parent().siblings(".jichu").children(".jichu_score").children(".hj_score").text();
+            let anli_score = $(obj).parent().parent().siblings(".jichu").children(".jichu_score").children(".anli_score").text();
+            let guimo_score = $(obj).parent().parent().siblings(".jichu").children(".jichu_score").children(".guimo_score").text();
+            let lingdao_score = ((parseFloat(hj_score) * 10) * (parseFloat(anli_score) * 100) * (parseFloat(guimo_score) * 10) / 10000) * sum_score;
+            lingdao_score = lingdao_score.toFixed(2);
+            let score_final = (parseFloat(hp_score) + parseFloat(lingdao_score)) / 2; // 同事分 + 领导分 /2
+            score_final = score_final.toFixed(2); // 最终分
+            $(obj).parent().siblings(".show_score").html(score_final);
+            //以下为各人所得分
+            let perent_list = [];
+            $(obj).parent().parent().siblings(".jichu").children(".jichu_score").children(".join_percent").each(function () {
+                perent_list.push(parseFloat($(this).text()).toFixed(2))
+            });
+            $(obj).parent().parent().children(".percent").children(".per").each(function (index) {
+                let per_score = ((parseFloat(score_final) * 100) * ((parseFloat(perent_list[index]) * 100) / 100) / 10000).toFixed(2);
+                $(this).text(per_score);
+            })
+
+        }
+        else if (type_name == "mi") {
+            let zx_score = $(obj).parent().parent().siblings(".score_params").children(".lingdao").children(".score").val();
+            if (zx_score == "") {
+                layer.msg("输入参数不全");
+                return false;
+            }
+            zx_score = Math.abs(zx_score);
+            let hp_score = $(obj).parent().siblings(".hp_score").html(); //同事互评得到的总分
+            hp_score = Math.abs(hp_score);
+            let score_final = (((parseFloat(zx_score) * 100) + (parseFloat(hp_score) * 100)) / 200).toFixed(2);
+            score_final = Math.abs(score_final);
+            $(obj).parent().siblings(".show_score").html(-score_final);
+            //以下为各人所得分
+            let perent_list = [];
+            $(obj).parent().parent().siblings(".jichu").children(".join_percent").each(function () {
+                perent_list.push(parseFloat($(this).text()).toFixed(2))
+            });
+            $(obj).parent().parent().children(".percent").children(".per").each(function (index) {
+                let per_score = ((parseFloat(score_final) * 100) * ((parseFloat(perent_list[index]) * 100) / 100) / 10000).toFixed(2);
+                $(this).text(-per_score);
+            })
+        }
+        else {
+            let zx_score = $(obj).parent().parent().siblings(".score_params").children(".lingdao").children(".score").val();
+            if (zx_score == "") {
+                layer.msg("输入参数不全");
+                return false;
+            }
+            let hp_score = $(obj).parent().siblings(".hp_score").html(); //同事互评得到的总分
+            let score_final = (((parseFloat(zx_score) * 100) + (parseFloat(hp_score) * 100)) / 200).toFixed(2);
+            $(obj).parent().siblings(".show_score").html(score_final);
+            //以下为各人所得分
+            let perent_list = [];
+            $(obj).parent().parent().siblings(".jichu").children(".join_percent").each(function () {
+                perent_list.push(parseFloat($(this).text()).toFixed(2))
+            });
+            $(obj).parent().parent().children(".percent").children(".per").each(function (index) {
+                let per_score = ((parseFloat(score_final) * 100) * ((parseFloat(perent_list[index]) * 100) / 100) / 10000).toFixed(2);
+                $(this).text(per_score);
+            })
+        }
+    }
+
+    function save_score(obj, type_name, type_id) {
+        let lingdao_list = [];
+        if (type_name == 'xx') {
+            let zl_score = $(obj).parent().parent().siblings(".zhiliang").children(".lingdao").children(".score").val();
+            let xl_score = $(obj).parent().parent().siblings(".xiaolv").children(".lingdao").children(".score").val();
+            let sh_score = $(obj).parent().parent().siblings(".shanghui").html();
+            if (zl_score == "" || xl_score == "" || sh_score == "") {
+                layer.msg("输入参数不全");
+                return false;
+            }
+            let sum_score = [zl_score, xl_score];
+            if (!sh_score) {
+            }
+            else {
+                sh_score = $(obj).parent().parent().siblings(".shanghui").children(".lingdao").children(".score").val();
+                sum_score.push(sh_score)
+            }
+            let hp_score = $(obj).parent().siblings(".hp_score").html(); //同事互评得到的总分
+            let show_score = $(obj).parent().siblings(".show_score").html(); //同事互评得到的总分
+            lingdao_list = [sum_score, hp_score, show_score];
+
+        }
+        else {
+            let zx_score = $(obj).parent().parent().siblings(".score_params").children(".lingdao").children(".score").val();
+            if (zx_score == "") {
+                layer.msg("输入参数不全");
+                return false;
+            }
+            let hp_score = $(obj).parent().siblings(".hp_score").html(); //同事互评得到的总分
+            let show_score = $(obj).parent().siblings(".show_score").html(); //同事互评得到的总分
+            lingdao_list = [zx_score, hp_score, show_score]
+        }
+        $.ajax({
+            url: '/xuanxing/lingdao_submit/',
+            type: 'post',
+            data: {
+                "lingdao_type": type_name,
+                "lingdao_id": type_id,
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "lingdao_list": JSON.stringify(lingdao_list),
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    return false;
+                } else if (ReState["code"] == "0004") {
+                    layer.msg("提交失败");
+                    return false;
+                } else if (ReState["code"] == "0003") {
+                    alert("提交失败2")
+                }
+            }
+        });
+    }
+
+    function save_final_score(obj) {
+        let score_list = [];
+        $(obj).parent().children(".score").each(function () {
+            score_list.push($(this).text());
+        });
+        $.ajax({
+            url: '/xuanxing/save_final/',
+            type: 'post',
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "score_list": JSON.stringify(score_list),
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.msg("保存成功");
+                    return false;
+                } else if (ReState["code"] == "0004") {
+                    layer.msg("提交失败");
+                    return false;
+                } else if (ReState["code"] == "0003") {
+                    alert("提交失败2")
+                }
+            }
+        });
+    }
+
+    $("#clear_final").click(function () {
+        $.ajax({
+            url: '/xuanxing/clear_final/',
+            type: 'post',
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "flag": "1"
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.msg("清空成功");
+                    return false;
+                } else if (ReState["code"] == "0005") {
+                    layer.msg("清空失败");
+                    return false;
+                } else if (ReState["code"] == "0003") {
+                    alert("提交失败2")
+                }
+            }
+        });
+    });
+
+    $("#flush_pj").click(function () {
+        window.location.href = "/xuanxing/lingdao";
+    });
+
+    function xuanxing_calc(obj) {
+        $(obj).parent().siblings(".xuanxing_final").children(".xuanxing_calc").children(".calc").click();
+        $(obj).parent().siblings(".xuanxing_final").children(".xuanxing_calc").children(".save").click();
+    }
+    $("#download_score_excel").click(function () {
+        window.location.href = "/xuanxing/score_excel";
+    })
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎登录内部系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+    <link rel="stylesheet" href="/static/css/xuanxing/pm/pm_page.css">
+    <script src="/static/js/pm_check.js"></script>
+    <script src="/static/js/pm_paging.js"></script>
+
+</head>
+
+<body>
+
+<div class="x-body" id="user_show">
+    {% csrf_token %}
+    <div class="layui-row">
+        <div class="layui-form layui-col-md12 x-so">
+            <input class="layui-input" placeholder="开始日" id="start">
+            <input class="layui-input" placeholder="截止日" id="end">
+            <input type="text" placeholder="请输入用户名" autocomplete="off" class="layui-input" id="query_username">
+            <button class="layui-btn" id="search_user"
+                    onclick="change_page('1', '/xuanxing/user_manage/','{{ csrf_token }}')"><i
+                    class="layui-icon">&#xe615;</i>
+            </button>
+            <button class="layui-btn" id="clear_msg">重置</button>
+        </div>
+    </div>
+    <xblock>
+        <button class="layui-btn layui-btn-danger" onclick="delAll()" id="usr_del_all"><i class="layui-icon"></i>批量删除
+        </button>
+        <button class="layui-btn" onclick="add_user(this,'添加用户')" id="usr_add"><i class="layui-icon"></i>添加</button>
+        <button class="layui-btn layui-btn-warm" id="daoru_user"><i class="layui-icon"></i>导入用户表</button>
+
+        <div class="layui-input-inline"
+             style="height: 40px;font-size: 20px;vertical-align: baseline;margin-left: 10px;">每页显示条数:
+        </div>
+        <div class="layui-input-inline">
+            <select id="pg_num" class="valid" style="height: 40px;">
+                <option value="8">请选择</option>
+                {% for num in page_num_list %}
+                    <option value="{{ num }}">{{ num }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </xblock>
+    <table class="layui-table">
+        <thead>
+        <th>
+            <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i
+                    class="layui-icon">&#xe605;</i></div>
+        </th>
+        <th>ID</th>
+        <th>登录名</th>
+        <th>手机</th>
+        <th>邮箱</th>
+        <th>员工id</th>
+        <th>入职时间</th>
+        <th>状态</th>
+        <th>操作</th>
+        </thead>
+        <tbody v-for="(user,index) in current_list">
+        <tr>
+            <td>
+                <div class="layui-unselect layui-form-checkbox" lay-skin="primary" v-bind:data-id=user.uid
+                     onclick="change_cls(this)">
+                    <i class="layui-icon">&#xe605;</i>
+                </div>
+            </td>
+            <td style="display: none;" class="uid_value">{[ user.uid ]}</td>
+            <td>{[ index + page_jizhun ]}</td>
+            <td class="user_ids" style="display: none">{[ user.uid ]}</td>
+            <td>{[ user.username ]}</td>
+            <td>{[ user.user_mobile ]}</td>
+            <td>{[ user.user_email ]}</td>
+            <td>{[ user.user_workid ]}</td>
+            <td>{[ user.rz_time ]}</td>
+            <td class="td-status">
+                <span v-if="('0' == user.user_status) || ('' == user.user_status)"
+                      class="layui-btn layui-btn-normal layui-btn-mini layui-btn-disabled">已停用</span>
+                <span v-else class="layui-btn layui-btn-normal layui-btn-mini">已启用</span>
+            </td>
+            <td class="td-manage">
+                <a v-if="('0' == user.user_status) || ('' == user.user_status)" onclick="member_stop(this)"
+                   href="javascript:;" title="启用" class="usr_chg_status">
+                    <i class="layui-icon">&#xe601;</i>
+                </a>
+                <a v-else onclick="member_stop(this)" href="javascript:;" title="停用" class="usr_chg_status">
+                    <i class="layui-icon">&#xe601;</i>
+                </a>
+
+                <a title="编辑" onclick="x_admin_show_new(this, '编辑')" href="javascript:;" class="usr_edit">
+                    <i class="layui-icon">&#xe642;</i>
+                </a>
+                <a title="删除" onclick="member_del(this,'要删除的id')" href="javascript:;" class="usr_del">
+                    <i class="layui-icon">&#xe640;</i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <div class="tcdPageCode">
+        <div class="pm_shows" v-for="(pp,index) in page_list">
+            <span v-if="(pp[1] == 0) && (pp[2] == 1)" class="current">{[ pp[0] ]}</span>
+            <span v-if="(pp[1] == 0) && (pp[2] == 0)">{[ pp[0] ]}</span>
+            <a href="javascript:return false;" v-if="pp[1] == 1"
+               onclick="change_page(this,'/xuanxing/user_manage/','{{ csrf_token }}')">{[
+                pp[0] ]}</a>
+        </div>
+        <span>共</span><span id="total_num">{[ total_page ]}</span><span>页</span>
+    </div>
+
+</div>
+
+<script>
+    $(function () {
+        let opt_type_str = '{{ request.session.opt_type_list}}';
+        let opt_type_list = opt_type_str.split(";");
+        let usr_del = $.inArray("用户删除", opt_type_list); //判断菜单名是否在数组中
+        if (usr_del != -1) {
+            $(".usr_del").each(function () {
+                $(this).show()
+            });
+            $("#usr_del_all").show();
+        }
+        else {
+            $(".usr_del").each(function () {
+                $(this).hide()
+            });
+            $("#usr_del_all").hide();
+        }
+
+        let usr_add_index = $.inArray("用户新增", opt_type_list); //判断菜单名是否在数组中
+        if (usr_add_index != -1) {
+            $("#usr_add").show();
+            $("#daoru_user").show();
+        }
+        else {
+            $("#usr_add").hide();
+            $("#daoru_user").hide();
+        }
+        let usr_edit_index = $.inArray("用户修改", opt_type_list); //判断菜单名是否在数组中
+        if (usr_edit_index != -1) {
+            $("#usr_edit").show();
+        }
+        else {
+            $("#usr_edit").hide();
+        }
+
+        let usr_chg_index = $.inArray("用户停用", opt_type_list); //判断菜单名是否在数组中
+        if (usr_chg_index != -1) {
+            $(".td-status").each(function () {
+                $(this).show();
+            });
+            $(".usr_chg_status").each(function () {
+                $(this).show();
+            })
+        }
+        else {
+            $(".td-status").each(function () {
+                $(this).hide();
+            });
+            $(".usr_chg_status").each(function () {
+                $(this).hide();
+            })
+        }
+    });
+
+    let page_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#user_show",
+        data: {
+            page_list: [],
+            current_list: [],
+            total_page: 1,
+            curr_page: 1,
+            page_jizhun: 1
+        }
+    });
+
+    $("#clear_msg").click(function () {
+        $("#start").val("");
+        $("#end").val("");
+        $("#query_username").val("");
+    });
+
+    function x_admin_show_new(obj, title, url, w, h) {
+        let user_id = $(obj).parent().parent().children(".user_ids").html();
+        url = "/xuanxing/user_edit?uid=" + user_id;
+
+        layer = layui.layer;
+        element = layui.element;
+
+        if (title == null || title == '') {
+            title = false;
+        }
+        if (url == null || url == '') {
+            url = "404.html";
+        }
+        if (w == null || w == '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h == '') {
+            h = ($(window).height() - 50);
+        }
+        layer.open({
+            type: 2,
+            area: [w + 'px', h + 'px'],
+            fix: false, //不固定
+            maxmin: true,
+            shadeClose: true,
+            shade: 0.4,
+            title: "编辑",
+            content: url,
+            end: function () {
+                window.location.href = "/xuanxing/user_manage"
+            }
+        });
+    }
+
+    function add_user(obj, title, url, w, h) {
+        url = "/xuanxing/user_add";
+        layer = layui.layer;
+        element = layui.element;
+
+        if (title == null || title == '') {
+            title = false;
+        }
+        if (url == null || url == '') {
+            url = "404.html";
+        }
+        if (w == null || w == '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h == '') {
+            h = ($(window).height() - 50);
+        }
+        layer.open({
+            type: 2,
+            area: [w + 'px', h + 'px'],
+            fix: false, //不固定
+            maxmin: true,
+            shadeClose: true,
+            shade: 0.4,
+            title: "编辑",
+            content: url,
+            end: function () {
+                window.location.href = "/xuanxing/user_manage"
+            }
+        });
+    }
+
+    layui.use('upload', function () {
+        let $ = layui.jquery
+            , upload = layui.upload;
+        //指定允许上传的文件类型
+        upload.render({
+            elem: "#daoru_user"
+            , url: '/xuanxing/user_upload/' // 后端接收文件的接口
+            , accept: 'file' //类型：支持文件
+            , method: 'POST'
+            , data: {csrfmiddlewaretoken: '{{ csrf_token }}', pj_id: ""}
+            , before: function (obj) {
+                console.log(this.item);
+                this.data.pj_id = this.item.attr("id")
+            }
+            , done: function (res) {
+                if (res["code"] == "0000") {
+                    layer.msg('上传成功');
+                    window.location.href = "/xuanxing/user_manage"
+                }
+                if (res["code"] == "0001") {
+                    layer.msg('上传失败');
+                }
+                if (res["code"] == "0002") {
+                    layer.msg('用户名已存在，请修改之后重新上传');
+                }
+
+            }
+        });
+    });
+
+    layui.use('laydate', function () {
+        let laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+    });
+
+    /*用户-停用*/
+    function member_stop(obj) {
+        let change_uid = $(obj).parent().siblings(".uid_value").html();
+        layer.confirm('确认要' + $(obj).attr('title') + '吗?', function (index) {
+
+            if ($(obj).attr('title') == '停用') {
+
+                $.ajax({
+                    url: '/xuanxing/user_status_change/',
+                    type: 'post',
+                    async: false,
+                    data: {
+                        "csrfmiddlewaretoken": '{{ csrf_token }}',
+                        "uid": change_uid,
+                        "option": "0"
+                    },
+                    success: function (msg) {
+                        let ReState = eval("(" + JSON.stringify(msg) + ")");
+                        if (ReState["code"] == "0000") {
+                            $(obj).attr('title', '启用');
+                            $(obj).find('i').html('&#xe62f;');
+
+                            $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
+
+                            layer.msg('已停用!', {icon: 5, time: 1000});
+                            return false;
+                        } else if (ReState["code"] == "0002") {
+                            alert("Password Error")
+                        } else if (ReState["code"] == "0003") {
+                            alert("Username Error")
+                        }
+                    }
+                });
+                //发异步把用户状态进行更改
+
+
+            } else {
+                $.ajax({
+                    url: '/xuanxing/user_status_change/',
+                    type: 'post',
+                    async: false,
+                    data: {
+                        "csrfmiddlewaretoken": '{{ csrf_token }}',
+                        "uid": change_uid,
+                        "option": "1"
+                    },
+                    success: function (msg) {
+                        let ReState = eval("(" + JSON.stringify(msg) + ")");
+                        if (ReState["code"] == "0000") {
+                            $(obj).attr('title', '停用');
+                            $(obj).find('i').html('&#xe601;');
+
+                            $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
+                            layer.msg('已启用!', {icon: 5, time: 1000});
+                            return false;
+                        } else if (ReState["code"] == "0002") {
+                            alert("Password Error")
+                        } else if (ReState["code"] == "0003") {
+                            alert("Username Error")
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    /*用户-删除*/
+    function member_del(obj, id) {
+        layer.confirm('确认要删除吗？', function (index) {
+            //发异步删除数据
+            let del_uid = $(obj).parent().parent().children(".user_ids").html();
+            $.ajax({
+                url: '/xuanxing/user_del/',
+                type: 'post',
+                async: false,
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "uid": del_uid,
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!', {icon: 1, time: 1000});
+                        window.location.href = "/xuanxing/user_manage"
+                        return false;
+                    } else if (ReState["code"] == "0002") {
+                        alert("Password Error")
+                    } else if (ReState["code"] == "0003") {
+                        alert("Username Error")
+                    }
+                }
+            });
+        });
+    }
+
+    function delAll(argument) {
+        let uids = tableCheck.getData();
+        layer.confirm('确认要删除吗？', function (index) {
+            //捉到所有被选中的，发异步进行删除
+            layer.msg('删除成功', {icon: 1});
+            $.ajax({
+                url: '/xuanxing/user_del/',
+                type: 'post',
+                async: false,
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "uid": JSON.stringify(uids),
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        $(".layui-form-checked").not('.header').parents('tr').remove();
+                        window.location.href = "/xuanxing/user_manage";
+                        return false;
+                    } else if (ReState["code"] == "0002") {
+                        alert("webserver error")
+                    }
+                }
+            });
+        });
+    }
+
+
+    change_page("", '/xuanxing/user_manage/', '{{ csrf_token }}');
+    $("#pg_num").bind("change", function () {
+        change_page("1", "/xuanxing/user_manage/", "{{ csrf_token }}")
+    });
+
+</script>
+
+</body>
+
+</html>

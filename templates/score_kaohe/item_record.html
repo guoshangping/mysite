@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<style>
+    .xuanxing_button {
+        height: 30px;
+        text-align: center;
+        line-height: 30px
+    }
+
+</style>
+<body>
+
+<div>
+    <br><br>
+    <label class="layui-form-label" style="width: 100px">请选择事项类型</label>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block; background-color: deepskyblue"
+            id="xuanxing_test">选型测试
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block; background-color: deepskyblue" id="work">专项工作
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block; background-color: deepskyblue"
+            id="contribution">对处室的贡献
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block;background-color: deepskyblue" id="add_score">
+        加分项
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block;background-color: deepskyblue"
+            id="minus_score">扣分项
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius xuanxing_button"
+            style="display: inline-block;background-color: deepskyblue"
+            id="show_all">显示全部
+    </button>
+</div>
+<hr>
+<br><br>
+{% csrf_token %}
+<div id="score_sys">
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">选型测试</div>
+        {% for xx_item in item_all %}
+            <div class="xuanxing_normal" style="margin-bottom: 50px;">
+                <div class="layui-input-inline shixiang">
+                    <label class="layui-form-label" style="width: 100px">添加事项</label>
+                    <input type="text" name="title" autocomplete="off" value="{{ xx_item.0 }}"
+                           class="layui-input sx_name"
+                           style="margin-left: 35px; width: 300px;display: inline-block; float: left; border: 1px solid deepskyblue;">
+                </div>
+                <br><br>
+                <div class="layui-input-inline params">
+                    <label class="layui-form-label" style="width: 100px">各项参数</label>
+                    <span style="margin-left: 135px;">厂商数:</span>
+                    <input type="text" name="title" autocomplete="off" class="layui-input changshang"
+                           value="{{ xx_item.1 }}"
+                           style="width: 80px;height: 30px; display: inline-block;  border: 1px solid deepskyblue;">
+                    <span>测试案例数:</span>
+                    <input type="text" name="title" value="{{ xx_item.2 }}" autocomplete="off"
+                           class="layui-input anli_num"
+                           style="width: 80px;height: 30px; display: inline-block; border: 1px solid deepskyblue;">
+                    <span>测试环境复杂程度:</span>
+                    <select style="height: 30px;width: 110px;border: 1px solid deepskyblue;direction: ltr;"
+                            class="hj_select" onchange="hj_func(this)">
+                        <option value="">请选择</option>
+                        <option value="1.0">简单</option>
+                        <option value="1.1">中等</option>
+                        <option value="1.2">复杂</option>
+                    </select>
+                    <span>选型类型:</span>
+                    <input type="text" name="title" value="{{ xx_item.3 }}" autocomplete="off"
+                           class="layui-input anli_num"
+                           style="width: 130px;height: 30px; display: inline-block; border: 1px solid deepskyblue;">
+                </div>
+                <br>
+                <div class="layui-input-inline calc">
+                    <label class="layui-form-label" style="width: 100px">各项指数</label>
+                    <span style="margin-left: 35px;" onmouseover="show_tips('hj', this)" onmouseleave="tip_close()">测试环境复杂系数:</span>
+                    <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input huanjing"
+                           style="width: 80px;height: 30px; display: inline-block;  border: 1px solid deepskyblue;">
+                    <span onmouseover="show_tips('al', this)" onmouseleave="tip_close()">测试案例系数:</span>
+                    <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input anli"
+                           style="width: 80px;height: 30px; display: inline-block; border: 1px solid deepskyblue;"
+                           onmouseover="anli_clk(this)" value="{{ xx_item.4 }}">
+                    <span onmouseover="show_tips('gm', this)" onmouseleave="tip_close()">测试规模系数:</span>
+                    <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input guimo"
+                           style="width: 80px;height: 30px; display: inline-block;  border: 1px solid deepskyblue;"
+                           onmouseover="test_scale(this)" value="{{ xx_item.5 }}">
+                    <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input total_score"
+                           style="width: 80px;height: 32px; display: inline-block;  border: 1px solid deepskyblue;margin-left: 35px;">
+                    <button type="button" class="layui-btn layui-btn-radius calc_sum"
+                            style="display: inline-block; background-color: deepskyblue" onclick="calc_score(this)">计算总分
+                    </button>
+                </div>
+                <br><br>
+                <div class="layui-input-inline jieduan">
+                    <label class="layui-form-label jieduan_name" style="width: 100px">方案准备</label>
+                    <span style="margin-left: 35px;">占比:</span>
+                    <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input percent"
+                           style="width: 40px;height: 30px; display: inline-block;  border: 1px solid deepskyblue;"
+                           value="30">
+                    <span>(%)</span>
+                    <div class="mem_allot"
+                         style="display: inline-block;border: 1px solid deepskyblue; margin: 0px -25px 0px 35px;height: 30px;vertical-align: middle"
+                         v-for="members in member_list">
+                        <span style="color:deepskyblue">{[ members ]}</span>
+                        <input class="mem_percent" type="text" style="width: 60px;border: none; text-align: center"
+                               placeholder="输入比例">
+                        <span>(%)</span>
+                        &nbsp;&nbsp;
+                    </div>
+                </div>
+
+                <div class="layui-input-inline jieduan">
+                    <label class="layui-form-label jieduan_name" style="width: 100px">环境准备</label>
+                    <span style="margin-left: 35px;">占比:</span>
+                    <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input percent"
+                           style="width: 40px;height: 30px; display: inline-block;  border: 1px solid deepskyblue;"
+                           value="30">
+                    <span>(%)</span>
+                    <div class="mem_allot"
+                         style="display: inline-block;border: 1px solid deepskyblue; margin: 0px -25px 0px 35px;height: 30px;vertical-align: middle"
+                         v-for="members in member_list">
+                        <span style="color:deepskyblue">{[ members ]}</span>
+                        <input class="mem_percent" type="text" style="width: 60px;border: none; text-align: center"
+                               placeholder="输入比例">
+                        <span>(%)</span>
+                        &nbsp;&nbsp;
+                    </div>
+                </div>
+                <div class="layui-input-inline jieduan">
+                    <label class="layui-form-label jieduan_name" style="width: 100px">案例执行</label>
+                    <span style="margin-left: 35px;">占比:</span>
+                    <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input percent"
+                           style="width: 40px;height: 30px; display: inline-block;  border: 1px solid deepskyblue;"
+                           value="40">
+                    <span>(%)</span>
+                    <div class="mem_allot"
+                         style="display: inline-block;border: 1px solid deepskyblue; margin: 0px -25px 0px 35px;height: 30px;vertical-align: middle"
+                         v-for="members in member_list">
+                        <span style="color:deepskyblue">{[ members ]}</span>
+                        <input type="text" class="mem_percent" style="width: 60px;border: none; text-align: center"
+                               placeholder="输入比例">
+                        <span>(%)</span>
+                        &nbsp;&nbsp;
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <div style="text-align: center;" id="num_change">
+            <a title="添加" onclick="xuanxing_change('1', 'xx')" href="javascript:;">
+                <i class="layui-icon">&#xe654;</i>
+            </a>
+            <a title="减少" onclick="xuanxing_change('0', 'xx')" href="javascript:;">
+                <i class="layui-icon">&#xe67e;</i>
+            </a>
+        </div>
+        <hr>
+    </div>
+
+    <div style="display: none" class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">专项工作</div>
+
+        <div class="zhuanxiang_normal" v-for="count in zhuanxiang_num" style="margin-bottom: 50px;">
+            <div class="layui-input-inline shixiang">
+                <label class="layui-form-label" style="width: 100px">添加事项</label>
+                <input type="text" name="title" placeholder="请输入事项(项目)名称" autocomplete="off" class="layui-input zx_name"
+                       style="margin-left: 35px; width: 300px;display: inline-block; float: left; border: 1px solid deepskyblue;">
+            </div>
+            <br><br>
+            <div class="layui-input-inline shuxing">
+                <label class="layui-form-label" style="width: 100px">事项属性</label>
+                <select style="height: 30px;width: 180px;border: 1px solid deepskyblue;direction: ltr;margin-left: 35px;"
+                        class="sx_select">
+                    <option value="">请选择</option>
+                    <option value="1">中心重点工作</option>
+                    <option value="2">处室重点工作</option>
+                    <option value="3">一般事项</option>
+                </select>
+            </div>
+            <br><br>
+            <div class="layui-input-inline params">
+                <span style="margin: 0px 10px 0px 75px">参与人</span>
+                <div class="mem_allot"
+                     style="display: inline-block;border: 1px solid deepskyblue; margin: 0px -25px 0px 35px"
+                     v-for="members in member_list">
+                    <span style="color:deepskyblue">{[ members ]}</span>
+                    <input class="mem_percent" type="text" style="width: 60px;border: none; text-align: center"
+                           placeholder="输入比例">
+                    <span>(%)</span>
+                    &nbsp;&nbsp;
+                </div>
+            </div>
+            <br><br>
+            <div class="layui-input-inline description">
+                <label class="layui-form-label" style="width: 100px">事项描述</label>
+                <textarea cols="100" rows="10" style="border: 1px solid deepskyblue;margin-left: 35px;"
+                          class="des_content"></textarea>
+            </div>
+            <br>
+            <div class="total">
+                <label class="layui-form-label" style="width: 100px">该事项总分</label>
+                <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input total_score"
+                       style="width: 50px;height: 30px; display: inline-block;  border: 1px solid deepskyblue;margin-left: 35px;">
+                <span>(10-30分)</span>
+            </div>
+            <hr>
+        </div>
+
+        <div style="text-align: center;">
+            <a title="添加" onclick="xuanxing_change('1', 'zx')" href="javascript:;">
+                <i class="layui-icon">&#xe654;</i>
+            </a>
+            <a title="减少" onclick="xuanxing_change('0', 'zx')" href="javascript:;">
+                <i class="layui-icon">&#xe640;</i>
+            </a>
+        </div>
+        <hr>
+
+    </div>
+
+    <div style="display: none" class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">对处室的贡献</div>
+
+        <div class="chushi_normal" v-for="count in chushi_num" style="margin-bottom: 50px;">
+            <div class="layui-input-inline shixiang">
+                <label class="layui-form-label" style="width: 100px">添加事项</label>
+                <input type="text" name="title" placeholder="请输入事项(项目)名称" autocomplete="off" class="layui-input cs_name"
+                       style="margin-left: 35px; width: 300px;display: inline-block; float: left; border: 1px solid deepskyblue;">
+            </div>
+            <br><br>
+            <div class="layui-input-inline params">
+                <span style="margin: 0px 10px 0px 75px">参与人</span>
+                <div class="mem_allot"
+                     style="display: inline-block;border: 1px solid deepskyblue; margin: 0px -25px 0px 35px"
+                     v-for="members in member_list">
+                    <span style="color:deepskyblue">{[ members ]}</span>
+                    <input type="text" style="width: 60px;border: none; text-align: center" placeholder="输入比例"
+                           class="mem_percent">
+                    <span>(%)</span>
+                    &nbsp;&nbsp;
+                </div>
+            </div>
+            <br><br>
+            <div class="layui-input-inline description">
+                <label class="layui-form-label" style="width: 100px">事项描述</label>
+                <textarea cols="100" rows="10" style="border: 1px solid deepskyblue;margin-left: 35px;"
+                          class="des_content"></textarea>
+            </div>
+            <br>
+            <div class="layui-input-inline total">
+                <label class="layui-form-label" style="width: 100px">该事项总分</label>
+                <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input total_score"
+                       style="width: 50px;height: 30px; display: inline-block;  border: 1px solid deepskyblue;margin-left: 35px;">
+                <span>(10-30分)</span>
+            </div>
+            <hr>
+
+        </div>
+        <div style="text-align: center;">
+            <a title="添加" onclick="xuanxing_change('1', 'cs')" href="javascript:;">
+                <i class="layui-icon">&#xe654;</i>
+            </a>
+            <a title="减少" onclick="xuanxing_change('0', 'cs')" href="javascript:;">
+                <i class="layui-icon">&#xe640;</i>
+            </a>
+        </div>
+        <hr>
+    </div>
+
+    <div style="display: none" class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">加分项</div>
+
+        <div class="add_score_normal" v-for="count in ad_num" style="margin-bottom: 50px;">
+            <div class="layui-input-inline shixiang">
+                <label class="layui-form-label " style="width: 100px">添加事项</label>
+                <input type="text" name="title" placeholder="请输入事项(项目)名称" autocomplete="off" class="layui-input ad_name"
+                       style="margin-left: 35px; width: 300px;display: inline-block; float: left; border: 1px solid deepskyblue;">
+            </div>
+            <br><br>
+            <div class="layui-input-inline params">
+                <span style="margin: 0px 10px 0px 75px">参与人</span>
+                <div class="mem_allot"
+                     style="display: inline-block;border: 1px solid deepskyblue; margin: 0px -25px 0px 35px"
+                     v-for="members in member_list">
+                    <span style="color:deepskyblue">{[ members ]}</span>
+                    <input class="mem_percent" type="text" style="width: 60px;border: none; text-align: center"
+                           placeholder="输入比例">
+                    <span>(%)</span>
+                    &nbsp;&nbsp;
+                </div>
+            </div>
+            <br><br>
+            <div class="layui-input-inline description">
+                <label class="layui-form-label" style="width: 100px">事项描述</label>
+
+                <textarea cols="100" rows="10" style="border: 1px solid deepskyblue;margin-left: 35px;"
+                          class="des_content">例如：
+提出优化建议并实现
+承担中心、处室重点工作，按任务工作量和效果加分
+受到中心通报表扬，中心领导书面、口头表扬
+完成专利、著作权申请和授权
+
+                </textarea>
+            </div>
+            <br>
+            <div class="layui-input-inline total">
+                <label class="layui-form-label" style="width: 100px">该事项总分</label>
+                <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input total_score"
+                       style="width: 50px;height: 30px; display: inline-block;  border: 1px solid deepskyblue;margin-left: 35px;">
+                <span>(10-30分)</span>
+            </div>
+            <hr>
+        </div>
+        <div style="text-align: center;">
+            <a title="添加" onclick="xuanxing_change('1', 'ad')" href="javascript:;">
+                <i class="layui-icon">&#xe654;</i>
+            </a>
+            <a title="减少" onclick="xuanxing_change('0', 'ad')" href="javascript:;">
+                <i class="layui-icon">&#xe640;</i>
+            </a>
+        </div>
+        <hr>
+    </div>
+
+    <div style="display: none" class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">扣分项</div>
+
+        <div class="minus_score_normal" v-for="count in minus_num" style="margin-bottom: 50px;">
+            <div class="layui-input-inline shixiang">
+                <label class="layui-form-label" style="width: 100px">添加事项</label>
+                <input type="text" name="title" placeholder="请输入事项(项目)名称" autocomplete="off" class="layui-input mi_name"
+                       style="margin-left: 35px; width: 300px;display: inline-block; float: left; border: 1px solid deepskyblue;">
+            </div>
+            <br><br>
+            <div class="layui-input-inline params">
+                <span style="margin: 0px 10px 0px 75px">参与人</span>
+                <div style="display: inline-block;border: 1px solid deepskyblue; margin: 0px -25px 0px 35px"
+                     v-for="members in member_list" class="mem_allot">
+                    <span style="color:deepskyblue">{[ members ]}</span>
+                    <input type="text" style="width: 60px;border: none; text-align: center" placeholder="输入比例"
+                           class="mem_percent">
+                    <span>(%)</span>
+                    &nbsp;&nbsp;
+                </div>
+            </div>
+            <br><br>
+            <div class="layui-input-inline description">
+                <label class="layui-form-label" style="width: 100px">事项描述</label>
+                <textarea cols="100" rows="10" style="border: 1px solid deepskyblue;margin-left: 35px;"
+                          class="des_content">例如：
+丢失选型测试文档
+导致相关部门投诉
+未完成处室重点工作
+导致供应商投诉
+                </textarea>
+            </div>
+            <br>
+            <div class="layui-input-inline total">
+                <label class="layui-form-label" style="width: 100px">该事项扣分</label>
+                <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input total_score"
+                       style="width: 50px;height: 30px; display: inline-block;  border: 1px solid deepskyblue;margin-left: 35px;">
+                <span>(0~20分)</span>
+            </div>
+            <hr>
+
+        </div>
+        <div style="text-align: center;">
+            <a title="添加" onclick="xuanxing_change('1', 'ad')" href="javascript:;">
+                <i class="layui-icon">&#xe654;</i>
+            </a>
+            <a title="减少" onclick="xuanxing_change('0', 'ad')" href="javascript:;">
+                <i class="layui-icon">&#xe640;</i>
+            </a>
+        </div>
+        <hr>
+    </div>
+    <br>
+    <div>
+        <button type="button" class="layui-btn layui-btn-radius"
+                style="display: inline-block; background-color: deepskyblue;margin-left: 50px;" id="submit_all">提交全部
+        </button>
+    </div>
+</div>
+
+<script>
+    let input_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#score_sys",
+        data: {
+            member_list: ["戴路", "张勇", "倪海波", "姜炜", "王超", "杨博"],
+            xuanxing_num: 1,
+            zhuanxiang_num: 1,
+            chushi_num: 1,
+            ad_num: 1,
+            minus_num: 1,
+        }
+    });
+
+    function xuanxing_change(change_option, cls_name) {
+        if (change_option == "0") {
+            if (cls_name == "xx") {
+                if (input_vue.xuanxing_num > 0) {
+                    input_vue.$set(input_vue, "xuanxing_num", input_vue.xuanxing_num - 1);
+                }
+            }
+            if (cls_name == "zx") {
+                if (input_vue.zhuanxiang_num > 0) {
+                    input_vue.$set(input_vue, "zhuanxiang_num", input_vue.zhuanxiang_num - 1);
+                }
+            }
+            if (cls_name == "cs") {
+                if (input_vue.chushi_num > 0) {
+                    input_vue.$set(input_vue, "chushi_num", input_vue.chushi_num - 1);
+                }
+            }
+            if (cls_name == "ad") {
+                if (input_vue.ad_num > 0) {
+                    input_vue.$set(input_vue, "ad_num", input_vue.ad_num - 1);
+                }
+            }
+            if (cls_name == "mi") {
+                if (input_vue.minus_num > 0) {
+                    input_vue.$set(input_vue, "minus_num", input_vue.minus_num - 1);
+                }
+            }
+        }
+        else {
+            if (cls_name == "xx") {
+                input_vue.$set(input_vue, "xuanxing_num", input_vue.xuanxing_num + 1);
+            }
+            if (cls_name == "zx") {
+                input_vue.$set(input_vue, "zhuanxiang_num", input_vue.zhuanxiang_num + 1);
+            }
+            if (cls_name == "cs") {
+                input_vue.$set(input_vue, "chushi_num", input_vue.chushi_num + 1);
+            }
+            if (cls_name == "ad") {
+                input_vue.$set(input_vue, "chushad_numi_num", input_vue.ad_num + 1);
+            }
+            if (cls_name == "mi") {
+                input_vue.$set(input_vue, "minus_num", input_vue.minus_num + 1);
+            }
+        }
+    }
+
+    $(".xuanxing_button").click(function () {
+        let bt_name = $(this).text().replace(/(^\s*)|(\s*$)/g, "");
+        $(".big_select").each(function () {
+            if ($(this).children(".bt_name").text().replace(/(^\s*)|(\s*$)/g, "") == bt_name) {
+                $(this).show();
+                $(this).siblings(".big_select").hide();
+            }
+        })
+    });
+
+    $("#show_all").click(function () {
+        $(".big_select").show()
+    });
+
+    function hj_func(obj) {
+        let op_val = $(obj).find("option:selected").val();
+        $(obj).parent().siblings(".calc").children(".huanjing").val(op_val)
+    }
+
+
+    function anli_clk(obj) {
+        let anli_num = $(obj).parent().siblings(".params").children(".anli_num").val();
+        if (anli_num == null || anli_num == "") {
+        }
+        else {
+            if (!isNaN(anli_num)) {
+                let anli_xishu = (Math.sqrt(anli_num) / 10).toFixed(2);
+                if (anli_xishu > 1) {
+                    anli_xishu = 1
+                }
+                $(obj).val(anli_xishu);
+            }
+        }
+    }
+
+    function test_scale(obj) {
+        let vend_num = $(obj).parent().siblings(".params").children(".changshang").val(); //厂商数
+        let op_text = $(obj).parent().siblings(".params").children(".sh_select").find("option:selected").val();
+        if (vend_num == "" || vend_num == null || op_text == "" || op_text == null || op_text == "0") {
+        }
+        else {
+            if (!isNaN(vend_num)) {
+                let guimo_num = 0;
+                if (vend_num <= 5) {
+                    if (op_text == "1") {
+                        guimo_num = 2
+                    }
+                    else if (op_text == "2") {
+                        guimo_num = 1
+                    }
+                    else if (op_text == "3") {
+                        guimo_num = 0.7
+                    }
+                }
+                else {
+                    if (op_text == "1") {
+                        guimo_num = 2.5
+                    }
+                    else if (op_text == "2") {
+                        guimo_num = 1.5
+                    }
+                    else if (op_text == "3") {
+                        guimo_num = 1.2
+                    }
+                }
+                $(obj).val(guimo_num);
+            }
+        }
+    }
+
+    function show_tips(show_type, obj) {
+        let tip_msg = "";
+        if (show_type == 'zf') {
+            tip_msg = '测试总得分=（质量10+效率10+上会效果10）*测试环境复杂系数*测试案例系数*测试规模*参与比例';
+        }
+        else if (show_type == "hj") {
+            tip_msg = '简单环境系数为1,中等环境，系数为1.1,复杂环境，系数为1.2';
+        }
+        else if (show_type == "al") {
+            tip_msg = '按照测试案例个数的开方计算，上限是100个案例，开方后为10个，系数为1，超过按1计算；不足，则按开方后的案例比例计分。';
+        }
+        else if (show_type == "gm") {
+            tip_msg = '不上会且厂商数≤ 5，则系数为1；不上会且厂商数> 5，则系数为1.5；上会且厂商数≤ 5，则系数为2；上会且厂商数> 5，则系数为2.5；选型评估且厂商数≤ 5，则系数为0.7；选型评估且厂商数> 5，则系数为1.2；';
+        }
+        else if (show_type == "sh") {
+            tip_msg = '上会通过的以10分为基准，对于因测试中心原因要求再次上会的此项以5分为基准。\n' +
+                '                           对于上会受到批评、专家要求方案作出较大调整、要求补充案例较多的情况由处室负责人酌情减分。';
+        }
+        openMsg(tip_msg, obj);
+    }
+
+    function tip_close() {
+        layer.close(subtips);
+    }
+
+    function openMsg(tip_msg, obj) {
+        subtips = layer.tips(tip_msg, $(obj), {tips: [2, '#ff6700'], time: 30000});
+    }
+
+    $("#submit_all").click(function () {
+        layer.confirm("确认要提交吗", function () {
+            let xuanxing_all = [];
+            let xuanxing_flag = 0;
+            $(".xuanxing_normal").each(function () {
+                let sx_name = $(this).children(".shixiang").children(".sx_name").val();
+                if (sx_name != "") {
+                    let changshang = $(this).children(".params").children(".changshang").val();
+                    let anli_num = $(this).children(".params").children(".anli_num").val();
+                    let hj_level = $(this).children(".params").children(".hj_select").find("option:selected").text();
+                    let shanghui = $(this).children(".params").children(".sh_select").find("option:selected").val();
+                    let hj_score = $(this).children(".calc").children(".huanjing").val();
+                    let anli_score = $(this).children(".calc").children(".anli").val();
+                    let guimo_score = $(this).children(".calc").children(".guimo").val();
+                    if (sx_name == "" || changshang == "" || anli_num == "" || hj_level == "" || shanghui == "" || hj_score == "" || anli_score == "" || guimo_score == "") {
+                        layer.msg("参数填写不完整，请检查");
+                        return false;
+                    }
+                    console.log(sx_name, changshang, anli_num, hj_level, shanghui, hj_score, anli_score, guimo_score);
+                    let all_list = [];
+                    let return_flag = 0;
+                    $(this).children(".jieduan").each(function () {
+                        let jieduan_name = $(this).children(".jieduan_name").text();
+                        let jieduan_percent = $(this).children(".percent").val();
+                        if (isNaN(jieduan_percent) || jieduan_percent == "") {
+                            return_flag = 1;
+                            layer.msg("阶段占比没有填写");
+                            return false;
+                        }
+                        let mem_percent = [];
+                        let jieduan_num = 0; // 加起来是否为1
+                        let jieduan_flg = 0; // 判断是否没填人员比例
+                        $(this).children(".mem_allot").children(".mem_percent").each(function () {
+                            if ($(this).val() != "") {
+                                jieduan_flg = 1;
+                                jieduan_num = jieduan_num + parseFloat($(this).val());
+                                mem_percent.push($(this).prev().text() + "_" + $(this).val())
+                            }
+                        });
+                        if (jieduan_flg == 0) {
+                            layer.msg("阶段人员比例没有填写");
+                            return_flag = 1;
+                            return false;
+                        }
+                        if (jieduan_num != 100) {
+                            layer.msg("阶段人员占比不正确");
+                            return_flag = 1;
+                            return false;
+                        }
+                        let jieduan_list = [jieduan_name, jieduan_percent, mem_percent];
+                        all_list.push(jieduan_list);
+                    });
+                    if (return_flag == 1) {
+                        xuanxing_flag = 1;
+                        return false
+                    }
+                    let xuanxing_list = [sx_name, changshang, anli_num, hj_level, shanghui, hj_score, anli_score, guimo_score, all_list];
+                    xuanxing_all.push(xuanxing_list);
+                }
+            });
+            if (xuanxing_flag == 1) {
+                return false;
+            }
+            let zhuanxiang_all = [];
+            let zhuanxiang_flag = 0;
+
+            $(".zhuanxiang_normal").each(function () {
+                let zx_name = $(this).children(".shixiang").children(".zx_name").val();
+                if (zx_name != "") {
+                    let shuxing = $(this).children(".shuxing").children(".sx_select").find("option:selected").val();
+                    let mem_flag = 0;
+                    let mem_num = 0;
+                    let mem_list = [];
+                    $(this).children(".params").children(".mem_allot").each(function () {
+                        if ($(this).children(".mem_percent").val() != "") {
+                            mem_flag = 1;
+                            mem_num = mem_num + parseFloat($(this).children(".mem_percent").val());
+                            mem_list.push($(this).children(".mem_percent").prev().text() + "_" + $(this).children(".mem_percent").val());
+                        }
+                    });
+                    if (mem_flag == 0) {
+                        zhuanxiang_flag = 1;
+                        layer.msg("人员比例没有填写完整");
+                        return false;
+                    }
+                    if (mem_num != 100) {
+                        layer.msg("人员比例填写不正确");
+                        zhuanxiang_flag = 1;
+                        return false;
+                    }
+                    let desc = $(this).children(".description").children(".des_content").val();
+                    let socre = $(this).children(".total").children(".total_score").val();
+                    if (Math.abs(socre) > 30 || Math.abs(socre) < 0) {
+                        zhuanxiang_flag = 1;
+                        layer.msg("分值超出范围");
+                        return false;
+                    }
+                    let zhuanxiang_list = [zx_name, shuxing, mem_list, desc, socre];
+                    zhuanxiang_all.push(zhuanxiang_list);
+                }
+            });
+            if (zhuanxiang_flag != 0) {
+                layer.msg("专项工作人员占比不正确或分值超出范围");
+                return false;
+            }
+            let chushi_all = [];
+            let chushi_flag = 0;
+            $(".chushi_normal").each(function () {
+                let cs_name = $(this).children(".shixiang").children(".cs_name").val();
+                if (cs_name != "") {
+                    let mem_flag = 0;
+                    let mem_num = 0;
+                    let mem_list = [];
+                    $(this).children(".params").children(".mem_allot").each(function () {
+                        if ($(this).children(".mem_percent").val() != "") {
+                            mem_flag = 1;
+                            mem_num = mem_num + parseFloat($(this).children(".mem_percent").val());
+                            mem_list.push($(this).children(".mem_percent").prev().text() + "_" + $(this).children(".mem_percent").val());
+                        }
+                    });
+                    if (mem_flag == 0) {
+                        chushi_flag = 1;
+                        layer.msg("人员比例没有填写完整");
+                        return false;
+                    }
+                    if (mem_num != 100) {
+                        chushi_flag = 1;
+                        layer.msg("人员比例填写不正确");
+                        return false;
+                    }
+                    let desc = $(this).children(".description").children(".des_content").val();
+                    let socre = $(this).children(".total").children(".total_score").val();
+                    if (Math.abs(socre) > 30 || Math.abs(socre) < 0) {
+                        chushi_flag = 1;
+                        layer.msg("分值超出范围");
+                        return false;
+                    }
+                    let chushi_list = [cs_name, mem_list, desc, socre];
+                    chushi_all.push(chushi_list);
+                }
+            });
+            if (chushi_flag != 0) {
+                layer.msg("处室贡献人员占比不正确或分值超出范围");
+                return false;
+            }
+
+            let add_score_all = [];
+            let add_falg = 0;
+            $(".add_score_normal").each(function () {
+                let ad_name = $(this).children(".shixiang").children(".ad_name").val();
+                if (ad_name != "") {
+                    let mem_flag = 0;
+                    let mem_num = 0;
+                    let mem_list = [];
+                    $(this).children(".params").children(".mem_allot").each(function () {
+                        if ($(this).children(".mem_percent").val() != "") {
+                            mem_flag = 1;
+                            mem_num = mem_num + parseFloat($(this).children(".mem_percent").val());
+                            mem_list.push($(this).children(".mem_percent").prev().text() + "_" + $(this).children(".mem_percent").val());
+                        }
+                    });
+                    if (mem_flag == 0) {
+                        add_falg = 1;
+                        layer.msg("人员比例没有填写完整");
+                        return false;
+                    }
+                    if (mem_num != 100) {
+                        add_falg = 1;
+                        layer.msg("人员比例填写不正确");
+                        return false;
+                    }
+                    let desc = $(this).children(".description").children(".des_content").val();
+                    let socre = $(this).children(".total").children(".total_score").val();
+                    if (Math.abs(socre) > 30 || Math.abs(socre) < 0) {
+                        add_falg = 1;
+                        layer.msg("分值超出范围");
+                        return false;
+                    }
+                    let ad_list = [ad_name, mem_list, desc, socre];
+                    add_score_all.push(ad_list);
+                }
+            });
+            if (add_falg != 0) {
+                layer.msg("加分项人员占比不正确或者分值超出范围");
+            }
+            let minus_score_all = [];
+            let minus_flag = 0;
+            $(".minus_score_normal").each(function () {
+                let mi_name = $(this).children(".shixiang").children(".mi_name").val();
+                if (mi_name != "") {
+                    let mem_flag = 0;
+                    let mem_num = 0;
+                    let mem_list = [];
+                    $(this).children(".params").children(".mem_allot").each(function () {
+                        if ($(this).children(".mem_percent").val() != "") {
+                            mem_flag = 1;
+                            mem_num = mem_num + parseFloat($(this).children(".mem_percent").val());
+                            mem_list.push($(this).children(".mem_percent").prev().text() + "_" + $(this).children(".mem_percent").val());
+                        }
+                    });
+                    if (mem_flag == 0) {
+                        minus_flag = 1;
+                        layer.msg("人员比例没有填写完整");
+                        return false;
+                    }
+                    if (mem_num != 100) {
+                        minus_flag = 1;
+                        layer.msg("人员比例填写不正确");
+                        return false;
+                    }
+                    let desc = $(this).children(".description").children(".des_content").val();
+                    let socre = $(this).children(".total").children(".total_score").val();
+                    if (Math.abs(socre) > 20) {
+                        minus_flag = 1;
+                        layer.msg("分值超出范围");
+                        return false;
+                    }
+                    let mi_list = [mi_name, mem_list, desc, Math.abs(socre)];
+                    minus_score_all.push(mi_list);
+                }
+            });
+            if (minus_flag != 0) {
+                layer.msg("扣分项人员占比或者分值超出范围");
+                return false;
+            }
+            $.ajax({
+                url: '/xuanxing/item_submit/',
+                type: 'post',
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "xuanxing_all": JSON.stringify(xuanxing_all),
+                    "zhuanxiang_all": JSON.stringify(zhuanxiang_all),
+                    "chushi_all": JSON.stringify(chushi_all),
+                    "add_score_all": JSON.stringify(add_score_all),
+                    "minus_score_all": JSON.stringify(minus_score_all),
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        window.location.href = "/xuanxing/item_input/";
+                        layer.msg("提交成功");
+                        return false;
+                    } else if (ReState["code"] == "0004") {
+                        layer.msg("事项重复,请修改后提交");
+                        return false;
+                    } else if (ReState["code"] == "0003") {
+                        alert("提交失败2")
+                    }
+                }
+            });
+        })
+    });
+
+    function calc_score(obj) {
+        let guimo = $(obj).parent().children(".guimo").val();
+        let anli = $(obj).parent().children(".anli").val();
+        let huanjing = $(obj).parent().children(".huanjing").val();
+        let shanghui = $(obj).parent().siblings(".params").children(".sh_select").find("option:selected").val();
+        let jizhun = 0;
+        if (shanghui == "1") {
+            jizhun = 30
+        }
+        else {
+            jizhun = 20
+        }
+        let final_score = jizhun * (parseFloat(huanjing) * 10) * (parseFloat(anli) * 100) * (parseFloat(guimo) * 10) / 10000;
+        final_score = final_score.toFixed(2);
+        $(obj).prev().val(final_score);
+
+    }
+</script>
+</body>
+</html>

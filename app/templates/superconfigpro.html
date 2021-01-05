@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>超级用户管理项目界面</title>
+</head>
+<body>
+    <div>
+        <h3 style="background: #74A8F5;text-align:center">修改项目</h3>
+        <input type="hidden" id="loguser" name="loguser" value="{{ username }}">
+        <input type="hidden" id="userclass" name="userclass" value="{{ userclass }}">
+        <input type="hidden" id="userid" name="userid" value="{{ userid }}">
+        <input type="hidden" id="flag" value="{{ flag }}">
+        <input type="hidden" id="cretime" value="{{ time }}">
+        <input type="hidden" id="creuser" value="{{ creatuser }}">
+        <input type="hidden" id="proxmjd" value="{{ xmjd }}">
+        <input type="hidden" id="procharperson" value="{{ charperson }}">
+        <input type="hidden" id="proparticipant" value="{{ participant }}">
+        <input type="hidden" id="pronameinput" value="{{ proname }}">
+        <input type="hidden" id="mohuproname" value="{{ proname }}">
+        <input type="hidden" id="configproname" name="configproname" value="{{ proname }}">
+        要操作的项目：<input type="text"  id="oldproname" value="{{ proname }}" disabled>&nbsp;<input type="button" style="background: #74A8F5" value="一键修改" onclick="yjxg()">&nbsp;<input type="button" style="background: #7BB425" value="返回看板/取消" onclick="fh()"> <br>
+        <div id="">
+            <h4>1、修改项目名称</h4>
+            &nbsp;&nbsp;&nbsp;&nbsp; 输入新的项目名称：<input type="text" id="newproname" name="newproname">&nbsp;<input type="button" value="修改" onclick="xgproname()">
+        </div>
+
+        <div>
+            <h4>2、修改时间</h4>
+            &nbsp;&nbsp;&nbsp;&nbsp;请选择时间：<input type="date" id="newtime" name="newtime">&nbsp;<input type="button" value="修改" onclick="xgprotime()">
+        </div>
+
+        <div>
+            <h4>3、修改负责人</h4>
+            &nbsp;&nbsp;&nbsp;&nbsp;选择新的负责人 <br><br>
+            {% for char in chars %}
+                <input  id="chargeperson" type="checkbox" name="chargeperson" value="{{char.username}}">{{char.username}}
+            {% endfor %}
+            <br><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="修改" onclick="xgchar()">
+        </div>
+
+        <div>
+            <h4>4、修改参与人</h4>
+            &nbsp;&nbsp;&nbsp;&nbsp;选择新的参与人 <br><br>
+            {% for char in chars %}
+                <input  id="participant" type="checkbox" name="participant" value="{{char.username}}">{{char.username}}
+            {% endfor %}
+            <br><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="修改" onclick="xgpar()">
+        </div>
+
+        <div>
+            <h4>5、删除项目</h4>
+            &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="删除" onclick="delepro()">
+        </div>
+
+
+
+    </div>
+</body>
+</html>
+<script src="{% static 'js/jquery-1.11.1.js' %}"></script>
+<script type="text/javascript">
+
+    $.ajaxSetup({
+            data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
+        })
+
+    function yjxg() {
+        var username = $('#loguser').val();
+        var userclass = $('#userclass').val();
+        var userid = $('#userid').val();
+        var participant = $('input[id="participant"]:checked').map(function (index, elem) {
+        return $(elem).val()
+    }).get().join(',');
+        var chargeperson = $('input[id="chargeperson"]:checked').map(function (index, elem) {
+        return $(elem).val()
+    }).get().join(',');
+        var newproname = $('#newproname').val();
+        var oldproname = $('#oldproname').val();
+        var newtime = $('#newtime').val();
+        console.log(username,userclass,userid,participant,chargeperson,newproname,oldproname);
+        if (participant ||chargeperson||newproname||newtime){
+            $.ajax({
+            type:'post',
+            url:'{% url 'app:superudate' %}',
+            traditional:true,
+            async: false,
+            data:{'username':username,'userclass':userclass,'userid':userid,'par':participant,'char':chargeperson,'newproname':newproname,'oldproname':oldproname,'newtime':newtime},
+            success:function (data) {
+                if (data=='1'){
+                    alert('一键修改成功');
+                    location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+                }
+            }
+        })
+        }else{
+            alert('您没有做任何修改');
+            location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+        }
+    }
+
+    function fh() {
+        var username = $('#loguser').val();
+        var userclass = $('#userclass').val();
+        var userid = $('#userid').val();
+        location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+    }
+
+    function delepro() {
+        var proname = $('#oldproname').val();
+        $.ajax({
+            type:'get',
+            data:'proname='+proname,
+            url:'{% url 'app:delpro' %}',
+            success:function (data) {
+                if (data=='1'){
+                    alert('已成功删除该项目');
+                    var username = $('#loguser').val();
+                    var userclass = $('#userclass').val();
+                    var userid = $('#userid').val();
+                    location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+                }
+            }
+        })
+    }
+
+    function xgpar() {
+        var proname = $('#oldproname').val();
+        var participant = $('input[id="participant"]:checked').map(function (index, elem) {
+        return $(elem).val()
+    }).get().join(',');
+        console.log(proname,participant);
+        if(participant==''){
+            alert('请选择负责人')
+        }else{
+            $.ajax({
+            type:'get',
+            data:'proname='+proname+'&participant='+participant,
+            url:'{% url 'app:updatepar' %}',
+            success:function (data) {
+                if (data=='1'){
+                    alert('参与人修改成功');
+                    var username = $('#loguser').val();
+                    var userclass = $('#userclass').val();
+                    var userid = $('#userid').val();
+                    {#location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass#}
+                }
+            }
+        })
+        }
+    }
+
+    function xgchar() {
+        var proname = $('#oldproname').val();
+        var chargeperson = $('input[id="chargeperson"]:checked').map(function (index, elem) {
+        return $(elem).val()
+    }).get().join(',');
+        console.log(proname,chargeperson);
+        if(chargeperson==''){
+            alert('请选择负责人')
+        }else{
+            $.ajax({
+            type:'get',
+            data:'proname='+proname+'&chargeperson='+chargeperson,
+            url:'{% url 'app:updatechar' %}',
+            success:function (data) {
+                if (data=='1'){
+                    alert('负责人修改成功');
+                    var username = $('#loguser').val();
+                    var userclass = $('#userclass').val();
+                    var userid = $('#userid').val();
+                    {#location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass#}
+                }
+            }
+        })
+        }
+    }
+
+    function xgprotime() {
+        var newtime = $('#newtime').val();
+        var proname = $('#oldproname').val();
+        console.log(newtime,proname);
+        if (newtime){
+            $.ajax({
+                type:'get',
+                data:'newtime='+newtime+'&proname='+proname,
+                url:'{% url 'app:updateprotime' %}',
+                success:function (data) {
+                    if (data=='1'){
+                        alert('时间修改成功');
+                        var username = $('#loguser').val();
+                        var userclass = $('#userclass').val();
+                        var userid = $('#userid').val();
+                        {#location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass#}
+                    }
+                }
+            })
+        }else {
+            alert('请选择时间')
+        }
+    }
+
+    function xgproname() {
+        var newproname = $('#newproname').val();
+        var oldproname = $('#oldproname').val();
+        if (newproname){
+            alert('您确定要修改项目名称吗？')
+            $.ajax({
+                type:'get',
+                data:'newproname='+newproname+'&oldproname='+oldproname,
+                url:'{% url 'app:updateproname' %}',
+                success:function (data) {
+                    if (data=='1'){
+                        alert('项目名称修改成功');
+                        var username = $('#loguser').val();
+                        var userclass = $('#userclass').val();
+                        var userid = $('#userid').val();
+                        {#location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass#}
+                    }else {
+                        alert('修改项目名称失败，请重新修改')
+                    }
+                }
+            })
+        }else if (newproname==''){
+            alert('请输入新的项目名称')
+        }
+    }
+
+    $(function(){
+       //得到当前时间
+	var date_now = new Date();
+	//得到当前年份
+	var year = date_now.getFullYear();
+	//得到当前月份
+	//注：
+	//  1：js中获取Date中的month时，会比当前月份少一个月，所以这里需要先加一
+	//  2: 判断当前月份是否小于10，如果小于，那么就在月份的前面加一个 '0' ， 如果大于，就显示当前月份
+	var month = date_now.getMonth()+1 < 10 ? "0"+(date_now.getMonth()+1) : (date_now.getMonth()+1);
+	//得到当前日子（多少号）
+	var date = date_now.getDate() < 10 ? "0"+date_now.getDate() : date_now.getDate();
+	//设置input标签的max属性
+	$("#newtime").attr("max",year+"-"+month+"-"+date);
+})
+
+</script>

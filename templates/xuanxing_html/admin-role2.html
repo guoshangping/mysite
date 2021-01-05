@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <![endif]-->
+</head>
+<style>
+
+</style>
+
+<body>
+<div class="x-body">
+    <div>
+        <button class="layui-btn" style="float: left;" onclick="add_role('添加角色','/xuanxing/role_add_html/')"><i
+                class="layui-icon"></i>添加角色
+        </button>
+    </div>
+    <br><br>
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>角色名</th>
+            <th>描述</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        {% for role_item in role_list %}
+            <tbody>
+            <tr style="width: 500px;">
+
+                <td>{{ forloop.counter }}</td>
+                <td class="role_ids" style="display: none">{{ role_item.role_id }}</td>
+                <td>{{ role_item.role_name }}</td>
+                <td>{{ role_item.desc }}</td>
+                <td class="td-manage">
+                    <a title="编辑" onclick="x_admin_show_new(this, '编辑')" href="javascript:;">
+                        <i class="layui-icon">&#xe642;</i>
+                    </a>
+                    <a title="删除" onclick="member_del(this,'要删除的id')" href="javascript:;">
+                        <i class="layui-icon">&#xe640;</i>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        {% endfor %}
+    </table>
+
+
+</div>
+
+<fieldset class="layui-elem-field layui-field-title">
+    <legend>权限分配设置</legend>
+</fieldset>
+
+<div class="layui-inline">
+    <div class="layui-input-block" style="margin-left: 10px">
+        <select id="op_user">
+            <option value="">请选择用户</option>
+            {% for uname in usr_list %}
+                <option value="{{ uname.1 }}">{{ uname.0 }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="layui-inline">
+    <div class="layui-input-block" style="margin-left: 10px">
+        <select id="op_select">
+            {% for rolename in rolename_list %}
+                <option value="1">{{ rolename }}</option>
+            {% endfor %}
+
+
+        </select>
+    </div>
+
+</div>
+
+<div class="layui-inline">
+    <div class="layui-input-block" style="margin-left: 20px;">
+        <button type="button" class="layui-btn layui-btn-sm" id="option_set" style="height: 50px">分配权限</button>
+    </div>
+</div>
+<br><br>
+<div id="cancel_opt">
+    <div class="layui-inline">
+        <div class="layui-input-block" style="margin-left: 10px">
+            <select id="cancel_user">
+                <option value="">请选择用户</option>
+                {% for uname in usr_list %}
+                    <option value="{{ uname.1 }}">{{ uname.0 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <div class="layui-input-block" style="margin-left: 10px">
+            <select id="cancel_select">
+                <option v-for="role_name in role_list">{[ role_name ]}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <div class="layui-input-block" style="margin-left: 20px;">
+            <button type="button" class="layui-btn layui-btn-sm" id="option_cancel" style="height: 50px">回收权限</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let opt_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#cancel_opt",
+        data: {
+            role_list: [],
+        }
+    });
+
+
+    function add_role(title, url, w, h) {
+        if (title == null || title == '') {
+            title = false;
+        }
+        ;
+        if (url == null || url == '') {
+            url = "404.html";
+        }
+        ;
+        if (w == null || w == '') {
+            w = ($(window).width() * 0.9);
+        }
+        ;
+        if (h == null || h == '') {
+            h = ($(window).height() - 50);
+        }
+        ;
+        layer.open({
+            type: 2,
+            area: [w + 'px', h + 'px'],
+            fix: false, //不固定
+            maxmin: true,
+            shadeClose: true,
+            shade: 0.4,
+            title: title,
+            content: url,
+            end: function () {
+                window.location.href = "/xuanxing/admin_role"
+            }
+        });
+    }
+
+    layui.use('laydate', function () {
+        let laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+    });
+
+    function x_admin_show_new(obj, title, url, w, h) {
+        let role_id = $(obj).parent().parent().children(".role_ids").html().replace(/(^\s*)|(\s*$)/g, ""); //要编辑的角色id
+        url = "/xuanxing/role_edit?role_id=" + role_id;
+
+        layer = layui.layer;
+        element = layui.element;
+
+        if (title == null || title == '') {
+            title = false;
+        }
+        if (url == null || url == '') {
+            url = "404.html";
+        }
+        if (w == null || w == '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h == '') {
+            h = ($(window).height() - 50);
+        }
+        layer.open({
+            type: 2,
+            area: [w + 'px', h + 'px'],
+            fix: false, //不固定
+            maxmin: true,
+            shadeClose: true,
+            shade: 0.4,
+            title: "编辑",
+            content: url
+        });
+    }
+
+    /*角色-删除*/
+    function member_del(obj, id) {
+        let role_id = $(obj).parent().parent().children(".role_ids").html();
+        layer.confirm('确认要删除吗？', function (index) {
+            //发异步删除数据
+            $.ajax({
+                url: '/xuanxing/role_del/',
+                type: 'post',
+                async: false,
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "role_id": role_id,
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!', {icon: 1, time: 1000});
+                        window.location.href = "/xuanxing/admin_role";
+                        return false;
+                    } else if (ReState["code"] == "0002") {
+                        alert("webserver error")
+                    }
+                }
+            });
+        });
+    }
+
+    $("#option_set").click(function () {
+        let uid = $("#op_user").find("option:selected").val();
+        let op_name = $("#op_select").find("option:selected").text();
+        $.ajax({
+            url: '/xuanxing/role_set/',
+            type: 'post',
+            async: false,
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "role_name": op_name,
+                "user_id": uid
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.msg("设置成功");
+
+                } else if (ReState["code"] == "0001") {
+                    layer.msg("设置失败");
+                }
+            }
+        });
+    });
+
+    $("#cancel_user").bind("change", function () {
+        let user_id = $(this).find("option:selected").val();
+        $.post(
+            "/xuanxing/role_query/", // url
+            {
+                "csrfmiddlewaretoken": "{{ csrf_token }}",
+                "user_id": user_id
+            }, // 参数
+            function (recv_data) {
+                if (recv_data["code"] == "0000") {
+                    opt_vue.$set(opt_vue, "role_list", recv_data["role_list"]);
+                }
+                else {
+                    layer.msg("数据出错")
+                }
+            }
+        )
+    });
+
+    $("#option_cancel").click(function () {
+        let cancel_user = $("#cancel_user").find("option:selected").val();
+        let cancel_role = $("#cancel_select").find("option:selected").text();
+        if (cancel_user == "" || cancel_role == "" || cancel_user == null || cancel_role == null) {
+            layer.msg("请选择用户或者权限")
+        }
+        else {
+            $.post(
+                "/xuanxing/role_cancel/", // url
+                {
+                    "csrfmiddlewaretoken": "{{ csrf_token }}",
+                    "user_id": cancel_user,
+                    "role_name": cancel_role
+                }, // 参数
+                function (recv_data) {
+                    if (recv_data["code"] == "0000") {
+                        layer.alert("回收权限成功", {icon: 6}, function () {
+                            window.location.href = location.href
+                        });
+                        //layer.msg("回收权限成功");
+                        //window.location.href = location.href
+                    }
+                    else {
+                        layer.msg("回收失败")
+                    }
+                }
+            )
+        }
+
+
+    });
+
+</script>
+
+</body>
+
+</html>

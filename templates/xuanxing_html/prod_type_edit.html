@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+    {% csrf_token %}
+    <div class="layui-form-item">
+        <label for="username" class="layui-form-label">
+            <span class="x-red">*</span>产品类型名称
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="prod_type_name">
+        </div>
+
+        <label for="phone" class="layui-form-label">
+            子类名称
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" id="cd_type" class="layui-input">
+        </div>
+
+        <div class="layui-input-inline" style="width: 100px;">
+            <button type="button" class="layui-btn layui-btn-radius score_button layui-btn-warm" id="prod_type_add">增加
+            </button>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label for="L_email" class="layui-form-label">
+            <span class="x-red">*</span> 要修改的产品类型名称
+        </label>
+        <div class="layui-input-inline">
+            <select id="md_prod_type" style="height: 38px;">
+                {% for pdt in pdt_list %}
+                    <option>{{ pdt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <input type="text" id="md_type_name" class="layui-input">
+        </div>
+
+        <div class="layui-input-inline" style="width: 100px;">
+            <button type="button" class="layui-btn layui-btn-radius score_button layui-btn-warm" id="prod_change">修改
+            </button>
+        </div>
+
+    </div>
+
+    <div class="layui-form-item">
+        <label for="L_email" class="layui-form-label">
+            <span class="x-red">*</span> 产品子类修改
+        </label>
+        <div class="layui-input-inline">
+            <select id="change_prod_type" style="height: 38px;">
+                {% for pdt in pdt_list %}
+                    <option>{{ pdt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select id="change_cd_type" style="height: 38px;">
+                {% for cdt in cdt_list %}
+                    <option>{{ cdt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <input type="text" id="cd_type_name" class="layui-input">
+        </div>
+
+        <div class="layui-input-inline" style="width: 100px;">
+            <button type="button" class="layui-btn layui-btn-radius score_button layui-btn-warm" id="cd_type_change">修改
+            </button>
+        </div>
+
+    </div>
+
+
+    <br><br>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>产品增加</legend>
+    </fieldset>
+    <br><br>
+    <input type="text" class="layui-input" id="pj_name" value="{{ pj_name }}" style="display: none">
+
+    <div class="layui-form-item">
+        <label for="L_email" class="layui-form-label">
+            <span class="x-red">*</span> 产品类型
+        </label>
+        <div class="layui-input-inline">
+            <select id="prod_type">
+                {% for pdt in pdt_list %}
+                    <option>{{ pdt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label for="L_email" class="layui-form-label">
+            <span class="x-red">*</span>子类
+        </label>
+        <div class="layui-input-inline">
+            <select id="prod_child_type">
+                {% for cdt in cdt_list %}
+                    <option>{{ cdt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label for="L_pass" class="layui-form-label">
+            <span class="x-red">*</span>厂商策略
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="prod_strategy">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label for="L_repass" class="layui-form-label">
+            <span class="x-red">*</span>生命周期状态
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="life_status">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>性能分类
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="property_type">
+
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>厂商
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="vend_name">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>产品
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="prod_name">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>主要技术指标
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="main_index">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>部署范围
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="deploy_scope">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>应用场景
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="apply_scene">
+
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>建议生产环境使用年限
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="use_years">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>备注
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="markinfo">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+        </label>
+        <button class="layui-btn" id="prod_add">
+            添加
+        </button>
+        <button class="layui-btn" id="prod_cancel">
+            取消
+        </button>
+    </div>
+    <input type="text" value="{{ bg_cls }}" style="display: none;" id="big_cls">
+</div>
+
+<script>
+    $("#cd_type_change").click(function () {
+        let chg_prod_type = $("#change_prod_type").find("option:selected").text();
+        let chg_cd_type = $("#change_cd_type").find("option:selected").text();
+        let cd_type_name = $("#cd_type_name").val();
+        let pj_name = $("#pj_name").val();
+        $.ajax({
+            url: '/xuanxing/prod_change/',
+            type: 'post',
+            async: false,
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "option": "1",
+                "chg_prod_type": chg_prod_type,
+                "cd_type_name": cd_type_name,
+                "chg_cd_type": chg_cd_type,
+                "pj_name": pj_name
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.alert("操作成功", {icon: 6}, function () {
+                        // 获得frame索引
+                        let index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                    return false;
+                } else if (ReState["code"] == "0001") {
+                    alert("没有该类型")
+                } else if (ReState["code"] == "0002") {
+                    alert("Username Error")
+                }
+            }
+        });
+    });
+
+    $("#prod_change").click(function () {
+        let pd_type_name = $("#md_prod_type").find("option:selected").text();
+        let md_chg_name = $("#md_type_name").val();
+        let pj_name = $("#pj_name").val(); //增加产品类型的操作
+        $.ajax({
+            url: '/xuanxing/prod_change/',
+            type: 'post',
+            async: false,
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "option": "0",
+                "pd_type_name": pd_type_name,
+                "md_chg_name": md_chg_name,
+                "pj_name": pj_name
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.alert("操作成功", {icon: 6}, function () {
+                        // 获得frame索引
+                        let index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                    return false;
+                } else if (ReState["code"] == "0001") {
+                    alert("没有该类型")
+                } else if (ReState["code"] == "0002") {
+                    alert("Username Error")
+                }
+            }
+        });
+    });
+
+    $("#prod_cancel").click(function () {
+        let index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+    });
+
+    $("#prod_add").click(function () {
+        let pj_name = $("#pj_name").val();
+        let prod_type = $("#prod_type").find("option:selected").text();
+        let prod_child_type = $("#prod_child_type").find("option:selected").text();
+        let prod_strategy = $("#prod_strategy").val();
+        let life_status = $("#life_status").val();
+        let property_type = $("#property_type").val();
+        let vend_name = $("#vend_name").val();
+        let prod_name = $("#prod_name").val();
+        let main_index = $("#main_index").val();
+        let deploy_scope = $("#deploy_scope").val();
+        let apply_scene = $("#apply_scene").val();
+        let use_years = $("#use_years").val();
+        let markinfo = $("#markinfo").val();
+        $.ajax({
+            url: '/xuanxing/prod_add/',
+            type: 'post',
+            async: false,
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "pj_name": pj_name,
+                "prod_type": prod_type,
+                "prod_child_type": prod_child_type,
+                "prod_strategy": prod_strategy,
+                "life_status": life_status,
+                "property_type": property_type,
+                "vend_name": vend_name,
+                "prod_name": prod_name,
+                "main_index": main_index,
+                "deploy_scope": deploy_scope,
+                "apply_scene": apply_scene,
+                "use_years": use_years,
+                "markinfo": markinfo,
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.alert("操作成功", {icon: 6}, function () {
+                        // 获得frame索引
+                        let index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                    return false;
+                } else if (ReState["code"] == "0002") {
+                    alert("Password Error")
+                } else if (ReState["code"] == "0003") {
+                    alert("Username Error")
+                }
+            }
+        });
+
+    });
+
+    $("#prod_type_add").click(function () {
+        let prod_type_val = $("#prod_type_name").val();
+        let cd_type = $("#cd_type").val();
+        let option = "1"; //增加产品类型的操作
+        let pj_name = $("#pj_name").val(); //增加产品类型的操作
+        let bg_cls = $("#big_cls").val(); //大类
+        $.ajax({
+            url: '/xuanxing/prod_type_add/',
+            type: 'post',
+            async: false,
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "pj_name": pj_name,
+                "prod_type_name": prod_type_val,
+                "option": option,
+                "bg_cls": bg_cls,
+                "cd_type": cd_type,
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.alert("操作成功", {icon: 6}, function () {
+                        // 获得frame索引
+                        let index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                    return false;
+                } else if (ReState["code"] == "0001") {
+                    alert("没有该类型")
+                } else if (ReState["code"] == "0002") {
+                    alert("Username Error")
+                }
+            }
+        });
+    });
+
+
+</script>
+
+</body>
+
+</html>

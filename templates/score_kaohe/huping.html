@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+<div>
+    <br><br>
+    <label class="layui-form-label" style="width: 100px">请选择季度</label>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <select style="height: 30px;width: 180px;border: 1px solid deepskyblue;direction: ltr;"
+            class="quarter_select">
+        {% for qa in quarter_all %}
+                <option value="">{{ qa }}</option>
+        {% endfor %}
+
+    </select>
+</div>
+<hr>
+<br><br>
+
+<div id="score_sys">
+    {% csrf_token %}
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">选型测试</div>
+        {% for xx_item in xuanxing_list %}
+            <div class="xuanxing_normal" style="margin-bottom: 50px;">
+                <div class="layui-input-inline params">
+                    <span style="width: 200px;font-size: 20px;color: #01AAED;display: inline-block;margin-left: 40px;">{{ xx_item.1 }}</span>
+                    <div class="layui-input-inline parms_val" style="margin-left: 20px;">
+                        <span>测试环境复杂系数</span>
+                        <span class="hj">{{ xx_item.2 }}</span>
+                        <span>测试案例系数</span>
+                        <span class="anli">{{ xx_item.3 }}</span>
+                        <span>测试规模系数</span>
+                        <span class="guimo">{{ xx_item.4 }}</span>
+                        <span>质量(10)</span>
+                        <span>效率(10)</span>
+                        {% if xx_item.5 == '1' %}
+                            <span>上会效果(10)</span>
+                        {% endif %}
+                        {% for per_item in xx_item.6 %}
+                            <span>{{ per_item.0 }}({{ per_item.1 }}%)</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <br><br>
+                <span class="xx_id" style="display: none">{{ xx_item.0 }}</span>
+
+                <div class="layui-input-inline hp_params" style="margin-left: 40px;">
+                    <span style="margin: 0px 45px 0px 15px;width: 60px;display: inline-block">质量</span>
+                    {% if xx_item.7 == "0" %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="calc_val" disabled="disabled">
+                    {% else %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="calc_val" value="{{ xx_item.8.0 }}" onmouseleave="xuanxing_check(this)">
+                    {% endif %}
+
+                    <span style="margin: 0px 10px 0px 15px;width: 60px;display: inline-block">效率</span>
+                    {% if xx_item.7 == "0" %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="calc_val" disabled="disabled">
+                    {% else %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="calc_val" value="{{ xx_item.8.1 }}" onmouseleave="xuanxing_check(this)">
+                    {% endif %}
+                    {% if xx_item.5 == '1' %}
+                        <span style="margin: 0px 10px 0px 15px;width: 60px;display: inline-block">上会效果</span>
+                        {% if xx_item.7 == "0" %}
+                            <input type="text"
+                                   style="width: 103px;border: none; text-align: center;margin-right: 10px;border: 1px solid deepskyblue;"
+                                   placeholder="请打分" class="calc_val" disabled="disabled">
+                        {% else %}
+                            <input type="text"
+                                   style="width: 103px;border: none; text-align: center;margin-right: 10px;border: 1px solid deepskyblue;"
+                                   placeholder="请打分" class="calc_val" value="{{ xx_item.8.2 }}" onmouseleave="xuanxing_check(this)">
+                        {% endif %}
+                    {% endif %}
+
+
+                    <button type="button" class="layui-btn layui-btn-radius"
+                            style="display: inline-block; background-color: deepskyblue" onclick="calc_score(this)">
+                        计算分数
+                    </button>
+                    <input type="text" name="title" placeholder="" autocomplete="off" class="layui-input"
+                           style="width: 50px;height: 32px; display: inline-block;  border: 1px solid deepskyblue;margin-left: 5px;">
+                </div>
+
+                <br>
+
+            </div>
+            <hr>
+        {% endfor %}
+
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">专项工作</div>
+        {% for zx_item in zhuanxiang_list %}
+            <div class="zhuanxiang_normal" style="margin-bottom: 50px;">
+                <span class="xx_id" style="display: none">{{ zx_item.0 }}</span>
+                <div class="layui-input-inline">
+                    <span style="width: 200px;font-size: 20px;color: #01AAED;display: inline-block;margin-left: 40px;">{{ zx_item.1 }}</span>
+                </div>
+                <div class="layui-input-inline parms_val" style="margin-left: 20px;">
+                    {% for zxx_item in zx_item.5 %}
+                        <span>{{ zxx_item.0 }}({{ zxx_item.1 }}%)</span>
+                    {% endfor %}
+                </div>
+                <br><br>
+                <div>
+                    <span style="width: 85px;display: inline-block;margin-left: 35px;">描述</span>
+                    <textarea cols="100" rows="5"
+                              style="border: 1px solid deepskyblue;margin-left: 35px;">{{ zx_item.2 }}</textarea>
+                </div>
+                <br>
+                <div>
+                    <span style="width: 85px;display: inline-block;margin-left: 35px;">属性</span>
+                    <span style="margin-left: 35px;">{{ zx_item.3 }}</span>
+                </div>
+                <br>
+                <div class="score">
+                    <span style="display: inline-block;margin-left: 35px;width: 85px;">打分</span>
+{#                    <span style="width: 85px;display: inline-block;margin-left: 35px;">上报分({{ zx_item.4 }})</span>#}
+                    {% if zx_item.6 == '1' %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;margin-left: 35px; border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="final_score" value="{{ zx_item.8 }}">
+                    {% else %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="final_score" disabled="disabled">
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">对处室的贡献</div>
+        {% for cs_item in chushi_list %}
+            <div class="chushi_normal" style="margin-bottom: 50px;">
+                <span class="xx_id" style="display: none">{{ cs_item.0 }}</span>
+                <div class="layui-input-inline">
+                    <span style="width: 200px;font-size: 20px;color: #01AAED;display: inline-block;margin-left: 40px;">{{ cs_item.1 }}</span>
+                </div>
+                <div class="layui-input-inline parms_val" style="margin-left: 20px;">
+                    {% for zxx_item in cs_item.4 %}
+                        <span>{{ zxx_item.0 }}({{ zxx_item.1 }}%)</span>
+                    {% endfor %}
+                </div>
+                <br><br>
+                <div>
+                    <span style="width: 85px;display: inline-block;margin-left: 35px;">描述</span>
+                    <textarea cols="100" rows="5"
+                              style="border: 1px solid deepskyblue;margin-left: 35px;">{{ cs_item.2 }}</textarea>
+                </div>
+                <br>
+                <div class="score">
+                    <span style="display: inline-block;margin-left: 35px;width: 85px;">打分</span>
+{#                    <span style="width: 85px;display: inline-block;margin-left: 35px;">上报分({{ cs_item.3 }})</span>#}
+                    {% if cs_item.5 == '1' %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;margin-left: 35px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="final_score" value="{{ cs_item.7 }}">
+                    {% else %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="final_score" disabled="disabled">
+                    {% endif %}
+                </div>
+                <br>
+            </div>
+            <hr>
+        {% endfor %}
+
+
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">加分项</div>
+        {% for add_item in ad_list %}
+            <div class="add_normal" style="margin-bottom: 50px;">
+                <span class="xx_id" style="display: none;">{{ add_item.0 }}</span>
+                <div class="layui-input-inline">
+                    <span style="width: 200px;font-size: 20px;color: #01AAED;display: inline-block;margin-left: 40px;">{{ add_item.1 }}</span>
+                </div>
+                <div class="layui-input-inline parms_val" style="margin-left: 20px;">
+                    {% for zxx_item in add_item.4 %}
+                        <span>{{ zxx_item.0 }}({{ zxx_item.1 }}%)</span>
+                    {% endfor %}
+                </div>
+                <br><br>
+                <div>
+                    <span style="width: 85px;display: inline-block;margin-left: 35px;">描述</span>
+                    <textarea cols="100" rows="5"
+                              style="border: 1px solid deepskyblue;margin-left: 35px;">{{ add_item.2 }}</textarea>
+                </div>
+                <br>
+                <div class="score">
+                    <span style="display: inline-block;margin-left: 35px;width: 85px;">打分</span>
+{#                    <span style="width: 85px;display: inline-block;margin-left: 35px;">上报分({{ add_item.3 }})</span>#}
+                    {% if add_item.5 == "1" %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;margin-left: 35px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="final_score" value="{{ add_item.7 }}">
+                    {% else %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="final_score" disabled="disabled">
+                    {% endif %}
+                </div>
+                <br>
+            </div>
+            <hr>
+        {% endfor %}
+
+    </div>
+
+    <div class="big_select">
+        <div class="bt_name" style="text-align: center;font-size: 17px;font-weight: bold">扣分项</div>
+        {% for mi_item in mi_list %}
+            <div class="minus_normal" style="margin-bottom: 50px;">
+                <span class="xx_id" style="display: none">{{ mi_item.0 }}</span>
+
+                <div class="layui-input-inline">
+                    <span style="width: 200px;font-size: 20px;color: #01AAED;display: inline-block;margin-left: 40px;">{{ mi_item.1 }}</span>
+
+                </div>
+                <div class="layui-input-inline parms_val" style="margin-left: 20px;">
+                    {% for zxx_item in mi_item.4 %}
+                        <span>{{ zxx_item.0 }}({{ zxx_item.1 }}%)</span>
+                    {% endfor %}
+                </div>
+                <br><br>
+                <div>
+                    <span style="width: 85px;display: inline-block;margin-left: 35px;">描述</span>
+                    <textarea cols="100" rows="5"
+                              style="border: 1px solid deepskyblue;margin-left: 35px;">{{ mi_item.2 }}</textarea>
+                </div>
+                <br>
+                <div class="score">
+                    <span style="display: inline-block;margin-left: 35px;width: 85px;">打分</span>
+{#                    <span style="width: 85px;display: inline-block;margin-left: 35px;">上报分({{ mi_item.3 }})</span>#}
+                    {% if mi_item.5 == "1" %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;margin-left: 35px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="final_score" value="{{ mi_item.7 }}">
+                    {% else %}
+                        <input type="text"
+                               style="width: 103px;border: none; text-align: center;margin-right: 10px;border: 1px solid deepskyblue;"
+                               placeholder="请打分" class="final_score" disabled="disabled">
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+    </div>
+
+    <div>
+        <button type="button" class="layui-btn layui-btn-radius"
+                style="display: inline-block; background-color: deepskyblue;margin-left: 50px;" id="submit_all">提交全部
+        </button>
+    </div>
+</div>
+
+<script>
+
+    function calc_score(obj) {
+        let score = 0;
+        $(obj).siblings(".calc_val").each(function () {
+            score = score + parseInt($(this).val());
+        });
+        let hj = $(obj).parent().siblings(".params").children(".parms_val").children(".hj").text();
+        let anli = $(obj).parent().siblings(".params").children(".parms_val").children(".anli").text();
+        let guimo = $(obj).parent().siblings(".params").children(".parms_val").children(".guimo").text();
+        let final_score = score * (parseFloat(hj) * 10) * (parseFloat(anli) * 100) * (parseFloat(guimo) * 10) / 10000;
+        final_score = final_score.toFixed(2);
+        $(obj).next().val(final_score)
+    }
+
+    $("#submit_all").click(function () {
+        let user_name = '{{ request.session.username}}';
+        let xuanxing_all = [];
+        $(".xuanxing_normal").each(function () {
+            let xx_id = $(this).children(".xx_id").text();
+            let xx_list = [xx_id];
+            $(this).children(".hp_params").children(".calc_val").each(function () {
+                if ($(this).val() != "") {
+                    xx_list.push($(this).val())
+                }
+            });
+            if (xx_list.length > 1) {
+                xuanxing_all.push(xx_list)
+            }
+        });
+        let zhuanxiang_all = [];
+        $(".zhuanxiang_normal").each(function () {
+            let xx_id = $(this).children(".xx_id").text();
+            let score = $(this).children(".score").children(".final_score").val();
+            if (score != "") {
+                let zx_list = [xx_id, score];
+                zhuanxiang_all.push(zx_list)
+            }
+        });
+
+        let chushi_all = [];
+        $(".chushi_normal").each(function () {
+            let xx_id = $(this).children(".xx_id").text();
+            let score = $(this).children(".score").children(".final_score").val();
+            let cs_list = [xx_id];
+            if (score != "") {
+                cs_list.push(score);
+                chushi_all.push(cs_list)
+            }
+        });
+
+        let add_all = [];
+        $(".add_normal").each(function () {
+            let xx_id = $(this).children(".xx_id").text();
+            let score = $(this).children(".score").children(".final_score").val();
+            if (score != "") {
+                let ad_list = [xx_id, score];
+                add_all.push(ad_list)
+            }
+        });
+        let minus_all = [];
+        $(".minus_normal").each(function () {
+            let xx_id = $(this).children(".xx_id").text();
+            let score = $(this).children(".score").children(".final_score").val();
+            if (score != "") {
+                let mi_list = [xx_id, score];
+                minus_all.push(mi_list)
+            }
+        });
+        $.ajax({
+            url: '/xuanxing/huping_submit/',
+            type: 'post',
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "username": user_name,
+                "xuanxing_all": JSON.stringify(xuanxing_all),
+                "zhuanxiang_all": JSON.stringify(zhuanxiang_all),
+                "chushi_all": JSON.stringify(chushi_all),
+                "add_all": JSON.stringify(add_all),
+                "minus_all": JSON.stringify(minus_all),
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.msg("提交成功");
+                    return false;
+                } else if (ReState["code"] == "0004") {
+                    layer.msg("提交失败");
+                    return false;
+                } else if (ReState["code"] == "0003") {
+                    alert("提交失败2")
+                }
+            }
+        });
+    });
+    function xuanxing_check(obj) {
+        let check_val = $(obj).val();
+        if(check_val != "" && !isNaN(check_val)){
+            check_val = (parseFloat(check_val) * 100)/100;
+            if(check_val > 10){
+                $(obj).val("10")
+            }
+            if(check_val < 0){
+                $(obj).val("0")
+            }
+        }
+    }
+</script>
+
+
+</body>
+</html>

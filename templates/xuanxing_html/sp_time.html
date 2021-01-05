@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <![endif]-->
+</head>
+<body>
+
+<div class="x-body">
+    {% csrf_token %}
+    <input type="text" value="{{ pj_id }}" style="display: none" id="project_id">
+    <div class="layui-row">
+        <h1>进度的持续时间</h1>
+        <table class="layui-table">
+            <thead>
+            <tr>
+                <th>项目进度</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>项目名称</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for t in t_list %}
+                <tr>
+                    {{ t }}
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>项目进度修改</legend>
+    </fieldset>
+    <div>
+        <div class="layui-inline">
+            <label>项目进度</label>
+            <div class="layui-input-inline">
+                <select id="sp_select">
+                    {% for pj_name in speed_list %}
+                        {% if pj_speed == pj_name.0 %}
+                            <option value="{{ pj_name.1 }}" selected="selected">{{ pj_name.0 }}</option>
+                        {% else %}
+                            <option value="{{ pj_name.1 }}">{{ pj_name.0 }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div>
+        <div class="layui-inline">
+            <label>起始时间</label>
+            <div class="layui-input-inline">
+                <input type="date" autocomplete="off" class="layui-input" value="{{ pj_start_time }}" id="start_time">
+            </div>
+            <label>结束时间</label>
+            <div class="layui-input-inline">
+                <input type="date" autocomplete="off" class="layui-input" value="{{ pj_end_time }}" id="end_time">
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="layui-form-item">
+        <button class="layui-btn" id="sp_modify">
+            修改
+        </button>
+    </div>
+</div>
+<script>
+    $("#sp_modify").click(function () {
+
+            // 原始数据
+            let speed_org = "{{ pj_speed }}";
+            let start_time_org = "{{ pj_start_time }}";
+            let end_time_org = "{{ pj_end_time }}";
+            let speed_now = $("#sp_select").find("option:selected").text();
+            let project_speed = $("#sp_select").find("option:selected").val();
+            let start_time = $("#start_time").val();
+            let end_time = $("#end_time").val();
+            let pj_id = $("#project_id").val();
+            if(start_time == start_time_org && end_time_org == end_time && speed_org == speed_now){
+                layer.msg("没有做任何改变");
+                return false;
+            }
+            if (start_time > end_time) {
+                layer.msg("起始时间大于结束时间");
+                return false;
+            }
+            layer.confirm('确认要修改吗', function () {
+            $.ajax({
+                url: '/xuanxing/sp_time/',
+                type: 'post',
+                async: false,
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "project_speed": project_speed,
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    "pj_id": pj_id
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        layer.msg("修改成功");
+                        window.location.href = location.href;
+                    } else if (ReState["code"] == "0002") {
+                        layer.msg("修改失败");
+                    } else if (ReState["code"] == "0003") {
+                        layer.msg("修改异常");
+                    } else {
+                        layer.msg("修改故障");
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+
+
+</html>

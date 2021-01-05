@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎登录内部系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+
+    <![endif]-->
+</head>
+
+<body>
+
+<div class="x-body">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+            <div class="layui-input-inline">
+                <select id="pj_speed" name="shipping" class="valid">
+                    <option value="7">天元</option>
+                    <option value="7">蓝天计划</option>
+                </select>
+                &nbsp;&nbsp;
+            </div>
+            <input class="layui-input" placeholder="截止日" name="end" id="end">
+            <input type="text" name="username" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+            <button class="layui-btn" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+        </form>
+    </div>
+
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th>
+                <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i
+                        class="layui-icon">&#xe605;</i></div>
+            </th>
+            <th>ID</th>
+            <th>产品类型</th>
+            <th>子类</th>
+            <th>厂商策略</th>
+            <th>生命周期状态</th>
+            <th>性能分类</th>
+            <th>厂商</th>
+            <th>产品</th>
+            <th>主要技术指标</th>
+            <th>部署范围</th>
+            <th>应用场景</th>
+            <th>建议生产环境使用年限</th>
+            <th>备注</th>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td>
+                <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id=''><i
+                        class="layui-icon">&#xe605;</i>
+                </div>
+            </td>
+            <td>1</td>
+            <td>路由器</td>
+            <td>路由器</td>
+            <td>按照产品子类确定厂商，产品厂商数量<=6</td>
+            <td>主推</td>
+            <td>高端</td>
+            <td>H3C</td>
+            <td>SR88</td>
+            <td style="width: 150px">模块化路由器，分布式转发架构，引擎、电源、风扇热
+                备，整机交换容量不低于400Gbps，业务插槽不低于4
+                个；支持OC12/OC3/STM1/ATM/E1/CE1/GE/10GE
+                接口；支持IPv4、IPv7双栈；支持TCP/IP协议族和通
+                用路由协议、MPLS VPN；符合业界管理标准；
+            </td>
+            <td>总行数据中心、总
+                行本部及其它分支
+                机构、一级分行
+            </td>
+            <td>A+/A/B</td>
+            <td>7</td>
+            <td></td>
+
+        </tr>
+        </tbody>
+
+
+    </table>
+    <div class="page">
+        <div>
+            <a class="prev" href="">&lt;&lt;</a>
+            <a class="num" href="">1</a>
+            <span class="current">2</span>
+            <a class="num" href="">3</a>
+            <a class="num" href="">489</a>
+            <a class="next" href="">&gt;&gt;</a>
+        </div>
+    </div>
+
+</div>
+<script>
+    layui.use('upload', function () {
+        let $ = layui.jquery
+            , upload = layui.upload;
+        //指定允许上传的文件类型
+        upload.render({
+            elem: "#daoru_user"
+            , url: '/xuanxing/user_upload/' // 后端接收文件的接口
+            , accept: 'file' //类型：支持文件
+            , method: 'POST'
+            , data: {csrfmiddlewaretoken: '{{ csrf_token }}', pj_id: ""}
+            , before: function (obj) {
+                console.log(this.item);
+                this.data.pj_id = this.item.attr("id")
+            }
+            , done: function (res) {
+                if (res["code"] == "0000") {
+                    layer.msg('上传成功');
+                    window.location.href = "/xuanxing/user_manage"
+                }
+                else {
+                    layer.msg('上传失败');
+                }
+            }
+        });
+    });
+
+
+    layui.use('laydate', function () {
+        let laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+    });
+
+    /*用户-停用*/
+    function member_stop(obj, id) {
+        layer.confirm('确认要停用吗？', function (index) {
+
+            if ($(obj).attr('title') == '启用') {
+
+                //发异步把用户状态进行更改
+                $(obj).attr('title', '停用');
+                $(obj).find('i').html('&#xe62f;');
+
+                $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
+                layer.msg('已停用!', {icon: 5, time: 1000});
+
+            } else {
+                $(obj).attr('title', '启用');
+                $(obj).find('i').html('&#xe601;');
+
+                $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
+                layer.msg('已启用!', {icon: 5, time: 1000});
+            }
+
+        });
+    }
+
+    /*用户-删除*/
+    function member_del(obj, id) {
+        layer.confirm('确认要删除吗？', function (index) {
+            //发异步删除数据
+            $(obj).parents("tr").remove();
+            layer.msg('已删除!', {icon: 1, time: 1000});
+        });
+    }
+
+
+    function delAll(argument) {
+
+        let data = tableCheck.getData();
+
+        layer.confirm('确认要删除吗？' + data, function (index) {
+            //捉到所有被选中的，发异步进行删除
+            layer.msg('删除成功', {icon: 1});
+            $(".layui-form-checked").not('.header').parents('tr').remove();
+        });
+    }
+</script>
+
+</body>
+
+</html>

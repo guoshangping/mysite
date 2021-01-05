@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-nav">
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <div class="layui-row">
+            {% csrf_token %}
+
+            <table class="layui-table">
+                <thead>
+                <tr>
+                    <th>
+                        <div class="layui-unselect header layui-form-checkbox" lay-skin="primary">
+                            <i class="layui-icon">&#xe605;</i>
+
+                        </div>
+                    </th>
+                    <th>姓名</th>
+                    <th>手机号</th>
+                    <th>邮箱</th>
+                    <th>密码</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+
+
+                <tbody>
+
+                {% for i in user_obj %}
+                    <tr>
+                        <td>
+                            <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id={{ pj_tmp.id }}>
+                                <i
+                                        class="layui-icon">&#xe605;</i>
+                            </div>
+                        </td>
+
+                        <td>{{ i.username }}</td>
+                        <td>{{ i.user_mobile }}</td>
+                        <td>{{ i.user_email }}</td>
+                        <td>{{ i.user_pwd }}</td>
+                        <td class="td-manage">
+                            {#                    <a title="查看" onclick="x_admin_show('编辑','order-view.html')" href="javascript:;">#}
+                            <a title="编辑" href="/xuanxing/user_edit?uid={{ i.id }}">
+                                <i class="layui-icon">&#xe642;</i>
+                            </a>
+
+                            {#                    <a title="删除"  href="/xuanxing/project_del/?id={{ i.id }}">#}
+                            {##}
+                            {#                        <i class="layui-icon">&#xe640;</i>#}
+                            {#                    </a>#}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+    </div>
+</div>
+
+</body>
+
+</html>

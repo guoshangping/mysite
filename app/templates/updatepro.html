@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改项目进度</title>
+</head>
+<body>
+    <input type="hidden" id="loguser" name="loguser" value="{{ loguser }}">
+    <input type="hidden" id="userclass" name="userclass" value="{{ userclass }}">
+    <input type="hidden" id="userid" name="userid" value="{{ userid }}">
+    <div>
+        <form id="updateform">
+            {% csrf_token %}
+            <h3 style="background: #74A8F5">修改项目进度</h3>
+            <input type="hidden" name="prostatus" value="{{ status }}">
+            要修改进度的项目：
+            <input type="text" id="updatepro" name="updatepro" value="{{ proname }}" disabled><br>
+            选择项目进度：
+                        <input type="radio" name="xmjd" value="未启动">未启动
+                        <input type="radio" name="xmjd" value="需求整理">需求整理
+                        <input type="radio" name="xmjd" value="测试方案准备">测试方案准备
+                        <input type="radio" name="xmjd" value="测试环境准备">测试环境准备
+                        <input type="radio" name="xmjd" value="准备测试报告">准备测试报告
+                        <input type="radio" name="xmjd" value="完成">完成 <br>
+            <input type="button" value="修改" onclick="xg()">
+        </form>
+    </div>
+</body>
+<script src="{% static 'js/jquery-1.11.1.js' %}"></script>
+<script type="text/javascript">
+   function xg() {
+       var proname = $('#updatepro').val();
+       var xmjd = $('input[type="radio"]:checked').val();
+       console.log(proname,xmjd,typeof xmjd);
+       if (xmjd==''){
+           alert('请选择项目进度')
+       } else if (xmjd==undefined){
+             alert('请选择项目进度')
+       }else {
+           $.ajax({
+            type:'get',
+            url:'{% url 'app:update_pro' %}',
+            data:'proname='+proname+'&xmjd='+xmjd,
+            success:function (data) {
+                console.log(data);
+                if (data==='0'){
+                    alert('项目已处于该进度！！')
+                }else{
+                    alert('修改成功！！');
+                    var userid = $('#userid').val();
+                    var username = $('#loguser').val();
+                    var userclass =$('#userclass').val();
+                    location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+                }
+            }
+        })
+       }
+
+    }
+</script>
+</html>

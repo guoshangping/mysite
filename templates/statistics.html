@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>统计页面</title>
+
+    <!-- 引入 echarts.js -->
+    <script src="/static/js/echarts.min.js"></script>
+
+</head>
+<body>
+
+
+<a href="manage" style="float:right">管理首页</a>
+
+
+<table>
+<div id="bar1"  style="width: 1500px;height:500px;">
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <tr><td><div id="pie1" style="width: 800px;height:500px; "></div></td>
+    <td><div id="pie2" style="width: 600px;height:400px; "></div> <div id="pie3" style="width: 600px;height:400px;"></div></td></tr>
+</table>
+
+
+    <script type="text/javascript">
+
+        var obj = JSON.parse(' {{ counts|safe }}');
+        var data1=[];
+        var data2=[];
+
+
+        for(var key in obj){
+            data1.push(obj[key])
+            data2.push(key)
+        }
+
+
+        // 基于准备好的dom，初始化echarts实例
+        var bar1 = echarts.init(document.getElementById('bar1'));
+
+        // 指定图表的配置项和数据
+        var bar1option = {
+            title: {
+                text: '全局统计(个)'
+            },
+            tooltip: {},
+
+            legend: {
+                data:['个数']
+            },
+            xAxis: {
+                data: data2
+            },
+            yAxis: {},
+            series: [{
+                //name: '个数',
+                type: 'bar',
+                        itemStyle: {
+            normal: {
+                // 随机显示
+                //color:function(d){return "#"+Math.floor(Math.random()*(256*256*256-1)).toString(16);}
+
+                // 定制显示（按顺序）
+                color: function(params) {
+                    var colorList = ['#E89589','#16A085','#4A235A','#C39BD3 ','#F9E79F','#BA4A00','#ECF0F1' ];
+                    return colorList[params.dataIndex]
+                }
+            },
+        },
+                data: data1,
+
+            }]
+        };
+        bar1.setOption(bar1option);
+
+        var obj = JSON.parse(' {{ prod_local_counts|safe }}');
+        var data1=[];
+        //var data2=["机房", "基础架构层-计算资源", '基础架构层-前端', '基础架构层-网络', '通用服务层-技术应用', '通用服务层-安全', '应用支持', '应用集成', '数据部署', '业务应用']
+        var dic1={'value':'','name':''}
+
+        for(var key in obj){
+            dic1['value'] = obj[key];
+            dic1['name'] = key;
+            //dic1['url'] = '/products/productsclass/?location_type__id__exact=11'
+            data1.push(dic1);
+            var dic1={'value':'','name':''}
+        }
+        console.log(data1)
+        var pie1 = echarts.init(document.getElementById('pie1'));
+        pie1option = {
+                     title : {
+                        text: '产品统计(个/百分比)',
+                    },
+                    series : [{
+                            name: '',
+                            type: 'pie',
+                            radius : '55%',
+
+                            label: {
+                                    normal: {
+                                    show: true,
+                                    formatter: '{b}: {c}({d}%)'
+                                    }
+                            },
+                    data:data1
+                    }]
+                    };
+        pie1.setOption(pie1option);
+
+        pie1.on('click', function(param) {
+         //console.log(param);
+        var url = param.data.url;
+        window.location.href = url;
+        });
+
+
+        var obj = JSON.parse(' {{ index13_count|safe }}');
+        data2 = []
+        for(var key in obj){
+            dic1['value'] = obj[key];
+            dic1['name'] = key;
+            dic1['url'] = '/products/productsclass/?location_type__id__exact=11'
+            data2.push(dic1);
+            var dic1={'value':'','name':''}
+        }
+        var pie2 = echarts.init(document.getElementById('pie2'));
+        pie2option = {
+                     title : {
+                        text: '指标统计(个/百分比)',
+                    },
+                    series : [{
+                            name: '',
+                            type: 'pie',
+                            radius : '55%',
+
+                            label: {
+                                    normal: {
+                                    show: true,
+                                    formatter: '{b}: {c}({d}%)'
+                                    }
+                            },
+                    data:data2
+                    }]
+                    };
+        pie2.setOption(pie2option);
+
+        var obj = JSON.parse(' {{ counts|safe }}');
+        data3 = [{'value':obj['案例'],'name':'案例','url':'/case/testcase/'}]
+
+        var pie3 = echarts.init(document.getElementById('pie3'));
+        pie3option = {
+                     title : {
+                        text: '案例统计(个/百分比)',
+                    },
+                    series : [{
+                            name: '',
+                            type: 'pie',
+                            radius : '55%',
+
+                            label: {
+                                    normal: {
+                                    show: true,
+                                    formatter: '{b}: {c}({d}%)'
+                                    }
+                            },
+                    data:data3
+                    }]
+                    };
+        pie3.setOption(pie3option);
+        pie3.on('click', function(param) {
+         //console.log(param);
+        var url = param.data.url;
+        window.location.href = url;
+        });
+    </script>
+</body>
+</html>

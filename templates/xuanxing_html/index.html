@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>选型测试组-管理系统</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            color: black;
+        }
+        .bg_blue{
+            background:wheat;
+            {#background:deepskyblue;#}
+            opacity: 0.5;
+        }
+        cite{
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+<!-- 顶部开始 -->
+
+<div class="container">
+    <div class="logo"><a href="./index.html">选型测试管理系统v1.1</a></div>
+    <div class="left_open">
+        <i title="展开左侧栏" class="iconfont">&#xe699;</i>
+    </div>
+{#    <ul class="layui-nav left fast-add">#}
+{#    </ul>#}
+    <ul class="layui-nav right">
+        <li class="layui-nav-item">
+
+            <a href="javascript:;">欢迎 {{ user_obj.username }}</a>
+
+            <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                <dd><a onclick="x_admin_show('个人信息','/xuanxing/my_info/')">个人信息</a></dd>
+                {#                <dd><a href="/xuanxing/my_info/">个人信息</a></dd>#}
+            </dl>
+        </li>
+        <li class="layui-nav-item to-index"><a href="/xuanxing/logout/">退出</a></li>
+    </ul>
+</div>
+
+<!-- 顶部结束 -->
+<!-- 中部开始 -->
+<!-- 左侧菜单开始 -->
+{#<div class="layui-nav">#}
+{#    <ul class="layui-nav" lay-filter="">#}
+{#        <li class="layui-nav-item"><a href="">最新活动</a></li>#}
+{#        <li class="layui-nav-item layui-this"><a href="">产品</a></li>#}
+{#        <li class="layui-nav-item"><a href="">大数据</a></li>#}
+{#        <li class="layui-nav-item">#}
+{#            <a href="javascript:;">解决方案</a>#}
+{#            <dl class="layui-nav-child"> <!-- 二级菜单 -->#}
+{#                <dd><a href="">移动模块</a></dd>#}
+{#                <dd><a href="">后台模版</a></dd>#}
+{#                <dd><a href="">电商平台</a></dd>#}
+{#            </dl>#}
+{#        </li>#}
+{#        <li class="layui-nav-item"><a href="">社区</a></li>#}
+{#    </ul>#}
+{#</div>#}
+<div class="left-nav">
+    <div id="side-nav">
+        <ul id="nav">
+            <li class="test_menu">
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe6b8;</i>
+                    <cite class="menu-name">用户管理</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="test_menu">
+                        <a _href="/xuanxing/user_manage">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">用户管理</cite>
+                        </a>
+                    </li>
+                    <li class="test_menu">
+                        <a _href="/xuanxing/option_list">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">权限管理</cite>
+                        </a>
+                    </li>
+                    <li class="test_menu">
+                        <a _href="/xuanxing/admin_role">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">角色管理</cite>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="test_menu">
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe723;</i>
+                    <cite class="menu-name">项目动态</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="test_menu">
+                        <a _href="/xuanxing/project_dongtai">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">项目动态</cite>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="test_menu">
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe723;</i>
+                    <cite class="menu-name">选型项目管理</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="test_menu">
+                        <a _href="/xuanxing/task_manage/">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">选型项目管理</cite>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="sub-menu">
+                    <li class="test_menu">
+                        <a _href="/xuanxing/project_daily/">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">项目日报(含会议)</cite>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="test_menu">
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe723;</i>
+                    <cite class="menu-name">配置管理</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="test_menu">
+                        {#                        <a _href="javascript:;">#}
+                        <a _href="/xuanxing/product_a_list/">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">产品目录(历史)</cite>
+                        </a>
+                    </li>
+
+                    <li class="test_menu">
+                        <a _href="/xuanxing/product_manage/">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">厂商管理</cite>
+                        </a>
+                    </li>
+
+                    <li class="test_menu">
+                        <a _href="/xuanxing/index_a_list/">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">指标目录(历史)</cite>
+                        </a>
+                    </li>
+
+                    <li class="test_menu">
+                        <a _href="/xuanxing/index_list/">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">指标管理</cite>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="test_menu">
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe726;</i>
+                    <cite class="menu-name">测试管理</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="test_menu">
+                        <a _href="/xuanxing/test_anli_list">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">测试案例</cite>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="test_menu">
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe6b4;</i>
+                    <cite class="menu-name">项目打分</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="test_menu">
+                        <a _href="/testm/score_tools/">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">打分工具</cite>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="test_menu">
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe6b4;</i>
+                    <cite class="menu-name">日志管理</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="test_menu">
+                        <a _href="/xuanxing/log">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">日志管理</cite>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+                        <li class="test_menu">
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe6b4;</i>
+                    <cite class="menu-name">文档管理</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="test_menu first-tab">
+                        <a _href="/xuanxing/document">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">文档提交</cite>
+                        </a>
+                    </li>
+
+                    <li class="test_menu">
+                        <a _href="/xuanxing/document_check">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">文档审核</cite>
+                        </a>
+                    </li>
+
+                     <li class="test_menu">
+                        <a _href="/xuanxing/doc_log">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">文档日志</cite>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="test_menu">
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe6b4;</i>
+                    <cite class="menu-name">统计</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="test_menu">
+                        <a _href="/xuanxing/project_tongji">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">项目统计</cite>
+                        </a>
+                    </li>
+                    <li class="test_menu">
+                        <a _href="/xuanxing/project_tongji">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">产品统计</cite>
+                        </a>
+                    </li>
+                    <li class="test_menu">
+                        <a _href="/xuanxing/index_tongji">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">指标统计</cite>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="test_menu">
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe6b4;</i>
+                    <cite class="menu-name">考核</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                <ul class="sub-menu">
+                    <li class="test_menu">
+                        <a _href="/xuanxing/item_check">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">事项审核</cite>
+                        </a>
+                    </li>
+
+                    <li class="test_menu">
+                        <a _href="/xuanxing/item_input">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">事项录入</cite>
+                        </a>
+                    </li>
+                    <li class="test_menu">
+                        <a _href="/xuanxing/huping">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">同事评价</cite>
+                        </a>
+                    </li>
+                    <li class="test_menu">
+                        <a _href="/xuanxing/lingdao">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">领导评价</cite>
+                        </a>
+                    </li>
+                    <li class="test_menu">
+                        <a _href="/xuanxing/shenhe_list">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">查看个人考核</cite>
+                        </a>
+                    </li>
+                    <li class="test_menu">
+                        <a _href="/xuanxing/kaohe_jili">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">激励与档次</cite>
+                        </a>
+                    </li>
+                    <li class="test_menu">
+                        <a _href="/xuanxing/index_tongji">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite class="menu-name">打印</cite>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- 左侧菜单结束 -->
+<!-- 右侧主体开始 -->
+<div class="page-content">
+    <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+        <ul class="layui-tab-title">
+            <li class="home"><i class="layui-icon">&#xe68e;</i>我的桌面</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="page-content-bg"></div>
+<!-- 右侧主体结束 -->
+<!-- 中部结束 -->
+<!-- 底部开始 -->
+<div class="footer">
+    <div class="copyright">Copyright ©2020 testdemo All Rights Reserved</div>
+</div>
+<!-- 底部结束 -->
+<script>
+    $(function () {
+        let opt_type_str = '{{ request.session.opt_type_list}}';
+        let opt_type_list = opt_type_str.split(";");
+        $(".test_menu").each(function () {
+            let menu_name = $(this).children("a").children(".menu-name").html().replace(/(^\s*)|(\s*$)/g, "");
+            let index = $.inArray(menu_name, opt_type_list); //判断菜单名是否在数组中
+            // 在数组中
+            if (index != -1) {
+                $(this).show();
+            }
+            else {
+                $(this).hide();
+            }
+        })
+    })
+
+</script>
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>打分工具</title>
+    <link rel="stylesheet" href="/static/layui2/css/layui.css">
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script src="/static/layui2/layui.js"></script>
+    <script src="/static/layui2/layui.all.js"></script>
+
+</head>
+<style>
+    .score_button {
+        height: 30px;
+        text-align: center;
+        line-height: 30px
+    }
+
+    .score_select {
+        height: 20px;
+        width: 20px;
+    }
+
+    .daoru {
+
+    }
+</style>
+<body>
+<br><br><br>
+<div>
+    <button type="button" class="layui-btn layui-btn-radius score_button" style="display: inline-block;float: left"
+            id="ps_button">
+        通过性指标
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius score_button" style="display: inline-block" id="pj_button">
+        评价性指标
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius score_button"
+            id="ps_save_button">
+        保存
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius score_button" style="display: none" id="pj_save_button">
+        保存
+    </button>
+</div>
+<br><br><br>
+<table class="layui-table">
+    <tbody id="ps_table">
+    {% for dt in  pass_data %}
+        <tr>
+            {% for s_dt in dt.normal_val %}
+                <td style="border:1px solid #328AA4;">{{ s_dt }}</td>
+            {% endfor %}
+            {% for calc_dt in dt.calc_val %}
+                {% if "" == calc_dt %}
+                    <td style="background-color: #aaaaaa"><select name="city" lay-verify=""
+                                                                  style="width: 100%; height:100%;padding: 0; margin: 0; border: none;text-align: center;background-color: #aaaaaa">
+                        <option value="021">通过</option>
+                        <option value="0571">不通过</option>
+                    </select></td>
+                {% else %}
+                    <td style="border:1px solid #328AA4; ">{{ calc_dt }}</td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+
+    <tbody style="display: none" id="pj_table">
+    {% for pj_dt in pj_data %}
+        {% if forloop.last == True %}
+            <tr class="zongji">
+                {% for pjs_dt in pj_dt.pj_normal_val %}
+                    <td class="sv_td"> {{ pjs_dt }} </td>
+                {% endfor %}
+                {% for pj_calc_dt in pj_dt.pj_calc_val %}
+                    {#                    总计这一行其实只有pjtwo，没有pjone,pj_calc_dt != ""这个也不存在#}
+                    {% if  pj_calc_dt == "pjone" %}
+                        <td></td>
+                    {% elif pj_calc_dt == "pjtwo" %}
+                        <td class="two_two">
+                            <button type="button" class="layui-btn layui-btn-radius layui-btn-danger" id="final_calc">
+                                总计
+                            </button>
+                        </td>
+                    {% elif pj_calc_dt != "" %}
+                        <td style="text-align: center" class="sv_td"></td>
+                    {% else %}
+                        <td class="final_score sv_td"></td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% else %}
+            <tr class="normal_ji">
+                {% for pjs_dt in pj_dt.pj_normal_val %}
+                    <td class="sv_td"> {{ pjs_dt }} </td>
+                {% endfor %}
+                {% for pj_calc_dt in pj_dt.pj_calc_val %}
+                    {% if  pj_calc_dt == "pjone" %}
+                        <td>操作</td>
+                    {% elif pj_calc_dt == "pjtwo" %}
+                        <td style="width: 250px">
+                            <select class="minmax_select" style="height: 25px">
+                                <option value="1">按最大值</option>
+                                <option value="0">按最小值</option>
+                            </select>
+                            &nbsp;&nbsp;
+                            <input type="text" style="width: 50px;height: 25px" class="input_g" placeholder="请输入g的值"
+                                   value="0.75">
+                            &nbsp;&nbsp;&nbsp;
+                            <button type="button"
+                                    class="layui-btn layui-btn-radius score_button layui-btn-danger calc_score"
+                                    id="ps_button">
+                                计算
+                            </button>
+                        </td>
+                    {% elif pj_calc_dt != "" %}
+                        <td style="text-align: center" class="vend_names  sv_td">
+                            {{ pj_calc_dt }}
+                        </td>
+                    {% else %}
+                        <td style="padding: 0; margin: 0;" class="calc_td sv_td">
+
+                            <input type="text"
+                                   style="width: 100%; height:20px;padding: 0; margin: 0; border: none;text-align: center; background-color: antiquewhite; float: right"
+                                   class="calc_vend_score"
+                                   value="{{ pj_calc_dt }}">
+
+                            <input type="text" disabled="value"
+                                   style="width: 100%; height:20px;padding: 0; margin-top: 10px; border: none;text-align: center; background-color: deepskyblue"
+                                   value="" class="show_td_input">
+
+                            <input type="text" disabled="value"
+                                   style="display: none; width: 100%; height:20px;padding: 0; margin-top: 10px; border: none;text-align: center; background-color: lawngreen"
+                                   value="">
+                        </td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endif %}
+    {% endfor %}
+    </tbody>
+
+</table>
+
+<script>
+    $(function () {
+        $("#pj_button").click(function () {
+            $("#pj_table").show();
+            $("#pj_save_button").show();
+            $("#ps_table").hide();
+            $("#ps_save_button").hide();
+        });
+        $("#ps_button").click(function () {
+            $("#ps_table").show();
+            $("#ps_save_button").show();
+            $("#pj_table").hide();
+            $("#pj_save_button").hide();
+
+        });
+
+        $(".input_g").each(function () {
+            let guiz = $(this).parent().parent().children().eq(2).text();
+            if (guiz == " 满足得满分，不满足不得分 ") {
+                $(this).hide();
+                $(this).siblings(".minmax_select").hide();
+            }
+            else if (guiz.indexOf("排名计分") >= 0) {
+                $(this).hide();
+            } else if (guiz.indexOf("线性插值") >= 0) {
+            }
+            else {
+                $(this).parent().siblings(".calc_td").children(".show_td_input").removeAttr("disabled");
+                $(this).hide();
+                $(this).siblings(".minmax_select").hide();
+            }
+        });
+
+
+        // 排名算法，返回名次
+
+        function rank_sort(rank_list) {
+            let rank_l = [];
+            let temp = "";
+            let num = 0;
+            let final_num = 0;
+            let temp_num = 0;
+            for (var rk in rank_list) {
+                if (rank_list[rk] == temp) {
+                    temp_num = temp_num + 1;
+                    final_num = num
+                }
+                else {
+                    num = num + 1;
+                    final_num = num + temp_num;
+                    num = final_num;
+                    temp_num = 0;
+                }
+                temp = rank_list[rk];
+                rank_l.push(final_num);
+            }
+            return rank_l;
+        }
+
+        function getArr(n, m) {
+            //  fill() 创建一个数组 个数为指定的
+            return Array(n).fill(m)
+        }
+
+        $(".calc_score").click(function () {
+            let calc_g = $(this).parent().children(".input_g").val(); // g
+            let vend_count = $(this).parent().parent().children(".calc_td").length; //厂商数量
+            let vend_zong_count = $(this).parent().parent().children(".calc_td").length; //厂商原本数量，不去掉不参与打分的
+            let vend_sum = 0; // 厂商输入的分数总和
+            let tup_flag = 0; //打断的flag(标识)
+            $(this).parent().parent().children(".calc_td").children(".calc_vend_score").each(function () {
+                let now_score = $(this).val(); //
+                if (now_score == "" | null == now_score) {
+                    // layer.msg('请输入厂商参数');
+                    tup_flag = 1;
+                    vend_count = vend_count - 1 // 如果没有填 则认定少一个厂商参与打分
+                }
+                else {
+                    vend_sum = vend_sum + Number(now_score);
+                }
+            });
+            if (1 == tup_flag) {
+                layer.msg('此次 非全部 厂商 参与打分');
+                // return false;
+            }
+
+            let guize = $(this).parent().children("select").find("option:selected").val(); //按最大值还是最小值
+            let vends_list = [];
+            $(this).parent().parent().children(".calc_td").children(".calc_vend_score").each(function () {
+                let vendscore = $(this).val();
+                if ("" != vendscore && null != vendscore)
+                    vends_list.push(vendscore);
+            });
+
+            let max_vends = Math.max.apply(null, vends_list);
+            let min_vends = Math.min.apply(null, vends_list);
+            // 进行判断
+            let vends_jizhun = 0;
+            if ("1" == guize.toString()) {
+                vends_jizhun = max_vends;
+            }
+            else {
+                vends_jizhun = min_vends;
+            }
+            let man_score_p = $(this).parent().parent().children().eq(1).text();
+            man_score_p = Number(man_score_p); // 案例满分p
+            let score_guize = $(this).parent().parent().children().eq(2).text();
+            // alert(score_guize);
+            let vend_list_shun = $.extend(true, [], vends_list.sort());   // 顺序,深拷贝
+            // 逆序
+            let vend_list_ni = $.map(vend_list_shun, function (v, i) {// map方法匿名函数传的值v是值、i是索引。
+                return vend_list_shun[vend_list_shun.length - 1 - i];
+            });
+
+            // 顺序名次
+            let rank_shun = rank_sort(vend_list_shun);
+            let rank_ni = rank_sort(vend_list_ni);
+
+            let vends_list_sorted = vends_list.sort();
+            $.unique(vends_list_sorted);
+            $(this).parent().parent().children(".calc_td").children(".calc_vend_score").each(function () {
+                if (score_guize == " 满足得满分，不满足不得分 ") {
+                    let manzu_fen = $(this).val();
+                    if ("1" == manzu_fen.toString()) {
+                        $(this).next().val(man_score_p);
+                    }
+                    else {
+                        $(this).next().val("0");
+                    }
+                }
+                else {
+                    if (score_guize.indexOf("排名计分") >= 0) {
+                        $(this).next().removeAttr("disabled");
+                        let the_score = $(this).val(); // 当前的分数
+                        let new_list_sorted = vends_list_sorted;
+                        let rank_number = 0;
+                        if ("1" == guize.toString()) {
+                            // 如果是按最大值来排名，则逆序数组
+                            //let vends_length = vends_list_sorted.length;
+                            //new_list_sorted = $.map(vends_list_sorted, function (v, i) {// map方法匿名函数传的值v是值、i是索引。
+                            //   return vends_list_sorted[vends_length - 1 - i];
+                            // });
+                            // if (vend_list_ni.indexOf(the_score) == vend_list_ni.lastIndexOf(the_score)) {
+                            //      rank_number = vend_list_ni.indexOf(the_score);
+                            //    }
+                            //  else {
+                            //      rank_number = new_list_sorted.indexOf(the_score);
+                            //     }
+                            //     $(this).next().next().show(); //把隐藏的input显示
+                            //    $(this).next().next().val("第" + (rank_number + 1) + "名") // 名次
+                            // }
+                            //  else {
+                            //       if (vend_list_shun.indexOf(the_score) == vend_list_shun.lastIndexOf(the_score)) {
+                            //         rank_number = vend_list_shun.indexOf(the_score);
+                            //        }
+                            //    else {
+                            //       rank_number = new_list_sorted.indexOf(the_score);
+                            //     }
+                            rank_number = vend_list_ni.indexOf(the_score);
+                            let rank_final = rank_ni[rank_number];
+                            $(this).next().next().show(); //把隐藏的input显示
+                            $(this).next().next().val("第" + rank_final + "名") // 名次
+                        }
+                        else {
+                            rank_number = vend_list_shun.indexOf(the_score);
+                            let rank_final = rank_shun[rank_number];
+                            $(this).next().next().show(); //把隐藏的input显示
+                            $(this).next().next().val("第" + rank_final + "名") // 名次
+                        }
+                    }
+                    else {
+                        let now_score = $(this).val(); // 当前分数
+                        if (score_guize.indexOf("线性插值") >= 0) {
+                            // 以下为线性插值的情况
+                            if ("" != now_score && null != now_score) {
+                                calc_g = Number(calc_g);
+                                vend_sum = Number(vend_sum);
+                                vend_count = Number(vend_count);
+                                let vend_avg = Number(vend_sum / vend_count);
+                                now_score = Number(now_score);
+                                // alert(now_score);
+                                let score_fenmu = vends_jizhun - vend_avg;
+                                let result_score = man_score_p;
+                                // (man_score_p * now_score * calc_g - man_score_p * vend_avg) / (now_score - vend_avg)
+                                if (0 == score_fenmu) {
+                                }
+                                else {
+                                    result_score = ((man_score_p - man_score_p * calc_g) / score_fenmu) * now_score + (man_score_p * vends_jizhun * calc_g - man_score_p * vend_avg) / score_fenmu;
+                                    if (result_score < 0) {
+                                        result_score = 0;
+                                    }
+                                }
+                                let last_score = result_score.toFixed(2);
+                                $(this).next().val(last_score);
+                            }
+                        }
+                        else {
+                            $(this).next().removeAttr("disabled");
+                            layer.msg("该规则暂不支持计算")
+                        }
+                    }
+                }
+            });
+            let zongfen = 0;
+            $(".normal_ji").each(function () {
+                let anli_score = $(this).children().eq(1).text();
+                if (!isNaN(anli_score) && "" != anli_score) {
+                    zongfen = zongfen + Number(anli_score);
+                }
+            });
+            $(".zongji").children().eq(1).text(zongfen);
+
+
+            let sum_n = Number(vend_zong_count);
+            let sum_list = getArr(sum_n, 0);
+            $(".normal_ji").each(function () {
+                $(this).children(".calc_td").each(function (i) {
+                    let child_text = $(this).children(".show_td_input").val();
+                    if (!isNaN(child_text) && "" != child_text) {
+                        sum_list[i] = sum_list[i] + Number(child_text);
+                    }
+                })
+            });
+            $(".zongji").children(".final_score").each(function (i) {
+                $(this).text(sum_list[i].toFixed(3));
+            })
+        });
+
+        $("#final_calc").click(function () {
+            let vends_all_num = $(".vend_names").length;
+            let sum_n = Number(vends_all_num);
+            let sum_list = getArr(sum_n, 0);
+            let no_calc_list = []; //未打分的 行列
+            $(".normal_ji").each(function (q) {
+                // 循环蓝色框里的分数值
+
+                $(this).children(".calc_td").each(function (i) {
+                    let child_text = $(this).children(".show_td_input").val(); //取得当前格子里的分数值
+                    if (!isNaN(child_text) && "" != child_text) {
+                        sum_list[i] = sum_list[i] + Number(child_text);
+                    }
+                    else {
+                        no_calc_list.push((q) + "行" + (i + 1) + "列");
+                    }
+                })
+            });
+            let hint = "确定计算总分吗";
+            if(no_calc_list.length != 0){
+                hint = "打分区     <br>" + no_calc_list + '<br>  未打分, 确定计算总分吗'
+            }
+            layer.confirm(hint, function () {
+                $(".zongji").children(".final_score").each(function (i) {
+                    $(this).text(sum_list[i].toFixed(3));
+                });
+                $("#pj_save_button").click();
+                layer.msg("计算完成");
+            });
+        });
+        $("#ps_save_button").click(function () {
+            let save_pj_id = {{ test_pj_id }};
+            let save_ps_list = [];
+            $("#ps_table").children().each(function () {
+                let ps_list = [];
+                $(this).children().each(function () {
+                    if ($(this).children("select").length > 0) {
+                        let select_text = $(this).children("select").find("option:selected").text();
+                        ps_list.push(select_text)
+                    }
+                    else {
+                        ps_list.push($(this).text())
+                    }
+                });
+                save_ps_list.push(ps_list);
+            });
+            console.log(save_ps_list);
+
+            $.post("/testm/test_save/", {
+                    save_pj_id: save_pj_id,
+                    save_type: "tg", //通过 通过性评价
+                    save_ps_data: JSON.stringify(save_ps_list),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+
+                }, function (res) {
+                    if (res["code"] == "0000") {
+                        layer.msg("保存成功")
+                    }
+                    else {
+                        layer.msg('保存出错');
+                    }
+                }
+            );
+        });
+        $("#pj_save_button").click(function () {
+            let save_pj_id = {{ test_pj_id }};
+            let save_pj_list = [];
+            $("#pj_table").children().each(function () {
+                let sv_pj_list = [];
+                $(this).children(".sv_td").each(function () {
+                    if ($(this).children().length > 0) {
+                        let sv_val = $(this).children(".show_td_input").val();
+                        sv_val.trim().replace(/\s/g, "");
+                        sv_pj_list.push(sv_val);
+                    }
+                    else {
+                        let sv_text = $(this).text();
+                        sv_text.trim().replace(/\s/g, "");
+                        sv_pj_list.push(sv_text);
+                    }
+                });
+                save_pj_list.push(sv_pj_list);
+
+            });
+            let rank_json = {};
+            $(".zongji").children(".final_score").each(function (i) {
+                let zongji_score = $(this).text();
+                let zongji_vend = $(".vend_names").eq(i).text();
+                zongji_vend = $.trim(zongji_vend);
+                rank_json[zongji_vend] = zongji_score;
+            });
+            console.log(rank_json);
+
+            $.post("/testm/test_save/", {
+                    save_pj_id: save_pj_id,
+                    save_type: "pj", // 通过性评价
+                    save_ps_data: JSON.stringify(save_pj_list),
+                    save_score_rnak: JSON.stringify(rank_json),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                }, function (res) {
+                    if (res["code"] == "0000") {
+                        layer.msg('保存成功');
+                    }
+                    else {
+                        layer.msg('保存出错');
+                    }
+                }
+            );
+        });
+    });
+</script>
+</body>
+</html>

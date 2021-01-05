@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+    <link rel="stylesheet" href="/static/layui2/css/layui.css" media="all">
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+
+
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+<!-- <div id="test7" class="demo-tree"></div> -->
+{% csrf_token %}
+<button type="button" class="layui-btn layui-btn-radius score_button layui-btn-warm"
+        style="display: none; "
+        id="up_index_content"> 上传指标目录文件
+</button>
+
+
+<fieldset class="layui-elem-field layui-field-title">
+    <legend>指标的维护</legend>
+</fieldset>
+
+<i></i>
+
+<div id="test9" class="demo-tree demo-tree-box" style="width: 200px; height: 550px; overflow: scroll;float: left">
+
+</div>
+
+<div style="float: left; width: 700px;display: inline-block" id="tree_index">
+    <input type="text" v-bind:value=big_cls_name id="bg_cls_name" style="display: none;">
+    <table class="layui-table" style="margin-top: 0; width: 1100px">
+        <thead>
+        <tr>
+            <th>产品大类</th>
+            <th>产品类型</th>
+            <th>子类</th>
+            <th>一级指标</th>
+            <th>二级指标</th>
+            <th>指标说明</th>
+            <th>三级指标</th>
+            <th>三级指标描述</th>
+            <th>指标ID</th>
+            <th>案例编号</th>
+            <th>测试类型</th>
+            <th>测试工具</th>
+            <th>备注</th>
+
+            <th style="display: none">备注2</th>
+        </thead>
+
+        <tbody>
+        <tr v-for="pdmsg in pd_info">
+
+            <td v-for="(msg_pd, index) in pdmsg" v-if="index < pdmsg.length-2" class="normal_cls">
+                <span v-if="pdmsg[pdmsg.length-2] == '0'">{[ msg_pd ]}</span>
+                <span v-else style="color: red">{[ msg_pd ]}</span>
+            </td>
+
+            <td v-for="(msg_pd, index) in pdmsg" v-if="index == pdmsg.length-1" style="display: none" class="obj_id">
+                {[ msg_pd ]}
+            </td>
+
+        </tr>
+        </tbody>
+
+    </table>
+    <input type="text" style="display: none" id="idx_title">
+
+
+</div>
+
+
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+
+
+    function x_admin_show_new(obj, title, url, w, h) {
+        let idx_list = [];
+        let bg_cls = $(obj).parent().parent().children(".big_cls").text().replace(/(^\s*)|(\s*$)/g, ""); //大类
+        let obj_id = $(obj).parent().parent().children(".obj_id").text().replace(/(^\s*)|(\s*$)/g, ""); //id
+
+        $(obj).parent().parent().children(".normal_cls").each(function () {
+            idx_list.push($(this).text().replace(/(^\s*)|(\s*$)/g, ""));
+        });
+        url = "/xuanxing/index_detail?obj_id=" + obj_id + "&normal_cls=" + idx_list.toString();
+
+        layer = layui.layer;
+        element = layui.element;
+
+        if (title == null || title == '') {
+            title = false;
+        }
+        if (url == null || url == '') {
+            url = "404.html";
+        }
+        if (w == null || w == '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h == '') {
+            h = ($(window).height() - 50);
+        }
+        layer.open({
+            type: 2,
+            area: [w + 'px', h + 'px'],
+            fix: false, //不固定
+            maxmin: true,
+            shadeClose: true,
+            shade: 0.4,
+            title: "编辑",
+            content: url
+        });
+    }
+
+    let pd_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#tree_index",
+        data: {
+            pd_info: [],
+            big_cls_name: ""
+        }
+    });
+
+
+    function rend_tree(pjname) {
+        layui.use(['tree', 'util'], function () {
+            let tree = layui.tree
+                , layer = layui.layer
+                , util = layui.util;
+
+            //模拟数据1
+            $.post("/xuanxing/index_show/", {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    pj_name: pjname,
+
+                }, function (res) {
+                    if (res["code"] == "0000") {
+                        layer.msg("完成");
+                        let data1 = res["prod_info"];
+                        pd_vue.$set(pd_vue, "big_cls_name", res["big_cls_name"]);
+                        tree.render({
+                            elem: '#test9'
+                            , data: data1
+                            {#, edit: ['add', 'update', 'del'] //操作节点的图标#}
+                            , click: function (obj) {
+                                layer.msg(JSON.stringify(obj.data.title));
+                                if (null == obj.data.children) {
+                                    let tree_title = obj.data.title;
+                                    $("#idx_title").val(tree_title);
+                                    let pj_name = $("#select_pj").find("option:selected").val();
+                                    $.post(
+                                        "/xuanxing/index_info/", // url
+                                        {
+                                            "csrfmiddlewaretoken": "{{ csrf_token }}",
+                                            "title": tree_title,
+                                            "pj_name": pj_name,
+
+                                        }, // 参数
+                                        function (recv_data) {
+                                            if (recv_data["code"] == "0000") {
+                                                pd_vue.$set(pd_vue, "pd_info", recv_data["prod_data"]);
+                                            }
+                                            else {
+                                                layer.msg("数据出错")
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        layer.msg('保存出错');
+                    }
+                }
+            )
+            //开启复选框
+            //开启节点操作图标
+        });
+    }
+
+    rend_tree("项目A");
+
+    // 删除指标
+    function index_del(obj) {
+        let del_obj_id = $(obj).parent().siblings(".obj_id").text().replace(/(^\s*)|(\s*$)/g, ""); //id
+        $.post("/xuanxing/index_del/", {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                del_obj_id: del_obj_id,
+
+            }, function (res) {
+                if (res["code"] == "0000") {
+                    layer.msg("删除成功");
+                    let idx_title = $("#idx_title").val();
+                    let pj_name = $("#select_pj").find("option:selected").val();
+                    $.post(
+                        "/xuanxing/index_info/", // url
+                        {
+                            "csrfmiddlewaretoken": "{{ csrf_token }}",
+                            "title": idx_title,
+                            "pj_name": pj_name,
+                        }, // 参数
+                        function (recv_data) {
+                            if (recv_data["code"] == "0000") {
+                                pd_vue.$set(pd_vue, "pd_info", recv_data["prod_data"]);
+                            }
+                            else {
+                                layer.msg("数据出错")
+                            }
+                        }
+                    );
+                }
+                else {
+                    layer.msg('删除出错');
+                }
+            }
+        )
+    }
+
+    // 上传指标目录文件
+    layui.use('upload', function () {
+        let $ = layui.jquery
+            , upload = layui.upload;
+        //指定允许上传的文件类型
+        upload.render({
+            elem: "#up_index_content"
+            , url: '/xuanxing/up_index_content/' // 后端接收文件的接口
+            , accept: 'file' //类型:支持文件
+            , method: 'POST'
+            , data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
+            , done: function (res) {
+                if (res["code"] == "0000") {
+                    layer.msg('上传成功');
+                }
+                else {
+                    layer.msg('上传失败');
+                }
+            }
+        });
+    });
+
+    // 调试按钮
+    $("#up_test").click(function () {
+        alert("dsda");
+        $.post("/xuanxing/prod_show/", {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+
+            }, function (res) {
+                if (res["code"] == "0000") {
+                    alert("sdadasd");
+                    layer.msg("完成")
+                }
+                else {
+                    layer.msg('保存出错');
+                }
+            }
+        )
+    });
+
+
+    $("#modify_index").click(function () {
+        index_tree_add("添加指标信息");
+    });
+
+    $("#export_index").click(function () {
+        let pj_name = $("#select_pj").find("option:selected").val();
+        window.location.href = "/xuanxing/index_export?pj_name=" + pj_name;
+
+    });
+
+    function index_tree_add(title, w, h) {
+
+        let bg_cls = $("#bg_cls_name").val(); //大类
+        let pj_name = $("#select_pj").find("option:selected").val();
+        let url = "/xuanxing/index_type_modify?pj_name=" + pj_name + "&bg_cls=" + bg_cls;
+
+
+        layer = layui.layer;
+        element = layui.element;
+
+        if (title == null || title == '') {
+            title = false;
+        }
+        if (url == null || url == '') {
+            url = "404.html";
+        }
+        if (w == null || w == '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h == '') {
+            h = ($(window).height() - 50);
+        }
+        layer.open({
+            type: 2,
+            area: [w + 'px', h + 'px'],
+            fix: false, //不固定
+            maxmin: true,
+            shadeClose: true,
+            shade: 0.4,
+            title: "编辑",
+            content: url,
+            end: function () {
+                let idx_title = $("#idx_title").val();
+                let pj_name = $("#select_pj").find("option:selected").val();
+                $.post(
+                    "/xuanxing/index_info/", // url
+                    {
+                        "csrfmiddlewaretoken": "{{ csrf_token }}",
+                        "title": idx_title,
+                        "pj_name": pj_name,
+                    }, // 参数
+                    function (recv_data) {
+                        if (recv_data["code"] == "0000") {
+                            pd_vue.$set(pd_vue, "pd_info", recv_data["prod_data"]);
+                        }
+                        else {
+                            layer.msg("数据出错")
+                        }
+                    }
+                );
+            }
+        });
+    }
+
+
+</script>
+
+</body>
+</html>

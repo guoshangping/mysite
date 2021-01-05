@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <link rel="stylesheet" href="/static/layui2/css/layui.css" media="all">
+
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+    <link rel="stylesheet" href="/static/css/xuanxing/pm/pm_page.css">
+    <script src="/static/js/pm_check.js"></script>
+    <script src="/static/js/pm_paging.js"></script>
+
+
+</head>
+
+<body>
+
+{% csrf_token %}
+
+<div class="x-body" id="daily">
+    <input type="text" value="{{ pd_id }}" style="display: none" id="pd_id">
+
+    <div style="height: 50px;">
+        <span style="height: 35px; margin-right: 40px;">所属项目</span>
+        <input type="text" autocomplete="off" value="{{ pj_id }}" disabled="disabled"
+               style="height: 35px;" id="pj_name">
+    </div>
+    <br>
+    <div style="height: 50px;">
+        <span style="height: 35px;margin-right: 40px;">事项名称</span>
+        <input type="text" autocomplete="off" value="{{ pd_name }}" style="height: 35px;" id="pd_name">
+    </div>
+    <br>
+    <div style="height: 50px;">
+        <span style="margin-left: 30px;margin-right: 40px;">类型</span>
+        <div class="layui-input-inline">
+            <select id="pd_select" style="height: 35px;">
+                {% for sx_type in daily_type_list %}
+                    {% if sx_type.0 == pd_type %}
+                        <option value="{{ sx_type.0 }}" selected="selected">{{ sx_type.1 }}</option>
+                    {% else %}
+                        <option value="{{ sx_type.0 }}">{{ sx_type.1 }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <br>
+    <div>
+        <span style="margin-left: 30px;margin-right: 40px;">备注</span>
+        <textarea id="pd_mark" cols="30" rows="2">{{ markinfo }}</textarea>
+    </div>
+    <br>
+
+    <div>
+        <span style="margin-right: 40px;">文件名称</span>
+        <input type="text" value="{{ pd_file_name }}" disabled="disabled" style="height: 35px;">
+    </div>
+    <br><br>
+    <div>
+        <span style="margin-right: 40px;">修改文件</span>
+        <input type="file" id="up_file" onchange="change_file(this)" style="display: none;">
+        <button type="button" class="layui-btn layui-btn-normal" onclick="chose(this)">选择文件</button>
+        <span class="file_name"></span>
+    </div>
+    <br>
+    <div>
+        <button class="layui-btn layui-btn-danger up_file" onclick="sub_all()">提交</button>
+    </div>
+</div>
+
+<script>
+    function chose(obj) {
+        $("#up_file").click();
+    }
+
+    function change_file(obj) {
+        let file_name = $(obj)[0].files[0].name;
+        $(obj).siblings(".file_name").text(file_name)
+    }
+
+    function sub_all() {
+        let pd_id = $("#pd_id").val();
+        let pd_name = $("#pd_name").val();
+        let pd_type = $("#pd_select").find("option:selected").val();
+        let pd_mark = $("#pd_mark").val();
+        let file_obj = $("#up_file")[0].files[0];
+        if (null == file_obj || undefined == file_obj) {
+            file_obj = "";
+        }
+        let formdata = new FormData;
+        formdata.append('file', file_obj);
+        formdata.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        formdata.append('pd_id', pd_id);
+        formdata.append('pd_name', pd_name);
+        formdata.append('pd_type', pd_type);
+        formdata.append('pd_mark', pd_mark);
+        console.log(formdata);
+        $.ajax({
+            url: '/xuanxing/project_daily_edit/',
+            type: 'post',
+            async: false,
+            processData: false,//必须设置
+            dataType: 'json',
+            contentType: false,
+            data: formdata,
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.msg('修改成功');
+                    window.location.href = "/xuanxing/project_daily/"
+                }
+                if (ReState["code"] == "0001") {
+                    layer.msg('参数不全');
+                }
+                if (ReState["code"] == "0002") {
+                    layer.msg('事项名称已存在');
+                }
+                if (ReState["code"] == "0003") {
+                    layer.msg('该事项不存在');
+                }
+            }
+        });
+    }
+
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+    <link rel="stylesheet" href="/static/css/xuanxing/pm/pm_page.css">
+    <script src="/static/js/pm_check.js"></script>
+    <script src="/static/js/pm_paging.js"></script>
+
+
+</head>
+
+<body>
+{% csrf_token %}
+
+<div class="x-nav">
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" title="刷新" id="flush_pj">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div style="margin-left: 30px;">
+    <div class="layui-input-inline"
+         style="height: 40px;font-size: 20px;vertical-align: baseline;margin-left: 10px;">每页显示条数:
+    </div>
+    <div class="layui-input-inline">
+        <select id="msg_num" class="valid" style="height: 40px;">
+            <option value="8">请选择</option>
+            {% for num in page_list %}
+                <option value="{{ num }}">{{ num }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div style="display: inline-block">
+        <select id="user_select" class="valid" style="height: 40px;">
+            <option value="">请选择</option>
+            {% for usr_id, usr_name in user_all.items %}
+                <option value="{{ usr_id }}">{{ usr_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+</div>
+<div class="x-body" id="user_show">
+
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th>时间</th>
+            <th>角色名</th>
+            <th>姓名</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(log_item, index) in current_list">
+            <td>{[ log_item[0] ]}</td>
+            <td>{[ log_item[1] ]}</td>
+            <td>{[ log_item[2] ]}</td>
+            <td>{[ log_item[3] ]}</td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="tcdPageCode">
+        <div class="pm_shows" v-for="(pp,index) in page_list">
+            <span v-if="(pp[1] == 0) && (pp[2] == 1)" class="current">{[ pp[0] ]}</span>
+            <span v-if="(pp[1] == 0) && (pp[2] == 0)">{[ pp[0] ]}</span>
+            <a href="javascript:return false;" v-if="pp[1] == 1"
+               onclick="change_page(this,'/xuanxing/log/','{{ csrf_token }}')">{[
+                pp[0] ]}</a>
+        </div>
+        <span>共</span><span id="total_num">{[ total_page ]}</span><span>页</span>
+    </div>
+
+</div>
+<script>
+    layui.use('laydate', function () {
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+    });
+    $("#flush_pj").click(function () {
+        window.location.href = "/xuanxing/log";
+    });
+    let page_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#user_show",
+        data: {
+            page_list: [],
+            current_list: [],
+            total_page: 1,
+            curr_page: 1,
+            page_jizhun: 1
+        }
+    });
+
+    change_page("", '/xuanxing/log/', '{{ csrf_token }}');
+
+    $("#msg_num").bind("change", function () {
+        change_page("1", "/xuanxing/log/", "{{ csrf_token }}")
+    });
+</script>
+</body>
+
+</html>

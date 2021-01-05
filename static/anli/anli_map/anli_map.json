@@ -1,0 +1,16 @@
+{
+  "案例编号": "case_id",
+  "测试目的": "test_goal",
+  "预置条件": "pre_condition",
+  "测试步骤": "test_steps",
+  "预期结果": "expect_result",
+  "实测结果": "test_result",
+  "测试结论": "test_conclusion",
+  "备注": "remark",
+  "测试编号": "case_id",
+  "测试项目": "test_goal",
+  "测试条件": "pre_condition",
+  "测试方法": "test_steps",
+  "测试结果": "test_result",
+  "测试员签名": "check_person"
+}

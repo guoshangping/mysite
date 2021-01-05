@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>项目负责人配置项目页面</title>
+</head>
+<body>
+    <div>
+        <h4 style="background: #74A8F5">配置项目</h4>
+        <input type="hidden" id="loguser" name="loguser" value="{{ username }}">
+        <input type="hidden" id="userclass" name="userclass" value="{{ userclass }}">
+        <input type="hidden" id="userid" name="userid" value="{{ userid }}">
+         <input type="hidden" id="flag" value="{{ flag }}">
+        <input type="hidden" id="cretime" value="{{ time }}">
+        <input type="hidden" id="creuser" value="{{ creatuser }}">
+        <input type="hidden" id="proxmjd" value="{{ xmjd }}">
+        <input type="hidden" id="procharperson" value="{{ charperson }}">
+        <input type="hidden" id="proparticipant" value="{{ participant }}">
+        <input type="hidden" id="pronameinput" value="{{ proname }}">
+        <input type="hidden" id="mohuproname" value="{{ proname }}">
+        <form id="configproform" action="">
+            {% csrf_token %}
+            <input type="hidden" id="configproname" name="configproname" value="{{ proname }}">
+            要配置的项目：<input type="text"  value="{{ proname }}" disabled> <br>
+            增加参与者:
+            <div id="participant">
+
+            </div>
+
+            <input type="button" value="保存配置" onclick="save_config()">
+        </form>
+    </div>
+</body>
+<script src="{% static 'js/jquery-1.11.1.js' %}"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        $.ajax({
+            type:'get',
+            url:'{% url 'app:query_all_users' %}',
+            dataType:'json',
+            success:function (data) {
+                if (data){
+                    var data = eval(data)['users'];
+                    console.log(data);
+                    for (i=0;i<data.length;i++){
+                        var user = data[i]['username'];
+                        console.log(user);
+                        $('#participant').append('<input type="checkbox" name="participant" value=" '+user+' ">'+user)
+                    }
+                }
+            }
+        })
+    }
+
+    function save_config() {
+        $.ajax({
+            type:'post',
+            url: '{% url 'app:save_config' %}',
+            data:new FormData(document.getElementById('configproform')),
+            success:function (data) {
+                if (data==='1'){
+                    alert('保存成功');
+                    var userid = $('#userid').val();
+                    var username = $('#loguser').val();
+                    var userclass = $('#userclass').val();
+                    location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+                }else{
+                    alert('')
+                }
+            },
+            processData: false,
+            contentType: false
+        })
+    }
+</script>
+</html>

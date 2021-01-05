@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+    <span style="font-size: 16px;text-align: center">请选择</span>
+
+    <div class="layui-input-inline">
+
+        <select id="pj_role" name="shipping" class="valid" style="height: 35px;">
+            {% for role_name in roles %}
+                <option value="{{ forloop.counter }}">{{ role_name }}</option>
+            {% endfor %}
+
+        </select>
+        &nbsp;&nbsp;
+    </div>
+
+    <div class="layui-form layui-form-pane">
+
+        <div class="layui-form-item layui-form-text">
+            <table class="layui-table" style="width: 1000px;">
+                <tbody>
+                {% for optp_key, optp_val in optp.items %}
+                    <tr>
+                        <td class="op_key" style="width: 100px;">
+                            {#                        <input type="checkbox" name="like1[write]" lay-skin="primary" title="用户管理">#}
+                            <span>{{ optp_key }}</span>
+                        </td>
+                        <td class="optionlist">
+                            {#                            <div class="layui-input-block">#}
+                            {% for optp_name in optp_val %}
+                                <input lay-skin="primary" type="checkbox" value="{{ optp_name }}"
+                                       title="{{ optp_name }}" class="opt_cls">
+                            {% endfor %}
+                            {#                            </div>#}
+
+                        </td>
+
+                        <input type="text" style="display: none" class="">
+
+                        <td class="td-opt">
+                            <a title="编辑" onclick="x_admin_show_new(this, '编辑')" href="javascript:;">
+                                <i class="layui-icon">&#xe642;</i>
+                            </a>
+                            <a title="删除" onclick="del_option(this)" href="javascript:;">
+                                <i class="layui-icon">&#xe640;</i>
+                            </a>
+                            <a title="添加" onclick="add_option(this, '添加权限')" href="javascript:;">
+                                <i class="layui-icon">&#xe654;</i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <button class="layui-btn" id="save_opt">保存</button>
+        </div>
+        {#        <div class="layui-form-item layui-form-text">#}
+        {#            <label for="desc" class="layui-form-label">#}
+        {#                权限类型添加及修改#}
+        {#            </label>#}
+        {#            <br><br>#}
+        {% csrf_token %}
+
+        {#            <div class="layui-input-block">#}
+        {##}
+        {#                <input type="text" name="title" placeholder="请输入权限类型名称"#}
+        {#                       autocomplete="off"#}
+        {#                       class="layui-input" style="width: 300px;display: inline-block; float: left" id="op_type">#}
+        {#                <button class="layui-btn" id="add_op_type">增加权限类型</button>#}
+        {##}
+        {#            </div>#}
+        {#            <br><br>#}
+
+        {#            <div class="layui-input-block">#}
+        {#                <div class="layui-input-inline">#}
+        {#                    <select id="optype_old_name" name="shipping" class="valid" style="height: 35px;">#}
+        {#                        {% for optype in optype_list %}#}
+        {#                            <option>{{ optype }}</option>#}
+        {#                        {% endfor %}#}
+        {#                    </select>#}
+        {#                </div>#}
+        {##}
+        {#                <input type="text" name="title" placeholder="请输入权限类型要修改的名称" autocomplete="off"#}
+        {#                       class="layui-input" style="width: 300px;display: inline-block; float: left"#}
+        {#                       id="optype_new_name">#}
+        {#                <button class="layui-btn" id="change_optype">修改权限类型名称</button>#}
+        {#            </div>#}
+        {#            <br><br>#}
+        {#            <div class="layui-form-item layui-form-text">#}
+        {#                <label for="desc" class="layui-form-label">#}
+        {#                    权限添加及删除#}
+        {#                </label>#}
+        {#                <br>#}
+        {#                {% csrf_token %}#}
+
+        {#                <div class="layui-input-block">#}
+        {#                    <div class="layui-input-inline">#}
+        {##}
+        {#                        <select id="optype_name" name="shipping" class="valid" style="height: 35px;">#}
+        {#                            {% for optype in optype_list %}#}
+        {#                                <option>{{ optype }}</option>#}
+        {#                            {% endfor %}#}
+        {#                        </select>#}
+        {#                        &nbsp;&nbsp;#}
+        {#                    </div>#}
+        {##}
+        {#                    <input type="text" name="title" placeholder="请输入权限名称"#}
+        {#                           autocomplete="off"#}
+        {#                           class="layui-input" style="width: 300px;display: inline-block; float: left" id="op_name">#}
+        {#                    <button class="layui-btn" id="add_op">增加权限</button>#}
+        {#                </div>#}
+        {#                <br><br>#}
+        {#                <div class="layui-input-block">#}
+        {#                    <div class="layui-input-inline">#}
+        {##}
+        {#                        <select id="del_optype" name="shipping" class="valid" style="height: 35px;">#}
+        {#                            {% for optype in optype_list %}#}
+        {#                                <option>{{ optype }}</option>#}
+        {#                            {% endfor %}#}
+        {#                        </select>#}
+        {#                        &nbsp;&nbsp;#}
+        {#                    </div>#}
+        {#                    <input type="text" name="title" placeholder="请输入权限名称"#}
+        {#                           autocomplete="off"#}
+        {#                           class="layui-input" style="width: 300px;display: inline-block; float: left" id="del_op_name">#}
+        {#                    <button class="layui-btn" id="del_op">删除权限</button>#}
+        {#                </div>#}
+    </div>
+</div>
+
+<script>
+    let options_list = [];
+    $(function () {
+        // 选择角色时 动态显示已有权限i
+        $("#pj_role").bind("change", function () {
+            options_list = [];
+            let role_name = $(this).find("option:selected").text();
+            $.ajax({
+                url: '/xuanxing/role_op_query/',
+                type: 'post',
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "role_name": role_name,
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        // 清除已选中的
+                        $(".opt_cls").each(function () {
+                            if ($(this).next().hasClass("layui-form-checked")) {
+                                $(this).next().removeClass("layui-form-checked");
+                            }
+                        });
+
+                        for (let op_index in ReState["op_list"]) {
+                            $(".opt_cls").each(function () {
+                                {#alert($(this).val());#}
+                                if ($(this).val() == ReState["op_list"][op_index]) {
+                                    $(this).next().addClass("layui-form-checked");
+                                    options_list.push($(this).val().replace(/(^\s*)|(\s*$)/g, ""));
+                                    return false;
+                                }
+                            });
+                        }
+                        return false;
+                    }
+                    else if (ReState["code"] == "0002") {
+                        alert("未创建角色")
+                    }
+                }
+            });
+        });
+
+        function init_option() {
+            $("#pj_role").val("1");
+            $("#pj_role").change();
+        }
+
+        init_option();
+    });
+
+    function x_admin_show_new(obj, title, url, w, h) {
+        let op_type = $(obj).parent().parent().children(".op_key").children("span").text();
+        url = "/xuanxing/op_edit_html?op_type=" + op_type;
+
+        layer = layui.layer;
+        element = layui.element;
+
+        if (title == null || title == '') {
+            title = false;
+        }
+        if (url == null || url == '') {
+            url = "404.html";
+        }
+        if (w == null || w == '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h == '') {
+            h = ($(window).height() - 50);
+        }
+        layer.open({
+            type: 2,
+            area: [w + 'px', h + 'px'],
+            fix: false, //不固定
+            maxmin: true,
+            shadeClose: true,
+            shade: 0.4,
+            title: "编辑",
+            content: url,
+            end: function () {
+                window.location.href = "/xuanxing/option_list"
+            }
+        });
+    }
+
+    // 添加权限
+    function add_option(obj, title, w, h) {
+        let optp_name = $(obj).parent().parent().children(".op_key").children().html(); // 权限类型名称
+        let url = "/xuanxing/op_add_html?optype=" + optp_name;
+        let layer = layui.layer;
+
+        if (title == null || title == '') {
+            title = false;
+        }
+        if (url == null || url == '') {
+            url = "404.html";
+        }
+        if (w == null || w == '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h == '') {
+            h = ($(window).height() - 50);
+        }
+        layer.open({
+            type: 2,
+            area: [w + 'px', h + 'px'],
+            fix: false, //不固定
+            maxmin: true,
+            shadeClose: true,
+            shade: 0.4,
+            title: "编辑",
+            content: url,
+            end: function () {
+                window.location.href = "/xuanxing/option_list"
+            }
+        });
+    }
+
+    // 删除权限
+    function del_option(obj) {
+        // 删除权限
+        let del_option_list = [];
+        $(obj).parent().parent().children(".optionlist").children().each(function () {
+            if ($(this).next().hasClass("layui-form-checked")) {
+                del_option_list.push($(this).val());
+            }
+        });
+        let del_optype = $(obj).parent().parent().children(".op_key").children().html();
+        layer.confirm('确认要是删除【' + del_option_list + '】吗？', function (index) {
+            $.ajax({
+                url: '/xuanxing/op_del/',
+                type: 'post',
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "optype": del_optype,
+                    "opname": JSON.stringify(del_option_list),
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        // 清除已选中的
+                        layer.msg("删除成功");
+                        window.location.href = "/xuanxing/option_list";
+
+                    } else if (ReState["code"] == "0002") {
+                        alert("修改失败");
+                    }
+                }
+            });
+        })
+
+    }
+
+    // 各个角色权限设置
+    $("#save_opt").click(function () {
+        let role_name = $("#pj_role").find("option:selected").text();
+        let option_list = [];
+        $(".opt_cls").each(function () {
+            if ($(this).next().hasClass("layui-form-checked")) {
+                option_list.push($(this).val().replace(/(^\s*)|(\s*$)/g, ""));
+            }
+        });
+        option_list = option_list.sort();
+        options_list = options_list.sort();
+        console.log(option_list);
+        console.log(options_list);
+        if (option_list.toString() == options_list.toString()){
+            layer.msg("没有做出修改哦");
+            return false;
+        }
+        options_list = option_list;
+        $.ajax({
+            url: '/xuanxing/role_op_add/',
+            type: 'post',
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "role_name": role_name,
+                "option_list": JSON.stringify(option_list),
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.msg("权限设置成功");
+                    return false;
+                } else if (ReState["code"] == "0002") {
+                    alert("Password Error")
+                } else if (ReState["code"] == "0003") {
+                    alert("Username Error")
+                }
+            }
+        });
+    });
+    // 增加权限类型
+
+
+    // $("#add_op_type").click(function () {
+    //     alert("add_op_type");
+    //     let op_type_name = $("#op_type").val();
+    //    if (op_type_name != "") {
+    //      alert("op_type_name ---");
+    //    $.ajax({
+    //        url: '/xuanxing/op_type_add/',
+    //        type: 'post',
+    //        data: {
+    //          "csrfmiddlewaretoken": '{{ csrf_token }}',
+    //          "op_type_name": op_type_name,
+    //    },
+    //     success: function (msg) {
+    //          let ReState = eval("(" + JSON.stringify(msg) + ")");
+    //          if (ReState["code"] == "0000") {
+    //              layer.msg("增加成功");
+    //              return false;
+    //          } else if (ReState["code"] == "0002") {
+    //          alert("Webserver Error")
+    //        } else if (ReState["code"] == "0003") {
+    //            alert("Username Error")
+    //       }
+    //    }
+    //  });
+    // }
+    // });
+    // 增加权限
+    //$("#add_op").click(function () {
+    //  let optp_name = $("#optype_name").find("option:selected").val(); // 权限类型名称
+    //   let opt = $("#op_name").val(); // 权限名称
+    //    $.ajax({
+    //        url: '/xuanxing/op_add/',
+    //        type: 'post',
+    //       data: {
+    //              "csrfmiddlewaretoken": '{{ csrf_token }}',
+    //            "op_name": opt,
+    //             "optp_name": optp_name
+    //          },
+    //           success: function (msg) {
+    //              let ReState = eval("(" + JSON.stringify(msg) + ")");
+    //            if (ReState["code"] == "0000") {
+    //                  layer.msg("增加成功");
+    //                return false;
+    //              } else if (ReState["code"] == "0002") {
+    //              alert("Password Error")
+    //           } else if (ReState["code"] == "0003") {
+    //               alert("Username Error")
+    //             }
+    //         }
+    //      });
+    //   });
+
+
+    // 修改权限类型名称
+    $("#change_optype").click(function () {
+        let optype_old_name = $("#optype_old_name").find("option:selected").text();
+        let optype_new_name = $("#optype_new_name").val();
+        if ("" == optype_new_name || "" == optype_old_name) {
+            layer.msg("请输入权限新名称");
+            return false;
+        }
+        $.ajax({
+            url: '/xuanxing/optype_edit/',
+            type: 'post',
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "old_name": optype_old_name,
+                "new_name": optype_new_name,
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    // 清除已选中的
+                    layer.msg("修改成功");
+
+                    return false;
+                } else if (ReState["code"] == "0002") {
+                    alert("修改失败");
+                }
+            }
+        });
+
+    });
+    // 删除权限
+    $("#del_op").click(function () {
+        let del_optype = $("#del_optype").find("option:selected").text();
+        let del_opname = $("#del_op_name").val();
+        $.ajax({
+            url: '/xuanxing/op_del/',
+            type: 'post',
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "optype": del_optype,
+                "opname": del_opname,
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    // 清除已选中的
+                    layer.msg("删除成功");
+
+                    return false;
+                } else if (ReState["code"] == "0002") {
+                    alert("修改失败");
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+
+</html>

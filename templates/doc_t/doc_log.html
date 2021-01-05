@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+
+    <![endif]-->
+  </head>
+
+  <body>
+<div class="x-body">
+      <div class="layui-row">
+
+      </div>
+
+      <table class="layui-table">
+          <colgroup>
+            <col width="50">
+            <col width="40">
+            <col width="40">
+            <col width="120">
+
+
+          </colgroup>
+            <thead>
+              <tr>
+                <th>时间</th>
+{#                <th>文件名</th>#}
+                <th>角色名</th>
+                <th>姓名</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+
+            <tbody>
+                {% for log_item in log_list %}
+                  <tr>
+
+                    <td>{{ log_item.0 }}</td>
+                    <td>{{ log_item.1 }}</td>
+
+                    <td>{{ log_item.2 }}</td>
+                    <td>{{ log_item.3 }}</td>
+
+                  </tr>
+
+                {% endfor %}
+            </tbody>
+
+      </table>
+</div>
+
+
+<script>
+
+</script>
+</body>
+
+</html>

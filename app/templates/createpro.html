@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>创建项目</title>
+</head>
+<body>
+    <input type="hidden" id="loguser" name="loguser" value="{{ createprouser }}">
+    <input type="hidden" id="userclass" name="userclass" value="{{ userclass }}">
+    <input type="hidden" id="userid" name="userid" value="{{ userid }}">
+    <div id="create" style="">
+
+        <form id="createform" enctype="multipart/form‐data">
+            {% csrf_token %}
+            <h3 style="background: #74A8F5">创建项目</h3>
+            <input type="hidden" id="createprouser" name="createprouser" value="{{ createprouser }}">
+            输入项目名称：<input id="proname" type="text" name="proname"><br>
+            选择项目进度：
+                        <input type="radio" name="xmjd" value="未启动" checked="true">未启动
+                        <input type="radio" name="xmjd" value="需求整理">需求整理
+                        <input type="radio" name="xmjd" value="测试方案准备">测试方案准备
+                        <input type="radio" name="xmjd" value="测试环境准备">测试环境准备
+                        <input type="radio" name="xmjd" value="准备测试报告">准备测试报告
+                        <input type="radio" name="xmjd" value="测试中">测试中
+                        <input type="radio" name="xmjd" value="完成">完成 <br>
+            指定负责人：{% for charge in charges %}
+                        <input  id="chargeperson" type="checkbox" name="chargeperson" value="{{charge.username}}">{{charge.username}}
+                        {% endfor %}
+            <br>
+            创建项目时间：<input id="time" type="date" name="createprotime"> <br>
+             <input type="button" value="创建" onclick="cj()">
+            <input type="button" value="取消" onclick="cancle()">
+        </form>
+</body>
+<script src="{% static 'js/jquery-1.11.1.js' %}"></script>
+<script type="text/javascript">
+
+    $(function(){
+       //得到当前时间
+	var date_now = new Date();
+	//得到当前年份
+	var year = date_now.getFullYear();
+	//得到当前月份
+	//注：
+	//  1：js中获取Date中的month时，会比当前月份少一个月，所以这里需要先加一
+	//  2: 判断当前月份是否小于10，如果小于，那么就在月份的前面加一个 '0' ， 如果大于，就显示当前月份
+	var month = date_now.getMonth()+1 < 10 ? "0"+(date_now.getMonth()+1) : (date_now.getMonth()+1);
+	//得到当前日子（多少号）
+	var date = date_now.getDate() < 10 ? "0"+date_now.getDate() : date_now.getDate();
+	//设置input标签的max属性
+	$("#time").attr("max",year+"-"+month+"-"+date);
+})
+
+
+    function cancle() {
+        alert('您确定取消创建项目？')
+            var username = $('#loguser').val();
+            var userclass = $('#userclass').val();
+            var userid = $('#userid').val();
+            console.log(username,userclass,userid)
+        location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+    }
+
+    function cj() {
+        var proname=$('#proname').val();
+        var chargeperson = $('#create input[id="chargeperson"]:checked').map(function (index, elem) {
+        return $(elem).val()
+    }).get().join(',');
+        var time = $('#time').val()
+        console.log(proname,chargeperson,time)
+        if (proname==''){
+            alert('请指定项目名称')
+        }else if (chargeperson==''){
+            alert('请指定负责人')
+        }else if (time==''){
+            alert('请指定创建时间')
+        }else {
+            var username = $('#loguser').val();
+            var userclass = $('#userclass').val();
+            var userid = $('#userid').val();
+            console.log(username,userclass,userid)
+            $.ajax({
+            type:'post',
+            url:'{% url 'app:create_pro' %}',
+            data:new FormData(document.getElementById("createform")),
+            success:function (data) {
+                if (data === '1'){
+                    alert('项目创建成功')
+                    location.href="/ap/pro_page/?userid="+userid+"&username="+username+"&userclass="+userclass
+                }else if(data === '2') {
+                    alert('项目已存在')
+                }else if(data === '0'){
+                    alert('创建失败，请重新创建')
+                }
+            },
+            processData: false,
+            contentType: false
+        })
+        }
+
+    }
+</script>
+</html>

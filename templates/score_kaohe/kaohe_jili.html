@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+<div>
+    <br><br>
+    <label class="layui-form-label" style="width: 100px">请选择季度</label>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <select style="height: 30px;width: 180px;border: 1px solid deepskyblue;direction: ltr;"
+            id="quarter_select">
+        <option value="">请选择季度</option>
+        {% for qa in quarter_all %}
+            <option value="">{{ qa }}</option>
+        {% endfor %}
+
+    </select>
+</div>
+<hr>
+<br><br>
+
+<div id="score_sys">
+    {% csrf_token %}
+    {% for mem in  members %}
+        <div style="margin-left: 30px;">
+            <span>{{ mem }}</span>
+            {% if mem == "倪海波" %}
+                <span style="margin-left: 6px;">档次</span>
+            {% else %}
+                <span style="margin-left: 20px;">档次</span>
+
+            {% endif %}
+            <select style="height: 30px;width: 100px;border: 1px solid deepskyblue;direction: ltr;"
+                    id="dc_select">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+            </select>
+            <span style="margin-left: 20px;">激励</span> <input type="text" style="width: 100px;">
+        </div>
+        <br>
+    {% endfor %}
+</div>
+<script>
+    $("#quarter_select").bind("change", function () {
+        let quarter = $(this).find("option:selected").text();
+        window.location.href = "/xuanxing/kaohe_jili?date=" + quarter
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>打分工具</title>
+    <link rel="stylesheet" href="/static/layui2/css/layui.css">
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script src="/static/layui2/layui.js"></script>
+
+
+</head>
+<style>
+    .score_button {
+        height: 30px;
+        text-align: center;
+        line-height: 30px
+    }
+
+    .score_select {
+        height: 20px;
+        width: 20px;
+    }
+</style>
+<body>
+
+<div>
+    <br><br>
+    {#    <button type="button" class="layui-btn" id="test3"><i class="layui-icon"></i>上传文件</button>#}
+    <input type="text" name="title" required lay-verify="required" placeholder="请输入项目名称" autocomplete="off"
+           class="layui-input" style="width: 300px;display: inline-block; float: left" id="pj_name">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <button type="button" class="layui-btn layui-btn-radius score_button" style="display: inline-block" id="chaxun">查询
+    </button>
+    <button type="button" class="layui-btn layui-btn-radius score_button" style="display: inline-block"
+            id="download_excel">指标模板文件下载
+    </button>
+</div>
+<br><br>
+<table class="layui-table">
+    <thead>
+    <tr>
+        <th><input type="checkbox" name="" title="写作" lay-skin="primary" class="score_select"></th>
+        <th>项目ID</th>
+        <th>项目名称</th>
+        <th>负责人</th>
+        <th>参与人</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for jp in resp %}
+        <tr class="score_pj">
+            <td><input type="checkbox" name="" title="写作" lay-skin="primary" class="score_select"></td>
+            <td style="width: 60px;">{{ jp.pj_id }}</td>
+            <td class="pj_names">{{ jp.pj_name }}</td>
+            <td>{{ jp.deal_user }}</td>
+            <td>{{ jp.members }}</td>
+            <td class="btns">
+                <button type="button" class="layui-btn layui-btn-radius layui-btn-danger score_button layui-show-result"
+                        id="show_result{{ jp.pj_id }}">查看测试结果
+                </button>
+                {% csrf_token %}
+                <button type="button"
+                        class="layui-btn layui-btn-radius layui-btn-normal score_button layui-upload-file_chaxun"
+                        id="daoru{{ jp.pj_id }}">导入测试指标
+                </button>
+                <button type="button" class="layui-btn layui-btn-radius layui-btn-warm score_button layui-export-result"
+                        id="export_result{{ jp.pj_id }}">导出测试结果
+                </button>
+                <button type="button" class="layui-btn layui-btn-radius score_button layui-clear-result"
+                        id="clear_result{{ jp.pj_id }}">清空测试结果
+                </button>
+                <button type="button" class="layui-btn layui-btn-radius score_button layui-vend-rank"
+                        id="vend_rank{{ jp.pj_id }}">厂商评分排序
+                </button>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    $(function () {
+        // 权限限制
+        let opt_type_str = '{{ request.session.opt_type_list}}';
+        let opt_type_list = opt_type_str.split(";");
+        // 判断
+        let pj_only_mem = '{{ request.session.pj_only_mem}}';
+        let mem_opt_list = '{{ request.session.mem_opt_list}}';
+        pj_only_mem = pj_only_mem.split(";");
+        mem_opt_list = mem_opt_list.split(";");
+        $(".score_button").each(function () {
+            let index_flag = $.inArray($(this).text().replace(/(^\s*)|(\s*$)/g, ""), opt_type_list); //判断菜单名是否在数组中
+            if (index_flag != -1) {
+                $(this).show();
+            }
+            else {
+                $(this).hide();
+            }
+        });
+
+        // 刪除结果
+        $(".layui-clear-result").click(function () {
+            let clear_pj_id = $(this).attr("id");
+            layer.confirm("确认要清空吗", function () {
+                $.post("/testm/test_clear/", {
+                        claer_pj_id: clear_pj_id,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+
+                    }, function (data) {
+                        if (data["code"] == "0000") {
+                            layer.msg('清空成功');
+                        }
+                        else if (data["code"] == "0001") {
+                            layer.msg('没有测试结果');
+                        }
+                        else if (data["code"] == "0002") {
+                            layer.msg('项目id不存在');
+                        }
+                        else if (data["code"] == "0003") {
+                            layer.msg('清空失败');
+                        }
+                    }
+                )
+            });
+        });
+
+        // 对每行的项目进行控制
+        $(".score_pj").each(function () {
+            let pj_name = $(this).children(".pj_names").text();
+            let index_pj = $.inArray(pj_name, pj_only_mem); //判断该项目名是否在数组中
+            if (index_pj != -1) {
+                $(this).children(".btns").children(".score_button").each(function () {
+                    let scr_name = $(this).text();
+                    let scr_index = $.inArray(scr_name, mem_opt_list); //判断菜单名是否在数组中
+                    if (scr_index != -1) {
+                        $(this).show();
+                    }
+                    else {
+                        $(this).hide();
+                    }
+                })
+            }
+        });
+
+        layui.use('upload', function () {
+            let $ = layui.jquery
+                , upload = layui.upload;
+            //指定允许上传的文件类型
+            upload.render({
+                elem: ".layui-upload-file_chaxun"
+                , url: '/testm/test_zhibiao/' // 后端接收文件的接口
+                , accept: 'file' //类型：支持文件
+                , method: 'POST'
+                , data: {csrfmiddlewaretoken: '{{ csrf_token }}', pj_id: ""}
+                , before: function (obj) {
+                    console.log(this.item);
+                    this.data.pj_id = this.item.attr("id")
+                }
+                , done: function (res) {
+                    if (res["code"] == "0000") {
+                        layer.msg('上传成功');
+                    }
+                    else if (res["code"] == "0005") {
+                        layer.msg('文件格式不正确，只支持xlsx格式的excel');
+                    }
+                    else if (res["code"] == "0002") {
+                        layer.msg('文件大小不正常，上传失败');
+                    }
+                    else {
+                        layer.msg('上传失败');
+                    }
+                }
+            });
+        });
+
+        $(".layui-show-result").click(function () {
+            let show_pj_id = $(this).attr("id");
+            $.post("/testm/test_show/", {
+                    show_pj_id: show_pj_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }, function (res) {
+                    if (res["code"] == "0000") {
+                        window.location.href = "/testm/test_show?show_pj_id=" + show_pj_id;
+                    }
+                    else if (res["code"] == "0001") {
+                        layer.msg('请选导入指标文件,可以点击下载指标模板文件修改之后导入');
+                    }
+                    else if (res["code"] == "0002") {
+                        layer.msg('该项目不存在');
+                    }
+                    else if (res["code"] == "0003") {
+                        layer.msg('请先为该项目添加厂商');
+                    }
+
+                }
+            );
+        });
+
+        $(".layui-export-result").click(function () {
+            let result_pj_id = $(this).attr("id");
+            window.location.href = "/testm/test_export?export_pj_id=" + result_pj_id;
+
+        });
+        //根据项目名查询
+        $("#chaxun").click(function () {
+            window.location.href = "/testm/score_tools?pj_name=" + $("#pj_name").val()
+        });
+        $("#download_excel").click(function () {
+            window.location.href = "/testm/muban_download/"
+        });
+        $(".layui-vend-rank").click(function () {
+
+
+            let rank_pj_id = $(this).attr("id");
+            $.post("/testm/vend_rank/", {
+                    rank_pj_id: rank_pj_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }, function (res) {
+                    if (res["code"] == "0000") {
+                        layer.open({
+                            title: '厂商评分'
+                            , content: res["rank_data"]
+                        });
+                    }
+                    else if (res["code"] == "0001") {
+                        layer.msg('请先进行打分');
+                    }
+                    else {
+                        layer.msg('厂商评分异常');
+                    }
+                }
+            );
+        });
+    })
+
+</script>
+</body>
+</html>

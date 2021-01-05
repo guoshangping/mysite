@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body" id="idx_div">
+    {% csrf_token %}
+
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>指标增加</legend>
+    </fieldset>
+    <br><br>
+    <input type="text" class="layui-input" id="pj_name" value="{{ pj_name }}" style="display: none">
+
+    <div class="layui-form-item">
+        <label for="L_email" class="layui-form-label">
+            <span class="x-red">*</span> 产品类型
+        </label>
+        <div class="layui-input-inline">
+            <select id="prod_type">
+                {% for pdt in pdt_list %}
+                    <option>{{ pdt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label for="L_email" class="layui-form-label">
+            <span class="x-red">*</span>子类
+        </label>
+        <div class="layui-input-inline">
+            <select id="prod_child_type">
+                {% for cdt in cdt_list %}
+                    <option>{{ cdt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label for="L_email" class="layui-form-label">
+            <span class="x-red">*</span>一级指标
+        </label>
+        <div class="layui-input-inline">
+            <select id="first_idx">
+                {% for fidx in f_list %}
+                    <option value="{{ forloop.counter }}">{{ fidx }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label for="L_email" class="layui-form-label">
+            <span class="x-red">*</span>二级指标
+        </label>
+        <div class="layui-input-inline">
+            <select id="two_idx">
+                <option v-for="idx_msg in t_idx_list">{[ idx_msg ]}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label for="L_pass" class="layui-form-label">
+            <span class="x-red">*</span>指标说明
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="index_explain">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label for="L_repass" class="layui-form-label">
+            <span class="x-red">*</span>指标名称
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="index_name">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>指标描述
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="index_description">
+
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>指标id
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="index_id">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>案例编号
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="anli_id">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>测试类型
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="test_type">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>工具
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="tool">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+            <span class="x-red"></span>备注
+        </label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="remark">
+
+        </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">
+        </label>
+        <button class="layui-btn" id="index_add">
+            添加
+        </button>
+        <button class="layui-btn" id="index_cancel">
+            取消
+        </button>
+    </div>
+    <input type="text" value="{{ bg_cls }}" style="display: none;" id="big_cls">
+</div>
+
+<script>
+    let idx_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#idx_div",
+        data: {
+            t_idx_list: [],
+        }
+    });
+
+    $("#first_idx").bind("change", function () {
+        let first_idx_name = $(this).find("option:selected").text();
+        $.post(
+            "/xuanxing/index_query/", // url
+            {
+                "csrfmiddlewaretoken": "{{ csrf_token }}",
+                "first_idx": first_idx_name
+            }, // 参数
+            function (recv_data) {
+                if (recv_data["code"] == "0000") {
+                    idx_vue.$set(idx_vue, "t_idx_list", recv_data["t_list"]);
+                }
+                else {
+                    layer.msg("数据出错")
+                }
+            }
+        )
+    });
+
+    $("#index_add").click(function () {
+        let pj_name = $("#pj_name").val();
+        let prod_type = $("#prod_type").find("option:selected").text();
+        let prod_child_type = $("#prod_child_type").find("option:selected").text();
+        let first_idx = $("#first_idx").find("option:selected").text().replace(/(^\s*)|(\s*$)/g, "");
+        let two_idx = $("#two_idx").find("option:selected").text();
+        // 数据判空
+        let index_explain = $("#index_explain").val().replace(/(^\s*)|(\s*$)/g, "");
+        let index_name = $("#index_name").val().replace(/(^\s*)|(\s*$)/g, "");
+        if(index_explain == "" || index_name == ""){
+            layer.msg("指标说明或者指标名称没有填写");
+            return false;
+        }
+        let index_description = $("#index_description").val();
+        let index_id = $("#index_id").val();
+        let anli_id = $("#anli_id").val();
+        let test_type = $("#test_type").val();
+        let tool = $("#tool").val();
+        let remark = $("#remark").val();
+        $.ajax({
+            url: '/xuanxing/index_add/',
+            type: 'post',
+            async: false,
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "pj_name": pj_name,
+                "prod_type": prod_type,
+                "prod_child_type": prod_child_type,
+                "first_idx": first_idx,
+                "two_idx": two_idx,
+                "index_explain": index_explain,
+                "index_name": index_name,
+                "index_description": index_description,
+                "index_id": index_id,
+                "anli_id": anli_id,
+                "test_type": test_type,
+                "tool": tool,
+                "remark": remark,
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.alert("操作成功", {icon: 6}, function () {
+                        // 获得frame索引
+                        let index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                    return false;
+                } else if (ReState["code"] == "0001") {
+                    alert("Password Error")
+                } else if (ReState["code"] == "0002") {
+                    alert("Username Error")
+                }
+            }
+        });
+
+    });
+
+    $("#index_cancel").click(function () {
+        let index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+    });
+
+    function init_option() {
+        $("#first_idx").val("1");
+        $("#first_idx").change();
+    }
+
+    init_option();
+
+
+</script>
+
+</body>
+
+</html>

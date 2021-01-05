@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+    <link rel="stylesheet" href="/static/css/xuanxing/pm/pm_page.css">
+    <script src="/static/js/pm_check.js"></script>
+    <script src="/static/js/pm_paging.js"></script>
+    <style>
+        .box_active {
+            background: green;
+        }
+    </style>
+
+</head>
+
+<body>
+<div class="x-nav">
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" title="刷新" id="flush_pj">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+{% csrf_token %}
+
+<div class="x-body" id="user_show">
+    <div>
+        {#  按项目进度搜索框#}
+        <div class="layui-input-inline">
+            <select style="height: 38px;" id="pj_speed">
+                <option value="">项目进度</option>
+                <option v-for="(sp,index) in sp_obj" v-if="value1 == sp.id" v-bind:value=sp.id selected="selected">
+                    {[ sp.speed_name ]}
+                </option>
+                <option v-for="(sp,index) in sp_obj" v-if="value1 != sp.id" v-bind:value=sp.id>{[ sp.speed_name ]}
+                </option>
+            </select>
+        </div>
+
+        {#按负责人搜索框#}
+        <div class="layui-input-inline">
+            <select id="deal_user" style="height: 38px;">
+                <option value="">负责人</option>
+                <option v-for="(usr,index) in user_list" v-if="value2 == usr.id" v-bind:value=usr.id
+                        selected="selected">{[ usr.username ]}
+                </option>
+                <option v-for="(usr,index) in user_list" v-if="value2 != usr.id" v-bind:value=usr.id>{[ usr.username
+                    ]}
+                </option>
+            </select>
+        </div>
+        {# 按参与者搜索框 #}
+        <div class="layui-input-inline">
+            <select id="members" style="height: 38px;">
+                <option value="">参与者</option>
+                <option v-for="(usr,index) in user_list" v-if="value3 == usr.id" v-bind:value=usr.id
+                        selected="selected">{[ usr.username ]}
+                </option>
+                <option v-for="(usr,index) in user_list" v-if="value3 != usr.id" v-bind:value=usr.id>{[ usr.username ]}
+                </option>
+            </select>
+        </div>
+
+        {#  输入创建时间进行搜索#}
+        <input class="layui-input" placeholder="创建时间" id="start" style="display: inline-block;width: 150px;">
+
+        {# 输入项目名称搜索 #}
+        <input type="text" id="pj_name" placeholder="请输入项目名称" autocomplete="off" class="layui-input"
+               style="display: inline-block;width: 150px;">
+        <button class="layui-btn" onclick="change_page('1', '/xuanxing/task_manage/', '{{ csrf_token }}')"><i
+                class="layui-icon">&#xe615;</i></button>
+        <button class="layui-btn" id="pj_reset" style="background-color: #1E9FFF">重置</button>
+    </div>
+    <br>
+
+    <xblock>
+        <button class="layui-btn layui-btn-danger" onclick="delAll()" id="pj_del_all"><i class="layui-icon"></i>批量删除项目
+        </button>
+        <a href="/xuanxing/project_add_html/" id="pj_create">
+            <button class="layui-btn"><i class="layui-icon"></i>创建项目</button>
+        </a>
+        <button class="layui-btn" id="pj_export" style="background-color: #1E9FFF">项目信息导出</button>
+        <div class="layui-input-inline"
+             style="height: 40px;font-size: 20px;vertical-align: baseline;margin-left: 10px;">每页显示条数:
+        </div>
+        <div class="layui-input-inline">
+            <select id="pg_num" class="valid" style="height: 40px;">
+                <option value="3">请选择</option>
+                {% for num in page_num_list %}
+                    <option value="{{ num }}">{{ num }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </xblock>
+
+    <table class="layui-table" id="pj_table">
+        <thead>
+        <tr>
+            <th>
+                <div lay-skin="primary" v-bind:class="select_all" onclick="change_select(this)"
+                     style="width: 16px;height: 16px;border: 1px solid #d2d2d2;border-radius: 2px;">
+                </div>
+
+            </th>
+            <th>创建时间</th>
+            <th>项目名称</th>
+            <th>负责人</th>
+            <th>参与者</th>
+            <th>项目进度</th>
+            <th>厂商</th>
+            <th>产品子类</th>
+            <th>上专家会</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr v-for="(pj_tmp,index) in current_list">
+            <td>
+                <div v-bind:class="box_style[pj_tmp.id]" v-bind:data-id=pj_tmp.id onclick="change_tb_cls(this)"
+                     style="width: 16px;height: 16px;border: 1px solid #d2d2d2;border-radius: 2px;"></div>
+            </td>
+
+            <td style="display: none">{[ pj_tmp.id ]}</td>
+            <td>{[ pj_tmp.creation_time ]}</td>
+            <td class="project_names">{[ pj_tmp.pj_name ]}</td>
+            <td>{[ pj_tmp.deal_user ]}</td>
+            <td>{[ pj_tmp.members ]}</td>
+
+            <td><a v-if="speed_flag == 1"  :href="'/xuanxing/sp_time/?id='+ pj_tmp.id" style="color: blue">{[
+                pj_tmp.project_speed ]}</a>
+                <a v-else  href="#" style="color: blue">{[
+                pj_tmp.project_speed ]}</a>
+            </td>
+            <td style="white-space: pre-line;">{[ pj_tmp.vend_prods ]}</td>
+            <td>{[ pj_tmp.product_subclass ]}</td>
+            <td>{[ pj_tmp.meet_status ]}</td>
+            <td class="td-manage">
+                <a title="编辑" :href="'/xuanxing/pro_edit/?id=' + pj_tmp.id" class="pj_edit">
+                    <i class="layui-icon">&#xe642;</i>
+                </a>
+                <a title="删除" href="javascript:;" onclick="pj_delete(this)" class="pj_del">
+                    <i class="layui-icon">&#xe640;</i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+
+    </table>
+    <div class="tcdPageCode">
+        <div class="pm_shows" v-for="(pp,index) in page_list">
+            <span v-if="(pp[1] == 0) && (pp[2] == 1)" class="current">{[ pp[0] ]}</span>
+            <span v-if="(pp[1] == 0) && (pp[2] == 0)">{[ pp[0] ]}</span>
+            <a href="javascript:return false;" v-if="pp[1] == 1"
+               onclick="change_page(this,'/xuanxing/task_manage/','{{ csrf_token }}')">{[ pp[0] ]}</a>
+        </div>
+        <span>共</span><span id="total_num">{[ total_page ]}</span><span>页</span>
+    </div>
+</div>
+<script>
+    let opt_type_str = '{{ request.session.opt_type_list}}';
+    let opt_type_list = opt_type_str.split(";");
+    $(function () {
+        let opt_type_str = '{{ request.session.opt_type_list}}';
+        let pj_only_mem = '{{ request.session.pj_only_mem}}';
+        let mem_opt_list = '{{ request.session.mem_opt_list}}';
+        let opt_type_list = opt_type_str.split(";");
+        pj_only_mem = pj_only_mem.split(";");
+        mem_opt_list = mem_opt_list.split(";");
+        let pj_flag = 0;
+        $(".project_names").each(function () {
+            let index_pj = $.inArray($(this).text(), pj_only_mem); //判断该项目名是否在数组中
+            if (index_pj != -1) {
+                pj_flag = 1;
+                // 删除
+                let index_del = $.inArray("删除项目", mem_opt_list); //判断菜单名是否在数组中
+                if (index_del != -1) {
+                    $(this).siblings(".td-manage").children(".pj_del").show();
+                }
+                else {
+                    $(this).siblings(".td-manage").children(".pj_del").hide();
+                }
+                // 修改
+                let index_edit = $.inArray("修改项目", mem_opt_list); //判断菜单名是否在数组中
+                if (index_edit != -1) {
+                    $(this).siblings(".td-manage").children(".pj_edit").show();
+                }
+                else {
+                    $(this).siblings(".td-manage").children(".pj_edit").hide();
+                }
+            }
+            else {
+                // 删除
+                let index_del = $.inArray("删除项目", opt_type_list); //判断菜单名是否在数组中
+                if (index_del != -1) {
+                    $(this).siblings(".td-manage").children(".pj_del").show();
+                }
+                else {
+                    $(this).siblings(".td-manage").children(".pj_del").hide();
+                }
+                // 修改
+                let index_edit = $.inArray("修改项目", opt_type_list); //判断菜单名是否在数组中
+                if (index_edit != -1) {
+                    $(this).siblings(".td-manage").children(".pj_edit").show();
+                }
+                else {
+                    $(this).siblings(".td-manage").children(".pj_edit").hide();
+                }
+            }
+        });
+        if (pj_flag == 1) {
+            $("#pj_del_all").hide()
+        }
+        else {
+            let index_del = $.inArray("删除项目", opt_type_list); //判断菜单名是否在数组中
+            if (index_del != -1) {
+                $("#pj_del_all").show();
+            }
+            else {
+                $("#pj_del_all").hide();
+            }
+        }
+
+        let index_create = $.inArray("创建项目", opt_type_list);
+        if (index_create != -1) {
+            $("#pj_create").show();
+        }
+        else {
+            $("#pj_create").hide();
+        }
+        let index_export = $.inArray("项目信息导出", opt_type_list);
+        if (index_export != -1) {
+            $("#pj_export").show();
+        }
+        else {
+            $("#pj_export").hide();
+        }
+
+    });
+    let page_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#user_show",
+        data: {
+            page_list: [],
+            current_list: [],
+            total_page: 1,
+            curr_page: 1,
+            page_jizhun: 1,
+            user_list: [],
+            sp_obj: "",
+            value1: "",
+            value2: "",
+            value3: "",
+            selected_list: [],
+            box_style: {},
+            select_all: {box_active: false},
+            select_flag: 0,
+            speed_flag: 1
+        }
+    });
+
+    function speed_func() {
+        let project_speed = $.inArray("项目进度", opt_type_list);
+        if (project_speed == -1) {
+            page_vue.$set(page_vue, "speed_flag", 0);
+        }
+    }
+
+    speed_func();
+
+    function delAll() {
+        let select_flag = page_vue.select_flag;
+        let box_style = {};
+        let box_style_org = page_vue.box_style;
+        // 循环page_vue.box_style
+        $.each(box_style_org, function (k) {
+            console.log(box_style_org[k]["box_active"]);
+            if (box_style_org[k]["box_active"]) {
+                box_style[k] = "1";
+            }
+            else {
+                box_style[k] = "0";
+            }
+        });
+        let del_flag = 0;
+        $.each(box_style, function (k) {
+            if (box_style[k] == "1") {
+                del_flag = 1;
+                return false;
+            }
+        });
+        if (del_flag == 0) {
+            layer.msg("请选择项目");
+            return false;
+        }
+
+        layer.confirm('确认要删除吗?', function (index) {
+            //捉到所有被选中的，发异步进行删除
+            $.ajax({
+                url: '/xuanxing/pro_delete_all/',
+                type: 'post',
+                async: false,
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "box_style": JSON.stringify(box_style),
+                    "select_flag": select_flag
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        layer.msg('删除成功!', {icon: 1, time: 1000});
+                        window.location.href = "/xuanxing/task_manage/";
+                        return false;
+                    } else if (ReState["code"] == "0002") {
+                        alert("Password Error")
+                    } else if (ReState["code"] == "0003") {
+                        alert("Username Error")
+                    }
+                }
+            });
+        });
+    }
+
+    function pj_delete(obj) {
+        let pj_name = $(obj).parent().siblings(".project_names").text();
+        let url = '/xuanxing/project_del/?pj_name=' + pj_name;
+        layer.confirm('确认要删除该项目吗', function () {
+            window.location.href = url;
+        });
+    }
+
+    //
+    layui.use('laydate', function () {
+        let laydate = layui.laydate;
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+    });
+
+    $("#flush_pj").click(function () {
+        window.location.href = "/xuanxing/task_manage";
+    });
+
+    $("#pj_export").click(function () {
+        let select_flag = page_vue.select_flag;
+        let box_style = {};
+        let box_style_org = page_vue.box_style;
+        // 循环page_vue.box_style
+        $.each(box_style_org, function (k) {
+            console.log(box_style_org[k]["box_active"]);
+            if (box_style_org[k]["box_active"]) {
+                box_style[k] = "1";
+            }
+            else {
+                box_style[k] = "0";
+            }
+        });
+        let daochu_flag = 0;
+        $.each(box_style, function (k) {
+            if (box_style[k] == "1") {
+                daochu_flag = 1;
+                return false;
+            }
+        });
+        if (daochu_flag == 0) {
+            layer.msg("请选择项目");
+            return false;
+        }
+        $.ajax({
+                url: '/xuanxing/project_export/',
+                type: 'post',
+                async: false,
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "box_style": JSON.stringify(box_style),
+                    "select_flag": select_flag
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        let pj_list = ReState["check_str"];
+                        window.location.href = "/xuanxing/project_export?pj_list=" + pj_list;
+                    } else if (ReState["code"] == "0004") {
+                        layer.msg("请选择项目");
+                        return false;
+                    } else if (ReState["code"] == "0003") {
+                        alert("Username Error")
+                    }
+                }
+            });
+    });
+
+    change_page("", '/xuanxing/task_manage/', '{{ csrf_token }}');
+
+    $("#pg_num").bind("change", function () {
+        change_page("1", "/xuanxing/task_manage/", "{{ csrf_token }}");
+    });
+
+    function change_select() {
+        let select_flag = page_vue.select_flag;
+        let select_all = page_vue.select_all;
+        let box_style = page_vue.box_style;
+        if (select_flag == 0) {
+            select_flag = 1;
+            select_all = {box_active: true};
+            $.each(box_style, function (k) {
+                box_style[k] = {box_active: true}
+            });
+        }
+        else {
+            select_flag = 0;
+            select_all = {box_active: false};
+            // 循环字典的方式
+            $.each(box_style, function (k) {
+                box_style[k] = {box_active: false}
+            });
+        }
+        page_vue.$set(page_vue, "box_style", {});
+        page_vue.$set(page_vue, "box_style", box_style);
+        page_vue.$set(page_vue, "select_flag", select_flag);
+        page_vue.$set(page_vue, "select_all", {});
+        page_vue.$set(page_vue, "select_all", select_all);
+    }
+
+    function change_tb_cls(obj) {
+        let data_id = $(obj).attr("data-id").toString();
+        let box_style = page_vue.box_style;
+        if ($(obj).hasClass("box_active")) {
+            box_style[data_id] = {box_active: false}
+        }
+        else {
+            box_style[data_id] = {box_active: true}
+        }
+        page_vue.$set(page_vue, "box_style", {});  //vue的大bug (Vue.$set之前一定要对象内key不存在 不然只会更新值 并不会为该Key添加响应监测)
+        page_vue.$set(page_vue, "box_style", box_style);
+    }
+
+    $("#pj_reset").click(function () {
+        $("#pj_name").val("");
+        $("#start").val("");
+        $("#members").val("");
+        $("#members").change();
+        $("#deal_user").val("");
+        $("#deal_user").change();
+        $("#pj_speed").val("");
+        $("#pj_speed").change();
+    });
+
+
+</script>
+
+</body>
+
+</html>

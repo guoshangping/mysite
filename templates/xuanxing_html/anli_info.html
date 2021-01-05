@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎登录ccb内部系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+    <link rel="stylesheet" href="/static/css/xuanxing/pm/pm_page.css">
+    <script src="/static/js/pm_check.js"></script>
+    <script src="/static/js/pm_paging.js"></script>
+    <style>
+        .tddsad {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        table {
+            table-layout: fixed;
+        }
+
+        table tr td {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+
+        }
+
+        .box_active {
+            background: green;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="x-body" id="anli_show">
+    {% csrf_token %}
+
+    <span style="display: none" id="pjname">{{ pj_name }}</span>
+    <div class="layui-row">
+        <div class="layui-form layui-col-md12 x-so" id="search_anli">
+
+            <div class="layui-input-inline">
+                <select id="doc_name_id" class="valid" style="height: 40px;">
+                    <option value="">请选择文件名</option>
+                    {% for doc_name in doclist %}
+                        <option value="{{ doc_name }}">{{ doc_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button class="layui-btn" id="search_doc"
+                    onclick="change_page('1', '/xuanxing/test_anli/', '{{ csrf_token }}')"><i class="layui-icon">&#xe615;</i>
+            </button>
+        </div>
+    </div>
+    <xblock>
+        <div class="layui-input-inline"
+             style="display: inline-block;height: 40px;width: 80px;text-align: center;vertical-align: sub">
+            {{ pj_name }}
+        </div>
+        <div class="layui-input-inline" style="display: none;">
+            <select id="project_id" name="shipping" class="valid" style="height: 40px;">
+                <option value="{{ pj_id }}">{{ pj_name }}</option>
+            </select>
+        </div>
+
+        <button class="layui-btn" id="daoru_word"><i class="layui-icon"></i>导入word文档</button>
+        <button class="layui-btn" id="daochu_word"><i class="layui-icon"></i>导出word</button>
+
+        <button class="layui-btn" id="anli_chaxun"><i class="layui-icon "></i>查看所有案例</button>
+        <button class="layui-btn" id="anli_map"><i class="layui-icon "></i>案例对照表</button>
+        <div class="layui-input-inline"
+             style="height: 40px;font-size: 20px;vertical-align: baseline;margin-left: 10px;">每页显示条数:
+        </div>
+        <div class="layui-input-inline">
+            <select id="pg_num" class="valid" style="height: 40px;">
+                <option value="8">请选择</option>
+                {% for num in page_num_list %}
+                    <option value="{{ num }}">{{ num }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </xblock>
+
+    <table class="layui-table" style="table-layout: fixed;">
+        <thead>
+        <tr>
+            <th>
+                <div lay-skin="primary" v-bind:class="select_all" onclick="change_select(this)"
+                     style="width: 16px;height: 16px;border: 1px solid #d2d2d2;border-radius: 2px;">
+                </div>
+            </th>
+            <th>案例编号</th>
+            <th>测试目的</th>
+            <th>预置条件</th>
+            <th>测试步骤</th>
+            <th>预期结果</th>
+            <th>实测结果</th>
+            <th>测试结论</th>
+            <th>备注</th>
+            <th>操作员</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(anli, index) in current_list">
+            <td>
+                <div v-bind:class="box_style[anli.id]" v-bind:data-id=anli.id onclick="change_tb_cls(this)"
+                     style="width: 16px;height: 16px;border: 1px solid #d2d2d2;border-radius: 2px;"></div>
+            </td>
+            <td style="display: none;" class="anliid">{[ anli.id ]}</td>
+            <td v-bind:title="anli.s_type_name">{[ anli.s_type_name|safe ]}</td>
+            <td v-bind:title="anli.test_goal">{[ anli.test_goal|safe ]}</td>
+            <td v-bind:title="anli.pre_condition">{[ anli.pre_condition|safe ]}</td>
+            <td v-bind:title="anli.test_steps">{[ anli.test_steps|safe ]}</td>
+            <td v-bind:title="anli.expect_result">{[ anli.expect_result|safe ]}</td>
+            <td v-bind:title="anli.test_result">{[ anli.test_result|safe ]}</td>
+            <td v-bind:title="anli.test_conclusion">{[ anli.test_conclusion|safe ]}</td>
+            <td v-bind:title="anli.remark">{[ anli.remark|safe ]}</td>
+            <td v-bind:title="anli.check_person">{[ anli.check_person|safe ]}</td>
+            <td class="td-manage">
+                <a title="查看" onclick="anli_edit('编辑',this)" href="javascript:;">
+                    <i class="layui-icon">&#xe63c;</i>
+                </a>
+                <a title="删除" onclick="anli_del(this)" href="javascript:;">
+                    <i class="layui-icon">&#xe640;</i>
+                </a>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+    <div class="tcdPageCode">
+        <div class="pm_shows" v-for="(pp,index) in page_list">
+            <span v-if="(pp[1] == 0) && (pp[2] == 1)" class="current">{[ pp[0] ]}</span>
+            <span v-if="(pp[1] == 0) && (pp[2] == 0)">{[ pp[0] ]}</span>
+            <a href="javascript:return false;" v-if="pp[1] == 1"
+               onclick="change_page(this,'/xuanxing/test_anli/','{{ csrf_token }}')">{[ pp[0] ]}</a>
+        </div>
+        <span>共</span><span id="total_num">{[ total_page ]}</span><span>页</span>
+    </div>
+
+</div>
+
+<script>
+    $(function () {
+        let pj_name = $("#project_id option:selected").text();
+        let opt_type_str = '{{ request.session.opt_type_list}}';
+        let opt_type_list = opt_type_str.split(";");
+        // 判断
+        let pj_only_mem = '{{ request.session.pj_only_mem}}';
+        let mem_opt_list = '{{ request.session.mem_opt_list}}';
+        pj_only_mem = pj_only_mem.split(";");
+        mem_opt_list = mem_opt_list.split(";");
+        let index_pj = $.inArray(pj_name, pj_only_mem); //判断该项目名是否在数组中
+        if (index_pj != -1) {
+            // 在m
+            let daoru_anli = $.inArray("导入案例文档", mem_opt_list); //判断菜单名是否在数组中
+            if (daoru_anli != -1) {
+                $("#daoru_word").show();
+            }
+            else {
+                $("#daoru_word").hide();
+            }
+            let daochu_anli = $.inArray("导出案例文档", mem_opt_list); //判断菜单名是否在数组中
+            if (daochu_anli != -1) {
+                $("#daochu_word").show();
+            }
+            else {
+                $("#daochu_word").hide();
+            }
+            let search_al = $.inArray("搜索案例", mem_opt_list); //判断菜单名是否在数组中
+            if (search_al != -1) {
+                $("#search_anli").show();
+            }
+            else {
+                $("#search_anli").hide();
+            }
+            let modify_al = $.inArray("修改案例", mem_opt_list); //判断菜单名是否在数组中
+            if (modify_al != -1) {
+                $(".td-manage").each(function () {
+                    $(this).show();
+                });
+            }
+            else {
+                $(".td-manage").each(function () {
+                    $(this).hide();
+                });
+            }
+        }
+        else {
+            let daoru_anli = $.inArray("导入案例文档", opt_type_list); //判断菜单名是否在数组中
+            if (daoru_anli != -1) {
+                $("#daoru_word").show();
+            }
+            else {
+                $("#daoru_word").hide();
+            }
+            let daochu_anli = $.inArray("导出案例文档", opt_type_list); //判断菜单名是否在数组中
+            if (daochu_anli != -1) {
+                $("#daochu_word").show();
+            }
+            else {
+                $("#daochu_word").hide();
+            }
+            let search_al = $.inArray("搜索案例", opt_type_list); //判断菜单名是否在数组中
+            if (search_al != -1) {
+                $("#search_anli").show();
+            }
+            else {
+                $("#search_anli").hide();
+            }
+            let modify_al = $.inArray("修改案例", opt_type_list); //判断菜单名是否在数组中
+            if (modify_al != -1) {
+                $(".td-manage").each(function () {
+                    $(this).show();
+                });
+            }
+            else {
+                $(".td-manage").each(function () {
+                    $(this).hide();
+                });
+            }
+        }
+
+        $("#anli_chaxun").click(function () {
+            window.location.href = "/xuanxing/show_doc_data?pj_id=" + $("#project_id option:selected").val();
+        });
+
+
+        layui.use('upload', function () {
+            let upload = layui.upload;
+            //指定允许上传的文件类型
+            upload.render({
+                elem: "#daoru_word"
+                , url: '/xuanxing/anli_upload/' // 后端接收文件的接口
+                , accept: 'file' //类型：支持文件
+                , method: 'POST'
+                , data: {csrfmiddlewaretoken: '{{ csrf_token }}', pj_name: ""}
+                , before: function (obj) {
+                    console.log(this.item);
+                    this.data.pj_name = $("#pjname").html();
+                }
+                , done: function (res) {
+                    if (res["code"] == "0000") {
+                        layer.msg('上传并入库成功');
+                        window.location.href = location.href;
+                    }
+                    else if (res["code"] == "0010") {
+                        layer.msg('参数错误');
+                    }
+                    else if (res["code"] == "0001") {
+                        layer.msg('入库失败');
+                    }
+                    else if (res["code"] == "0002") {
+                        layer.msg('该文件已入库,请勿重复操作');
+                    }
+                    else if (res["code"] == "0003") {
+                        layer.msg('入库产生异常');
+                    }
+                    else if (res["code"] == "0004") {
+                        layer.msg('上传失败');
+                    }
+                    else if (res["code"] == "0005") {
+                        layer.msg("文件格式错误,只支持docx格式的word文档")
+                    }
+                }
+            });
+        });
+
+    });
+    let page_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#anli_show",
+        data: {
+            page_list: [],
+            current_list: [],
+            total_page: 1,
+            curr_page: 1,
+            page_jizhun: 1,
+            selected_list: [],
+            box_style: {},
+            select_all: {box_active: false},
+            select_flag: 0,
+        }
+    });
+
+    $("#daochu_word").click(function () {
+
+        let select_flag = page_vue.select_flag;
+        let box_style = {};
+        let box_style_org = page_vue.box_style;
+        // 循环page_vue.box_style
+        $.each(box_style_org, function (k) {
+            console.log(box_style_org[k]["box_active"]);
+            if (box_style_org[k]["box_active"]) {
+                box_style[k] = "1";
+            }
+            else {
+                box_style[k] = "0";
+            }
+        });
+        let daochu_flag = 0;
+        $.each(box_style, function (k) {
+            if (box_style[k] == "1") {
+                daochu_flag = 1;
+                return false;
+            }
+        });
+        if (daochu_flag == 0) {
+            layer.msg("请选择案例");
+            return false;
+        }
+        let pj_id = $("#project_id option:selected").val();
+
+
+        //捉到所有被选中的，发异步进行删除
+        $.ajax({
+            url: '/xuanxing/daochu_anli_word/',
+            type: 'post',
+            async: false,
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "box_style": JSON.stringify(box_style),
+                "select_flag": select_flag,
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    let check_str = ReState["check_str"];
+                    window.location.href = "/xuanxing/daochu_anli_word?" + "pj_id=" + pj_id + "&anli_ids=" + check_str;
+                    return false;
+                } else if (ReState["code"] == "0002") {
+                    alert("Password Error")
+                } else if (ReState["code"] == "0003") {
+                    alert("Username Error")
+                }
+            }
+        });
+
+
+        //let check_arr = [];
+        //$(".layui-form-checked").not(".header").each(function () {
+        //   check_arr.push($(this).parents("tr").children(".anliid").html());
+        //});
+        //if (check_arr.length == 0) {
+        //    layer.msg("请选择案例");
+        //    return false;
+        //}
+        //let check_str = String(check_arr);
+        //window.location.href = "/xuanxing/daochu_anli_word?" + "pj_id=" + pj_id + "&anli_ids=" + check_str;
+    });
+
+    function anli_edit(title, obj, w, h) {
+        let anli_id = $(obj).parent().siblings(".anliid").text();
+        let url = "/xuanxing/anli_view?anli_id=" + anli_id;
+
+        layer = layui.layer;
+        element = layui.element;
+
+        if (title == null || title == '') {
+            title = false;
+        }
+        if (url == null || url == '') {
+            url = "404.html";
+        }
+        if (w == null || w == '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h == '') {
+            h = ($(window).height() - 50);
+        }
+        layer.open({
+            type: 2,
+            area: [w + 'px', h + 'px'],
+            fix: false, //不固定
+            maxmin: true,
+            shadeClose: true,
+            shade: 0.4,
+            title: "编辑",
+            content: url,
+            end: function () {
+            }
+        });
+    }
+
+    function anli_del(obj) {
+        layer.confirm("确认要删除吗", function () {
+            let anli_id = $(obj).parent().siblings(".anliid").text();
+            $.ajax({
+                url: '/xuanxing/anli_del/',
+                type: 'post',
+                async: false,
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "anli_id": anli_id
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        layer.msg("删除成功");
+                        $(obj).parents("tr").remove();
+                        return false;
+                    } else if (ReState["code"] == "0001") {
+                        layer.msg("删除失败")
+                    }
+                }
+            });
+        });
+    }
+
+    $("#anli_map").click(function () {
+        window.location.href = "/xuanxing/anli_map"
+    });
+
+    change_page("", '/xuanxing/test_anli/', '{{ csrf_token }}');
+    $("#pg_num").bind("change", function () {
+        change_page("1", "/xuanxing/test_anli/", "{{ csrf_token }}")
+    });
+
+    function change_select() {
+        let select_flag = page_vue.select_flag;
+        let select_all = page_vue.select_all;
+        let box_style = page_vue.box_style;
+        if (select_flag == 0) {
+            select_flag = 1;
+            select_all = {box_active: true};
+            $.each(box_style, function (k) {
+                box_style[k] = {box_active: true}
+            });
+        }
+        else {
+            select_flag = 0;
+            select_all = {box_active: false};
+            // 循环字典的方式
+            $.each(box_style, function (k) {
+                box_style[k] = {box_active: false}
+            });
+        }
+        page_vue.$set(page_vue, "box_style", {});
+        page_vue.$set(page_vue, "box_style", box_style);
+        page_vue.$set(page_vue, "select_flag", select_flag);
+        page_vue.$set(page_vue, "select_all", {});
+        page_vue.$set(page_vue, "select_all", select_all);
+    }
+
+    function change_tb_cls(obj) {
+        let data_id = $(obj).attr("data-id").toString();
+        let box_style = page_vue.box_style;
+        if ($(obj).hasClass("box_active")) {
+            box_style[data_id] = {box_active: false}
+        }
+        else {
+            box_style[data_id] = {box_active: true}
+        }
+        page_vue.$set(page_vue, "box_style", {});  //vue的大bug (Vue.$set之前一定要对象内key不存在 不然只会更新值 并不会为该Key添加响应监测)
+        page_vue.$set(page_vue, "box_style", box_style);
+    }
+
+</script>
+</body>
+</html>

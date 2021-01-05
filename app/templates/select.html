@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>选择页面</title>
+    <style>
+        #pro{width:500px; height:700px;border:1px solid #F00;float:right}
+    </style>
+</head>
+<body bgcolor="#f0f8ff">
+<h3 style="text-align: right">您好 {{ user.username }}</h3>
+<h1 style="text-align: center">请选择操作</h1>
+<a href="{% url 'app:index' %}?userid={{ userid }}" style="text-decoration : none ;color: red;font-size: 20px">1.点击该行文字使用空模板编辑内容</a><br><br>
+<p style="font-size: 20px;color: red">2.从下方的记录选择一条继续编辑</p> <br>
+
+{#{% for input in inputs %}#}
+{##}
+{#    <li data-id="{{ input.id }}" style="color: #dddddd" ><a style="text-decoration: none;color: blue"  href="{% url 'select_to_index2' %}?id={{ input.id }}&userid={{user.id}}">{{ input.pub_date|date:"Y-m-d H:i:s" }} 项目名称：{{ input.mark }} 编辑人：{{ input_0 }}</a></li>#}
+{#{% endfor %}#}
+
+{% for input in inputs %}
+
+    <li data-id="{{ input.id }}" style="color: #dddddd" ><a style="text-decoration: none;color: blue"  href="{% url 'app:select_to_index2' %}?id={{ input.id }}&userid={{input.tag_id}}">{{ input.pub_date|date:"Y-m-d H:i:s" }} &nbsp;&nbsp;项目名称：{{ input.mark }} &nbsp;&nbsp;编辑人：{{ user.username }}</a></li>
+
+{% endfor %}
+
+<p style="font-size: 20px;color: red">3.请输入项目名称查询选择</p>
+<input id="userid" type="hidden" name="userid" value="{{ user.id }}">
+项目名称：<input id="pname" type="text" name="pname" value=""><input type="button" value="查询" onclick="chaxun()">
+<div class="form-group has-success">
+    <label for="project" class="col-md-2 control-label text-info" style="font-size: 14px;">根据项目名称查询的结果:</label>
+    <div  id="project" class="col-md-4">
+{#        <select id="project" name="project" class="form-control" > //select控件添加onchange事件#}
+{#        </select>#}
+    </div>
+</div>
+</body >
+
+
+<script src="{% static 'js/jquery-1.11.1.js' %}"></script>
+<script type="text/javascript">
+function submit_frm(){
+            var frm = document.getElementById("cc");
+            frm.action = "index2";
+            frm.method = "post";
+            frm.submit();
+        }
+
+$('#pname').keyup(function (e) {
+    $('#project').empty()
+})
+
+function chaxun(){
+        var pname = $('#pname').val();
+        var uid = $('#userid').val();
+        var csrftoken = "{{csrf_token}}";
+        console.log(pname,uid);
+        $.ajax({
+            type:'post',
+            url:'{% url 'app:select2' %}',
+            data:'mark='+pname+'&csrfmiddlewaretoken='+csrftoken,
+            dataType:'json',
+            success:function (data) {
+                    if(data===0){
+                        alert('输入的项目名称不正确或者输入不全')
+                    }else if(data===2){
+                        alert('请输入项目名称')
+                        }else{
+                            console.log(data);
+                        for (i=0;i<data.length;i++){
+                            var a = data[i]['pub_date'];
+                            var id = data[i]['id'];
+                            console.log(a,id);
+                            $('#project').append("<li><a style=\"text-decoration: none;color: blue\" onclick=\"submit_frm();\"  href=\"{% url 'app:select_to_index2' %}?id="+id+"&userid="+uid+"\">"+a+"</a></li>" )
+                        }
+                    }
+            }
+        })
+}
+
+</script>
+</html>
+
+

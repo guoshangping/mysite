@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta   http-equiv="Expires"   CONTENT="0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+{#      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>#}
+{#      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>#}
+    <![endif]-->
+        <style type="text/css">
+        *{
+            margin:0;
+            padding:0;
+         }
+
+           #imgdiv img {
+            width: 100px;
+            margin: 0 150px;
+        }
+
+        #bigimg {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            background: rgba(0, 0, 0, .3);
+            top: 0;
+            display: none;
+        }
+
+        #bigimg img {
+            width: 600px;
+            position: fixed;
+            left: 700px;
+            right: 0;
+            top: 80px;
+            cursor: pointer;
+        }
+
+
+        .layui-table img {
+            max-width: 500px;
+        }
+
+
+    </style>
+<script src="/static/js/echarts.min.js"></script>
+</head>
+<body>
+
+<div class="x-body">
+{#     <iframe class="filename" :src="..\doc\桌面PC\苹果\1606978579.0-苹果_公司营业执照.pdf" width='10%' height='100%' frameborder='1' >666</iframe>#}
+{#     <a href="http://%E5%86%85%E9%83%A8%E7%B3%BB%E7%BB%9F%E5%90%88%E5%B9%B6%E7%89%88%E6%9C%AC/%E5%AE%8C%E6%95%B4%E7%89%881/TestPM/mysite/a.pdf" width='50%' height='100%'></a>#}
+{#     <embed src="苹果_公司营业执照.pdf" type="application/pdf" width="100%" height="100%">#}
+
+     <button type="button" class="layui-btn layui-btn-radius layui-btn-sm layui-btn-normal score_button" style="display: inline-block;float: left" id="ess_button">
+        厂商文件
+    </button>
+     <button type="button" class="layui-btn layui-btn-radius layui-btn-sm layui-btn-normal score_button" style="display: inline-block" id="pub_button">
+        公共文件
+    </button>
+
+{#    <button type="button" class="layui-btn layui-btn-radius score_button" style="display: inline-block" id="ret">#}
+{#        直观图#}
+{#    </button>#}
+
+    <hr>
+{#<div>#}
+{#<div id="mymain" style="width: 700px;height:500px;display: inline-block">#}
+
+{#必要文件页面#}
+{#<div id="ess_file"  id="select_prod">#}
+
+<div id="ess_file">
+    <h1 style="display: inline-block">厂商文件:</h1>
+        {% csrf_token %}
+
+        <div class="" id="select_prod" style="display: inline-block">
+            <div class="layui-input-inline pro">
+                <select id="pro_name" style="height: 35px;">
+{#                {% if pro_name and vend_name != "无" %}#}
+                {% if pro_name and flag == "1" or flag == "3" %}
+                    <option selected>{{ pro_name }}</option>
+                    {% for p in pro_obj %}
+                        {% if p.0.project_name != pro_name %}
+                        <option value="pro_name">{{ p.0.project_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <option>请选择项目</option>
+                    {% for p in pro_obj %}
+                        <option value="pro_name">{{ p.0.project_name }}</option>
+                    {% endfor %}
+                {% endif %}
+
+                </select>
+            </div>
+
+            <div class="layui-input-inline vend">
+                <select name="class2" id="vend_name" style="height: 35px;" >
+                    {% if vend_name and flag == '1' or flag == "3" %}
+                     <option value="" selected>{{ vend_name }}</option>
+
+                     <option value="1" v-for="(vend, index) in vend_list" v-if="vend_name!= vend">{[ vend]}</option>
+
+                    {% else %}
+                    <option value="">请选择厂商</option>
+                    <option value="1" v-for="(vend, index) in vend_list">{[ vend]}</option>
+                    {% endif %}
+                </select>
+            </div>
+        </div>
+
+        <hr>
+{#   <button class="layui-btn myadd" onclick="myadd(this)"><i class="layui-icon"></i>添加(必要文件)</button>#}
+        <button type="button" class="layui-btn layui-btn-normal layui-btn-xs layui-btn-radius myadd" onclick="myadd(this)">添加(必要文件)</button>
+
+{#   <button class="layui-btn"><i class="layui-icon"></i>批量上传</button>#}
+{#    <button class="layui-btn" id="sh">校验</button>#}
+    {% csrf_token %}
+    <table class="layui-table">
+      <colgroup>
+
+        <col width="80">
+        <col width="120">
+        <col width="40">
+        <col width="90">
+        <col width="80">
+        <col width="60">
+        <col width="60">
+        <col width="40">
+
+      </colgroup>
+
+      <thead>
+
+        <tr align="center" >
+          <th><h3 style="color: blue">必要文件</h3></th>
+          <th>上传文件名称</th>
+          <th>文件大小(KB)</th>
+          <th class="up_btn">上传</th>
+          <th>状态</th>
+          <th>提交备注</th>
+          <th>审核备注</th>
+          <th class="up_btn">操作</th>
+
+        </tr>
+
+      </thead>
+      <tbody id="mytr" >
+
+            <tr v-for="(v,index) in doc_obj_all" >
+              <td>{[ v.file_name ]}</td>
+
+              <td class="p_v"><span class="p_v_name">{[ v.upload_filename ]}</span>
+                  <br>
+                 <a :href="'/xuanxing/change_name/?f_id='+v.id" title="更改文件名称">
+                    <button style="width: 5px;height: 5px; float: right;background: blue"></button>
+                 </a>
+
+              </td>
+
+              <td>{[ v.filesize ]}</td>
+              <td v-show="isUp">
+
+
+{#  预览图形#}
+{#               <div id="imgdiv" style="width: 300px;display: inline-block; float: left" class="img_show">#}
+{#                    <img src="" id="show" class="pic_show" onclick="imgbig();">#}
+{#               </div>#}
+
+{#            #}
+
+                <!-- 放大遮罩层 -->
+{#                <div id="bigimg" onclick="closeimg();" style="z-index:8"></div>#}
+
+              <span class="vend_name" style="display: none" >{[ v.vend_name]}</span>
+              <span class="pro_name" style="display: none">{[ v.pro_name]}</span>
+              <input type="file" class="myfile"  id="myfile" name="myfile"  autocomplete="off" style="width: 230px; float: left" onchange="myinput(this)" >
+              <button  type="submit"  v-bind:value=index  id="upload_file"   onclick="myclick(this);" class="layui-btn layui-btn-radius layui-btn-sm upload" style="display: inline-block ;float: right">上传</button>
+              </td>
+
+              <td class="stat_sel">
+{#                  {[ v.status ]}#}
+
+                   <div v-if="v.status== '未上传'">
+                    <span>{[ v.status ]}</span>
+                  </div>
+
+                  <div v-if="v.status== '已上传'">
+                    <span style="color:blue"  >{[ v.status ]}</span>
+                  </div>
+
+                  <div v-if="v.status== '审核通过'&& v.filesize">
+                    <span style="color:green">{[ v.status ]} 🔵</span>
+                  </div>
+
+                  <div v-else-if="v.status== '审核通过'">
+                    <span style="color:green">{[ v.status ]} ⚪</span>
+                  </div>
+
+                   <div v-if="v.status== '审核不通过'">
+                    <span style="color:red">{[ v.status ]}</span>
+                   </div>
+
+                  <div v-if="v.status== '不涉及'">
+                    <span style="color:blue">{[ v.status ]}</span>
+                  </div>
+
+              </td>
+
+              <td>
+                 {[ v.remark ]}
+              </td>
+              <td>{[ v.check_remark ]} </td>
+
+              <td style="padding: 0;text-align: center" v-show="isUp">
+
+                    <a :href="'/xuanxing/add_mark/?m_id='+v.id">
+                      <button class="layui-btn layui-btn-normal layui-btn-xs layui-btn-radius">+备注</button>
+                    </a>
+              </td>
+            </tr>
+      </tbody>
+    </table>
+
+{# 其他文件#}
+    {% csrf_token %}
+{#    <button class="layui-btn myadd" onclick="other_myadd(this)"><i class="layui-icon"></i>添加(其他文件)</button>#}
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-xs layui-btn-radius myadd" onclick="other_myadd(this)">添加(其他文件)</button>
+    <table class="layui-table other_f">
+      <colgroup>
+
+        <col width="80">
+        <col width="120">
+        <col width="40">
+        <col width="90">
+        <col width="80">
+        <col width="60">
+        <col width="60">
+        <col width="40">
+
+      </colgroup>
+
+      <thead>
+        <tr style="text-align: center" >
+
+          <th><h3 style="color: blue">其他文件</h3></th>
+          <th>上传文件名称</th>
+          <th>文件大小(KB)</th>
+          <th class="up_btn">上传</th>
+          <th>状态</th>
+          <th>提交备注</th>
+          <th>审核备注</th>
+          <th class="up_btn">操作</th>
+
+        </tr>
+
+      </thead>
+      <tbody id="mytr_pub" >
+
+            <tr v-for="(v,index) in other_obj_all" class="other_tr">
+              <td class="other_f_name">{[ v.file_name ]}</td>
+              <td class="p_v"><span class="p_v_name">{[ v.upload_filename ]}</span> </td>
+
+              <td>{[ v.filesize ]} </td>
+              <td id="up_other" v-show="isUp">
+                  <span id="other_vend_name" style="display: none" >{[ v.vend_name]}</span>
+                  <span id="other_pro_name" style="display: none" >{[ v.pro_name]}</span>
+                  <input type="file" class="other_myfile"  id="myfile" name="myfile"  autocomplete="off" style="width: 230px; float: left" onchange="other_myinput(this)">
+                  <button  type="submit"  v-bind:value=index  id="upload_file"   onclick="other_myclick(this);" class="layui-btn layui-btn-radius layui-btn-sm upload" style="display: inline-block ;float: right">上传</button>
+              </td>
+
+              <td class="other_stat_sel stat_sel">
+                  {[ v.status ]}
+              </td>
+
+              <td>{[ v.remark ]}</td>
+
+              <td style="padding: 0;text-align: center">
+                {[ v.check_remark ]}
+              </td>
+
+              <td style="padding: 0;text-align: center" v-show="isUp">
+                  <a :href="'/xuanxing/add_mark/?m_id='+v.id" >
+                      <button class="layui-btn layui-btn-normal layui-btn-xs layui-btn-radius" >+备注</button>
+                  </a>
+              </td>
+            </tr>
+      </tbody>
+    </table>
+ </div>
+
+{#公共文件#}
+<div id="pub_file"  style="display: none">
+
+         <h1 style="display: inline-block">公共文件:</h1>
+         <div class="layui-input-inline pub_sel">
+            <span id="myflag" style="display: none">{{ flag }}</span>
+            <select id="pub_pro_name" name="pub_pro_name" class="" style="height: 35px;">
+                {% if pro_name and flag == "2" %}
+                    <option selected>{{ pro_name }}</option>
+                    {% for p in pro_obj %}
+                        {% if p.0.project_name != pro_name %}
+                        <option value="pro_name">{{ p.0.project_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% else %}
+                    <option value="">请选择项目</option>
+                    {% for pro in pro_obj %}
+                    <option value="{{ pro.id }}">{{ pro.0.project_name }}</option>
+                    {% endfor %}
+
+                {% endif %}
+            </select>
+        </div>
+        <hr>
+
+{#       <button class="layui-btn myadd" onclick="pub_myadd(this)"><i class="layui-icon"></i>添加</button>#}
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-xs layui-btn-radius myadd" onclick="pub_myadd(this)">添加(公共文件)</button>
+
+    <div id="mypub">
+        {% csrf_token %}
+         <table class="layui-table" >
+
+          <colgroup>
+                <col width="80">
+                <col width="140">
+                <col width="40">
+                <col width="90">
+                <col width="80">
+                <col width="60">
+                <col width="60">
+                <col width="40">
+               </colgroup>
+          <thead>
+
+        <tr>
+          <th><h3 style="color: blue">公共文件</h3></th>
+          <th>上传文件名称</th>
+          <th>文件大小(KB)</th>
+          <th class="up_btn">上传</th>
+          <th>状态</th>
+          <th>提交备注</th>
+          <th>审核备注</th>
+          <th class="up_btn">操作</th>
+        </tr>
+
+          </thead>
+
+           <tbody id="ps_table" >
+
+            <tr v-for="(v,index) in pub_obj_all">
+              <td>{[ v.file_name ]}</td>
+
+              <td class="p_v"><span class="p_v_name">{[ v.upload_filename ]}</span>
+                  <br>
+                  <a :href="'/xuanxing/change_name/?f_id='+v.id" title="更改文件名称" >
+                      <button style="width: 5px;height: 5px; float: right;background: blue"></button>
+                  </a>
+              </td>
+
+              <td>{[ v.filesize ]}</td>
+
+              <td v-show = "isUp">
+                  <span class="pro_name" style="display: none" >{[ v.pro_name]}</span>
+                  <span class="vend_name"  style="display: none">{[ v.vend_name]}</span>
+                  <input type="file" class="myfile"  id="myfile" name="myfile"  autocomplete="off" style="width: 260px; float: left" onchange="myinput(this)">
+                  <button  type="submit"  v-bind:value=index  id="upload_file"   onclick="myclick(this)" class="layui-btn layui-btn-radius layui-btn-sm upload" style="display: inline-block ;float: right">上传</button>
+              </td>
+
+              <td class="stat_sel">
+{#              {[ v.status ]}#}
+                  <div v-if="v.status== '未上传'">
+                    <span >{[ v.status ]}</span>
+                  </div>
+
+                  <div v-if="v.status== '已上传'">
+                    <span style="color:blue"  >{[ v.status ]}</span>
+                  </div>
+
+                  <div v-if="v.status== '审核通过'&& v.filesize">
+                    <span style="color:green">{[ v.status ]} 🔵</span>
+                  </div>
+
+                  <div v-else-if="v.status== '审核通过'">
+                    <span style="color:green">{[ v.status ]} ⚪</span>
+                  </div>
+
+                   <div v-if="v.status== '审核不通过'">
+                    <span style="color:red">{[ v.status ]}</span>
+                   </div>
+
+                  <div v-if="v.status== '不涉及'">
+                    <span style="color:blue">{[ v.status ]}</span>
+                  </div>
+
+
+              </td>
+
+              <td>
+              {[ v.remark ]}
+              </td>
+              <td>{[ v.check_remark ]}</td>
+              <td style="padding: 0;text-align: center" v-show="isUp">
+                    <a :href="'/xuanxing/add_mark/?m_id='+v.id" >
+                      <button class="layui-btn layui-btn-normal layui-btn-xs layui-btn-radius">+备注</button>
+                    </a>
+              </td>
+
+            </tr>
+      </tbody>
+    </table>
+</div>
+
+{# 会议纪要#}
+<h2>会议纪要</h2>
+    <div id="pub_jy">
+     <table class="layui-table">
+
+              <colgroup>
+                    <col width="60">
+                    <col width="60">
+                    <col width="60">
+                    <col width="30">
+                    <col width="30">
+              </colgroup>
+
+              <thead>
+                <tr>
+                  <th>类型</th>
+                  <th>文件名称 </th>
+                  <th>上传时间</th>
+                  <th>状态</th>
+                  <th>备注</th>
+                </tr>
+              </thead>
+
+               <tbody id="jy_table" >
+
+                <tr v-for ="(j,index) in pd_list">
+                  <td >{[j.type ]}</td>
+                  <td>{[ j.file_name ]}</td>
+                  <td>{[ j.up_time]}</td>
+                  <td class="stat_sel">
+
+{#                      {[ j.status]}#}
+                  <div v-if="j.status== '未上传'">
+                    <span >{[ j.status ]}</span>
+                  </div>
+
+                  <div v-if="j.status== '已上传'">
+                    <span style="color:blue"  >{[ j.status ]}</span>
+                  </div>
+
+{#                  <div v-if="v.status== '审核通过'&& v.filesize">#}
+{#                    <span style="color:green">{[ j.status ]} 🔵</span>#}
+{#                  </div>#}
+
+                  <div v-if="j.status== '审核通过'">
+                    <span style="color:green">{[ j.status ]} </span>
+                  </div>
+
+                   <div v-if="j.status== '审核不通过'">
+                    <span style="color:red">{[ j.status ]}</span>
+                   </div>
+
+                  <div v-if="j.status== '不涉及'">
+                    <span style="color:blue">{[ j.status ]}</span>
+                  </div>
+
+                  </td>
+
+                  <td>{[ j.mark ]}</td>
+
+                </tr>
+          </tbody>
+        </table>
+    </div>
+</div>
+
+{#  直观图展示界面  #}
+
+    <div id="sel" style="display: none">
+
+        <div v-for="(k,index) in shape_list" id="sp" >
+           <span id="shape_sp"> {[ k ]}</span>
+        </div>
+        <div id="myechart" style="width: 900px;height:500px;display: inline-block"  ></div>
+    </div>
+
+</div>
+
+<script src="/static/layui2/layui.js"></script>
+<script src="/static/layui2/layui.all.js"></script>
+<script type="text/javascript">
+
+ {# 权限#}
+ {# $(function () {#}
+ {#     let opt_type_str = '{{ request.session.opt_type_list}}';#}
+ {#     opt_type_str = opt_type_str.split(";");#}
+ {#     console.log(opt_type_str);#}
+ {#     let doc_up = $.inArray("文档提交", opt_type_str); //判断菜单名是否在数组中#}
+ {#     let doc_check = $.inArray("文档审核", opt_type_str); //判断菜单名是否在数组中#}
+ {#     console.log(doc_up);#}
+ {#     console.log(doc_check);#}
+ {##}
+ {#       if ( doc_up != -1 ) {#}
+ {#           $(".down_btn").each(function () {#}
+ {#               console.log(666888);#}
+ {#               $(this).hide();#}
+ {#               v_hide();#}
+ {#               v_hide_pub();#}
+ {#               v_hide_p();#}
+ {#           });#}
+ {#        }#}
+ {##}
+ {#        if ( doc_check != -1 ) {#}
+ {#            console.log(99999);#}
+ {#           $(".up_btn").each(function () {#}
+ {#               $(this).hide();#}
+ {#               v_show();#}
+ {#               v_show_pub();#}
+ {#               v_show_p()#}
+ {#           });#}
+ {#        }#}
+ {#    });#}
+
+{# vue#}
+      let pro_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#select_prod",
+        data: {
+            vend_list: [],
+        }
+      });
+
+      let pro1_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#mytr",
+        data: {
+            doc_obj_all: {},
+
+            doc_li: [],
+            isShow: true,
+            isUp:true,
+
+        },
+         mounted () {
+            window.v_hide = this.v_hide;    // 方法赋值给window
+            window.v_show = this.v_show;    // 方法赋值给window
+         },
+
+         methods:{
+             v_show(){
+                this.isUp=false;
+             },
+            v_hide(){
+                this.isShow=false;
+             },
+        },
+    });
+
+     let pro_vue_pub = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#mytr_pub",
+        data: {
+
+            other_obj_all:{},
+            doc_li:[],
+             isShow: true,
+             isUp:true,
+        },
+        mounted () {
+            window.v_hide_pub = this.v_hide_pub;    // 方法赋值给window
+            window.v_show_pub = this.v_show_pub;
+         },
+
+         methods: {
+             v_hide_pub() {
+                 this.isShow = false;
+             },
+
+             v_show_pub() {
+                 this.isUp = false;
+             }
+         }
+
+    });
+     let pub_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#mypub",
+        data: {
+            pub_obj_all:{},
+            pd_list:{},
+            isShow: true,
+            isUp:true,
+        },
+
+       mounted () {
+            window.v_hide_p = this.v_hide_p;    // 方法赋值给window
+            window.v_show_p = this.v_show_p;    // 方法赋值给window
+         },
+
+         methods: {
+             v_hide_p() {
+                 this.isShow = false;
+             },
+             v_show_p() {
+                 this.isUp = false;
+             }
+         }
+
+
+    });
+     let pub_vue_jy = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#pub_jy",
+        data: {
+            pub_obj_all:{},
+            pd_list:{}
+        },
+    });
+      let shape = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#sel",
+        data: {
+            shape_list:[],
+        },
+    });
+
+
+      function liandong(opt_name,pro_name,vend_name) {
+        {#let form = layui.form;#}
+        if (pro_name !== opt_name) {
+            $.ajax({
+                url: '/xuanxing/get_ven/',
+                type: 'post',
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "pro_name": pro_name,
+                    "vend_name": vend_name,
+                    "flag":1,
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    {#let ReState = msg;#}
+                    if (ReState["code"] == "0000") {
+
+                        pro_vue.$set(pro_vue, "vend_list", {});
+                        pro_vue.$set(pro_vue, "vend_list", ReState["vend_list"]);
+                        pro1_vue.$set(pro1_vue, "doc_obj_all", {});
+                        pro1_vue.$set(pro1_vue, "doc_obj_all", ReState["doc_obj_all"]);
+
+                        var ess = ReState["doc_obj_all"];
+
+                     }
+                }
+            });
+        }
+    }
+
+     function liandong_other(opt_name,pro_name,vend_name) {
+        let form = layui.form;
+        if (pro_name !== opt_name) {
+            $.ajax({
+                url: '/xuanxing/get_ven_other/',
+                type: 'post',
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "pro_name": pro_name,
+                    "vend_name": vend_name,
+                    "flag":3,
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        pro_vue.$set(pro_vue, "vend_list", {});
+                        pro_vue.$set(pro_vue, "vend_list", ReState["vend_list"]);
+                        pro_vue_pub.$set(pro_vue_pub, "other_obj_all", {});
+                        pro_vue_pub.$set(pro_vue_pub, "other_obj_all", ReState["other_obj_all"]);
+                        var ess = ReState["other_obj_all"];
+                        console.log(ess,888);
+
+                     }
+                }
+            });
+        }
+     }
+
+
+    let pro_name = $("#pro_name").find("option:selected").text();
+    let vend_name = $("#vend_name").find("option:selected").text();
+    if (pro_name && vend_name){
+        console.log(pro_name,vend_name,"*******************");
+        liandong("请选择项目",pro_name, vend_name);
+        liandong_other("请选择项目",pro_name, vend_name);
+    }
+
+    $("#pro_name").bind("change", function () {
+        let pro_name = $(this).find("option:selected").text();
+        console.log(pro_name,"-----------" );
+        liandong("请选择项目",pro_name, "");
+        liandong_other("请选择项目",pro_name, "");
+        $("#vend_name")[0].selectedIndex=0;
+    });
+
+    $("#vend_name").bind("change", function () {
+        let pro_name = $("#pro_name").find("option:selected").text();
+        let vend_name = $(this).find("option:selected").text();
+
+        liandong("请选择项目",pro_name, "");
+        liandong_other("请选择项目",pro_name, "");
+        liandong("请选择厂商", pro_name, vend_name);
+        liandong_other("请选择厂商", pro_name, vend_name);
+    });
+
+
+    {#点击按钮实现三个页面的跳转#}
+    $(function () {
+        $("#ess_button").click(function () {
+            $("#ess_file").show();
+            $("#pub_file").hide();
+            {#$("#mymain").hide();#}
+            $("#bar").hide();
+            $("#other_file").show();
+            $("#sel").hide();
+        });
+
+        $("#ret").click(function () {
+             $("#ess_file").hide();
+             {#$("#mymain").show();#}
+             {#$("#mymain").hide();#}
+             $("#bar").show();
+             $("#pub_file").hide();
+             $("#other_file").hide();
+             $("#sel").show();
+
+            $.ajax({
+                url: '/xuanxing/shape_show/',
+                type: 'post',
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    {#"pro_name": pro_name,#}
+                    {#"vend_name": vend_name,#}
+                    "flag":1,
+                },
+                success: function (shape_list) {
+                    let ReState = eval("(" + JSON.stringify(shape_list) + ")");
+                    shape.$set(shape, "shape_list", ReState["shape_list"]);
+                }
+            });
+        });
+
+
+
+
+
+       let myflag = $("#myflag").html();
+       console.log(myflag,"=====myflag");
+       if (myflag == "2"){
+           $("#ess_file").hide();
+           $("#pub_file").show();
+           $("#other_file").hide();
+       }
+
+        $("#pub_button").click(function () {
+             $("#ess_file").hide();
+             {#$("#mymain").hide();#}
+             $("#bar").hide();
+             $("#pub_file").show();
+             $("#other_file").hide();
+             $("#sel").hide();
+        });
+   });
+
+    {#必要文件  点击input框选择文件#}
+    var up_name="";
+    var pro_vend_name="";
+    function myinput(obj) {
+        up_name= obj.files[0].name;   //要上传文件的名字
+        console.log(up_name,"-------up_name");
+        var mysize = $(obj).parent().prev().html((obj.files[0].size/1024).toFixed(0));  // 把文件大小写入对应表格里
+        pro_vend_name =$(obj).parent().siblings(".p_v").children(".p_v_name").text();
+        console.log(pro_vend_name,"====pro_vend_name======");
+        //预览图
+        {#let newsrc = getObjectURL(obj.files[0]);#}
+        {#$(obj).siblings(".img_show").children(".pic_show").attr('src',newsrc);#}
+
+     }
+    var tt="";
+    function myclick(up_obj){
+        var tt=$(up_obj).val();
+        let formdata = new FormData();
+        formdata.append('myfile', $('.myfile')[tt].files[0]);
+
+        var vend_name=$(up_obj).siblings(".vend_name").html();
+        var pro_name=$(up_obj).siblings(".pro_name").html();
+        var flag = 1;
+        {#if ("联想_公司营业执照.pdf" != up_name){#}
+        if (pro_vend_name != up_name){
+            layer.msg("上传失败，注意文件名字格式！");
+            return false;
+         }
+        formdata.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        formdata.append('vend_name', vend_name);
+        formdata.append('pro_name', pro_name);
+        formdata.append('flag', 1);
+
+        var up=$(up_obj);
+        $.ajax({
+            url:"/xuanxing/upload_file/",
+            type:"post",
+            contentType: false,
+            // 不设置请求体数据格式类型
+            // 不处理数据，直接源数据发送
+            processData: false,
+            data:formdata,
+            cache:false,
+            async:false,
+            success: function (ret) {
+                {#let ReState = eval("(" + JSON.stringify(msg) + ")");#}
+                let Ret = ret;
+                if (Ret["code"] == "0000") {
+                    layer.msg("上传成功")
+                }
+                if (Ret["stat_obj"] == "2") {
+                    console.log(up, "=============up");
+                    $(up).parent().siblings(".stat_sel").html("<span style='color:blue'>"+"已上传"+"</span>");
+                  }
+
+                 if (Ret["ess_f_path"]) {
+                    console.log(Ret["ess_f_path"],"路径");
+                    $(up).parent().prev().attr('src',Ret["ess_f_path"]);
+
+                  }
+
+                }
+
+             });
+          }
+
+
+   //上传文件后显示图形，预览功能
+  {#function getObjectURL(file) {#}
+  {#      var url = null;#}
+  {#      // 下面函数执行的效果是一样的，只是需要针对不同的浏览器执行不同的 js 函数而已#}
+  {#      if (window.createObjectURL != undefined) { // basic#}
+  {#          url = window.createObjectURL(file);#}
+  {#      } else if (window.URL != undefined) { // mozilla(firefox)#}
+  {#          url = window.URL.createObjectURL(file);#}
+  {#      } else if (window.webkitURL != undefined) { // webkit or chrome#}
+  {#          url = window.webkitURL.createObjectURL(file);#}
+  {#      }#}
+  {#      return url;#}
+  {#  }#}
+  {##}
+  {##}
+  {#  function imgbig() {#}
+  {#      var imgsrc = $('#show').attr('src');#}
+  {#      $("#bigimg").css("display", "block");#}
+  {#      $("#bigimg").html("<img src=" + imgsrc + " />");#}
+  {#  }#}
+  {##}
+  {#  function closeimg() {#}
+  {#      $("#bigimg").css("display", "none");#}
+
+
+   {#厂商必要文件下载#}
+    function download_file(down_obj){
+         var file_id =$(down_obj).siblings("#down_f").text();
+
+         $.ajax({
+             url: "/xuanxing/download_file/",
+             type: "post",
+             {#contentType: false,#}
+             {#processData: false,#}
+             async:true,
+             data: {
+                 "csrfmiddlewaretoken": "{{ csrf_token }}",
+                 "file_id":file_id,
+                 "flag":1,
+             },
+             {#cache: false,#}
+             success: function (ret_data) {
+                var file_path = ret_data.f_path;
+                {#var file_name = ret_data.file_name;#}
+                location.href = "/xuanxing/down_load/?file_path="+file_path;
+
+                 $.ajax({
+                     url: "/xuanxing/down_load/",
+                     type: "get",
+                     {#contentType: false,#}
+                     {#processData: false,#}
+                     {#async:true,#}
+                     data: {
+                         "csrfmiddlewaretoken": "{{ csrf_token }}",
+                         "file_path":file_path,
+                     },
+                     {#cache: false,#}
+                     success: function (ret) {
+                        var Ret=ret;
+                        console.log(Ret,"文件！");
+                        if (Ret["code"]=="0000"){
+                            layer.msg("此文件未上传！")
+                        }
+
+
+             }
+          })
+
+         }
+      })
+    }
+
+
+    {#function mypass(ps) {#}
+    {##}
+    {#    var ps_obj=$(ps);#}
+    {#    var pass_id =  $(ps).parent().prev().children("#down_f").html();#}
+    {#    var pass_other_id =  $(ps).parent().prev().children("#other_down_f").html();#}
+    {#    console.log( pass_other_id);#}
+    {#    var pass_pub_id =  $(ps).parent().prev().children("#down_pub").html();#}
+    {#    $.ajax({#}
+    {#        url:"/xuanxing/check_pass/",#}
+    {#        type:"post",#}
+            {#contentType: false,#}
+    {#        data:{#}
+    {#            "csrfmiddlewaretoken": "{{ csrf_token }}",#}
+    {#            "pass_id":pass_id,#}
+    {#            "pass_other_id":pass_other_id,#}
+    {#            "pass_pub_id":pass_pub_id,#}
+    {#        },#}
+    {##}
+    {#        success: function (ret) {#}
+                {#let ReState = eval("(" + JSON.stringify(msg) + ")");#}
+    {#            let Ret = ret;#}
+    {#            if (Ret["code"] == "0000") {#}
+                     {#layer.ret("审核成功");#}
+    {#                $(ps_obj).parent().siblings(".stat_sel").html("审核通过！");#}
+    {#            }#}
+    {#           }#}
+    {#         });#}
+    {# }#}
+
+
+    {#function no_pass(nps) {#}
+    {##}
+    {#    var nps_obj = $(nps);#}
+    {#    var pass_id = $(nps).parent().prev().children("#down_f").html();#}
+    {#    var pass_other_id = $(nps).parent().prev().children("#other_down_f").html();#}
+    {#    console.log(pass_other_id);#}
+    {#    var pass_pub_id = $(nps).parent().prev().children("#down_pub").html();#}
+    {#    $.ajax({#}
+    {#        url: "/xuanxing/no_check_pass/",#}
+    {#        type: "post",#}
+    {##}
+            {#contentType: false,#}
+    {#        data: {#}
+    {#            "csrfmiddlewaretoken": "{{ csrf_token }}",#}
+    {#            "pass_id": pass_id,#}
+    {#            "pass_other_id": pass_other_id,#}
+    {#            "pass_pub_id": pass_pub_id,#}
+    {#        },#}
+    {##}
+    {#        success: function (ret) {#}
+                {#let ReState = eval("(" + JSON.stringify(msg) + ")");#}
+    {#            let Ret = ret;#}
+    {#            if (Ret["code"] == "0000") {#}
+                    {#layer.ret("审核成功");#}
+    {#                $(nps_obj).parent().siblings(".stat_sel").html("审核不通过");#}
+    {#            }#}
+    {#        }#}
+    {#    });#}
+    {# }#}
+
+
+    {#厂商其他文件上传#}
+
+    var other_up_name="";
+    function other_myinput(obj) {
+        up_name= obj.files[0].name;   //要上传文件的名字
+        console.log(up_name,"-------up_name");
+        var mysize = $(obj).parent().prev().html((obj.files[0].size/1024).toFixed(0));  // 把文件大小写入对应表格里
+        var myname = $(obj).parent().prev().prev().html((obj.files[0].name));  // 把文件名称写入对应表格里
+
+     }
+
+    var ot="";
+    function other_myclick(other_up_obj){
+        var ot=$(other_up_obj).val();
+        let formdata = new FormData();
+        formdata.append('myfile', $('.other_myfile')[ot].files[0],f_code);
+        var f_code=$(other_up_obj).parent().siblings(".other_f_name").html();
+        var other_vend_name=$(other_up_obj).siblings("#other_vend_name").html();
+        var other_pro_name=$(other_up_obj).siblings("#other_pro_name").html();
+
+        formdata.append('f_code', f_code);
+        formdata.append('other_vend_name', other_vend_name);
+        formdata.append('other_pro_name', other_pro_name);
+        formdata.append('flag', 3);
+        formdata.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+
+        var other_up=$(other_up_obj);
+        $.ajax({
+            url:"/xuanxing/upload_file/",
+            type:"post",
+            contentType: false,
+            // 不设置请求体数据格式类型
+            // 不处理数据，直接源数据发送
+            processData: false,
+            data:formdata,
+            cache:false,
+            async:false,
+            success: function (ret) {
+                {#let ReState = eval("(" + JSON.stringify(msg) + ")");#}
+                let Ret = ret;
+
+                if (Ret["code"] == "0000") {
+                    layer.msg("上传成功");
+                    {#window.location.href = "/xuanxing/document/"#}
+                }
+
+                if (Ret["stat_obj"] == 2) {
+                     {#$(other_up).parent().siblings(".other_stat_sel").html("已上传");#}
+                     $(other_up).parent().siblings(".other_stat_sel").html("<span style='color:blue'>"+"已上传"+"</span>");
+                }
+
+                if (Ret["code"] == "0001") {
+                    layer.msg("此文件名已存在！")
+                }
+
+               }
+             });
+           }
+
+        {#厂商其他文件下载#}
+    {#厂商必要文件下载#}
+    function other_download_file(down_obj){
+         var file_id =$(down_obj).siblings("#other_down_f").text();
+
+         $.ajax({
+             url: "/xuanxing/download_file/",
+             type: "post",
+             {#contentType: false,#}
+             {#processData: false,#}
+             async:true,
+             data: {
+                 "csrfmiddlewaretoken": "{{ csrf_token }}",
+                 "file_id":file_id,
+                 "flag":3,
+             },
+             {#cache: false,#}
+             success: function (ret_data) {
+                var file_path = ret_data.f_path;
+                {#var file_name = ret_data.file_name;#}
+
+                location.href = "/xuanxing/down_load/?file_path="+file_path;
+             }
+        })
+    }
+
+
+{#厂商必要文件添加动作#}
+
+    function myadd(add){
+        //联动框里获得项目和厂商
+        var  pro_add = $(add).siblings("#select_prod").children(".pro").find("option:selected").html();
+        console.log(pro_add);
+        var  vend_add = $(add).siblings("#select_prod").children(".vend").find("option:selected").html();
+        console.log(vend_add);
+        var flag=1;
+        location.href = "/xuanxing/doc_add?pro_add="+pro_add+"&"+"vend_add="+vend_add+"&"+"flag="+flag;
+       }
+
+
+{#  厂商其他文件添加  #}
+    function other_myadd(add){
+        var  pro_add = $(add).siblings("#select_prod").children(".pro").find("option:selected").html();
+        console.log(pro_add,77);
+        var vend_add = $(add).siblings("#select_prod").children(".vend").find("option:selected").html();
+
+        console.log(vend_add,88);
+        var flag=3;
+        location.href = "/xuanxing/doc_add?pro_add="+pro_add+"&"+"vend_add="+vend_add+"&"+"flag="+flag;
+       }
+
+
+{#  公共文件 #}
+    function pub(opt_name,pub_pro_name) {
+        {#let form = layui.form;#}
+        if (pub_pro_name !== opt_name) {
+            $.ajax({
+                url: '/xuanxing/get_pub/',
+                type: 'post',
+                data: {
+                    "csrfmiddlewaretoken": "{{ csrf_token }}",
+                    "pub_pro_name": pub_pro_name,
+                    "flag":2,
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    {#let ReState = msg;#}
+                    if (ReState["code"] == "0000") {
+                        pub_vue.$set(pub_vue, "pub_obj_all", ReState["pub_obj_all"]);
+                        {#pub_vue.$set(pub_vue, "pd_list", ReState["pd_list"]);#}
+                       pub_vue_jy .$set(pub_vue_jy , "pd_list", ReState["pd_list"]);
+                     }
+                }
+            });
+        }
+    }
+
+    //返回值之后，有值触发
+    let pub_pro_name =$("#pub_pro_name").find("option:selected").text();
+    if (pub_pro_name){
+         console.log(pub_pro_name,"*************");
+         pub("请选择项目",pub_pro_name);
+    }
+
+
+    //选择的时候触发
+     $("#pub_pro_name").bind("change", function () {
+            let pro_name = $(this).find("option:selected").text();
+            pub("请选择项目",pro_name);
+     });
+
+
+   {# 公共添加页面#}
+   function pub_myadd(add){
+        var  pro_add = $(add).siblings(".pub_sel").find("option:selected").html();
+        console.log(pro_add);
+        var flag = 2;
+        location.href = "/xuanxing/doc_add?pro_add="+pro_add+"&"+"flag="+flag;
+       }
+
+
+{#  pub 下载#}
+     function download_pub(down_obj){
+         var file_id =$(down_obj).siblings("#down_pub").text();
+
+         $.ajax({
+             url: "/xuanxing/download_file/",
+             type: "post",
+             {#contentType: false,#}
+             {#processData: false,#}
+             async:true,
+             data: {
+                 "csrfmiddlewaretoken": "{{ csrf_token }}",
+                 "file_id":file_id,
+                  "flag":2,
+             },
+             {#cache: false,#}
+             success: function (ret_data) {
+                var file_path = ret_data.f_path;
+                {#var file_name = ret_data.file_name;#}
+
+                location.href = "/xuanxing/down_load/?file_path="+file_path;
+             }
+        })
+    }
+
+
+    {#接收后端的值#}
+    {#var kv = new Array();//声明一个新的字典#}
+    {#kv = {{ shape_list|safe }};//取出后台传递的数据，此处添加safe过滤避免警告#}
+    {#var test = new Array();//声明一个新的字典用于存放数据#}
+    {#for (var logKey in kv) {#}
+    {#//将对应键值对取出存入test，logKey 为该字典的键#}
+    {#  test.push({value: kv[logKey], name: logKey});#}
+     {# }#}
+
+
+   // 基于准备好的dom，初始化echarts实例
+  {#var data =  $("#sp").html();#}
+  {# console.log(data,888999);#}
+   var myChart = echarts.init(document.getElementById('myechart'));
+   {#var data = document.getElementById('sel').html();#}
+   {# var data =  $("#sp").html();#}
+   {#console.log(data,888);#}
+{#        myChart.setOption({#}
+{#        series : [#}
+{#        {#}
+{#            name: '访问来源',#}
+{#            type: 'pie',    // 设置图表类型为饼图#}
+{#            radius: '65%',  // 饼图的半径，外半径为可视区尺寸（容器高宽中较小一项）的 55% 长度。#}
+            {#data:[          // 数据数组，name 为数据项名称，value 为数据项值#}
+            {#    {value:235, name:'公司营业执照'},#}
+            {#    {value:274, name:'法人代表授权书'},#}
+            {#    {value:310, name:'公司承诺与声明'},#}
+            {#    {value:335, name:'参测产品承诺书'},#}
+            {#    {value:400, name:'公司承诺书'}#}
+            {##}
+            {#]#}
+            {#data:shape_list,#}
+            {#data: data,#}
+{#        }#}
+{#    ]#}
+{# });#}
+
+
+       {#var myChart1 = echarts.init(document.getElementById('bar'));#}
+
+        // 指定图表的配置项和数据
+        {#var option = {#}
+        {#    title: {#}
+        {#        text: '资料核对'#}
+        {#    },#}
+        {#    tooltip: {},#}
+        {#    legend: {#}
+        {#        data:['数量']#}
+        {#    },#}
+        {#    xAxis: {#}
+        {#        data: ["联想","百度","惠普","小米","戴尔","宏基"]#}
+        {#    },#}
+        {#    yAxis: {},#}
+        {#    series: [{#}
+        {#        name: '数量',#}
+        {#        type: 'bar',#}
+        {#        data: [2, 5, 8, 10, 7, 15]#}
+        {#    }]#}
+        {# };#}
+
+
+
+  var option = {
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },
+    legend: {
+        data: ['未上传', '已上传', '审核通过', '审核不通过', '不涉及文件']
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '2%',
+        containLabel: true
+     },
+
+
+    xAxis: [
+        {
+            type: 'category',
+            data: ['数据库', '桌面PC', '系统运维', '一体化', '云视频']
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value',
+            name: '文件状态数量',
+            min: 0,
+            max: 40,
+            position: 'left',
+            {#offset: 1,#}
+             boundaryGap: true,
+                    axisLine : {
+                        show: true,
+                        lineStyle: {
+                            color: 'green',
+                            type: 'solid',
+                            width: 2,
+                        }
+                    },
+             }
+        ],
+    series: [
+
+         {
+            name: '未上传',
+            type: 'bar',
+             barWidth: 25,
+            stack: '其他文件',
+            data: [3, 2, 1, 7, 2, 3, 2]
+        },
+        {
+            name: '已上传',
+            type: 'bar',
+
+            stack: '其他文件',
+            data: [2, 8, 1, 6, 3, 3, 2]
+        },
+        {
+            name: '审核通过',
+            type: 'bar',
+            stack: '其他文件',
+            data: [12, 6, 1, 4, 9, 3, 8]
+        },
+        {
+            name: '审核不通过',
+            type: 'bar',
+            stack: '其他文件',
+            data: [5, 2, 7, 5, 3, 3, 10]
+        },
+
+         {
+            name: '不涉及文件',
+            type: 'bar',
+            stack: '其他文件',
+            data: [5, 2, 2, 5, 9, 3, 10]
+        },
+
+         {#必要文件#}
+         {
+            name: '未上传',
+            type: 'bar',
+            barWidth: 25,
+            stack: '必要文件',
+            data: [3, 6, 1, 7, 2, 3, 2]
+        },
+
+        {
+            name: '已上传',
+            type: 'bar',
+            stack: '必要文件',
+            data: [12, 12, 1, 1, 3, 3, 2]
+        },
+
+        {
+            name: '审核通过',
+            type: 'bar',
+            stack: '必要文件',
+            data: [2, 6, 11, 4, 9, 10, 8]
+        },
+
+        {
+            name: '审核不通过',
+            type: 'bar',
+            stack: '必要文件',
+            data: [5, 2, 9, 5, 10, 3, 10]
+        },
+
+         {
+            name: '不涉及文件',
+            type: 'bar',
+            stack: '必要文件',
+            data: [5, 2, 2, 5, 9, 3, 10]
+        },
+    ]
+ };
+
+   myChart.setOption(option)
+
+</script>
+
+</body>
+
+</html>
+
+
+

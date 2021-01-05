@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <link rel="stylesheet" href="/static/layui2/css/layui.css" media="all">
+
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+    <link rel="stylesheet" href="/static/css/xuanxing/pm/pm_page.css">
+    <script src="/static/js/pm_check.js"></script>
+    <script src="/static/js/pm_paging.js"></script>
+
+
+</head>
+
+<body>
+<div class="x-nav">
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" title="刷新" id="flush_pj">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+{% csrf_token %}
+
+<div class="x-body" id="daily">
+    <div>
+        <div class="layui-input-inline">
+            <select style="height: 38px;" id="project_name" onchange="select_pj(this)">
+                <option value="">项目名称</option>
+                {% for pj_item in pj_name_list %}
+                    {% if pj_item.id == pj_id %}
+                        <option value="{{ pj_id }}" selected="selected">{{ pj_item.name }}</option>
+                    {% else %}
+                        <option value="{{ pj_item.id }}">{{ pj_item.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="layui-input-inline"
+             style="height: 40px;font-size: 18px;vertical-align: baseline;margin-left: 10px;">每页显示条数:
+        </div>
+        <div class="layui-input-inline">
+            <select id="pg_num" class="valid" style="height: 40px;"
+                    onchange='change_page("1", "/xuanxing/project_daily/", "{{ csrf_token }}")'>
+                <option value="3">请选择</option>
+                {% for num in page_num_list %}
+                    <option value="{{ num }}">{{ num }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {#  输入创建时间进行搜索#}
+    </div>
+    <br>
+
+    <table class="layui-table">
+        <thead>
+        <tr>
+            {#            <th>#}
+            {#                <div class="layui-unselect header layui-form-checkbox" lay-skin="primary">#}
+            {#                    <i class="layui-icon">&#xe605;</i>#}
+            {#                </div>#}
+            {#            </th>#}
+            <th>项目</th>
+            <th>事项名称</th>
+            <th>类型</th>
+            <th>材料名称</th>
+            <th>状态</th>
+            <th>备注</th>
+            <th>审核备注</th>
+            <th>上传时间</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+
+        <tbody v-for="(pj_tmp,index) in current_list">
+        <tr>
+            {#            <td>#}
+            {#                <div class="layui-unselect layui-form-checkbox" lay-skin="primary" v-bind:data-id=pj_tmp.id#}
+            {#                     onclick="change_cls(this)">#}
+            {#                    <i class="layui-icon">&#xe605;</i>#}
+            {#                </div>#}
+            {#            </td>#}
+            <td style="display: none;" class="now_pj_id">{[ pj_tmp.id ]}</td>
+            <td>{[ pj_tmp.pj_name ]}</td>
+            <td>{[ pj_tmp.name ]}</td>
+            <td>{[ pj_tmp.pj_type ]}</td>
+            <td>{[ pj_tmp.file_name ]}</td>
+{#            <td>{[ pj_tmp.status ]}</td>#}
+            <td>
+                 <div v-if="pj_tmp.status== '未上传'">
+                    <span></span>
+                  </div>
+{#                <div v-if="pj_tmp.status != '未上传'">#}
+{#                    <span>{[ pj_tmp.status ]}</span>#}
+{#                  </div>#}
+
+                <div v-if="pj_tmp.status== '已上传'">
+                    <span style="color:blue"  >{[ pj_tmp.status ]}</span>
+                  </div>
+
+                  <div v-if="pj_tmp.status== '审核通过'">
+                    <span style="color:green">{[ pj_tmp.status ]} </span>
+                  </div>
+
+                   <div v-if="pj_tmp.status== '审核不通过'">
+                    <span style="color:red">{[ pj_tmp.status ]}</span>
+                   </div>
+
+                  <div v-if="pj_tmp.status== '不涉及'">
+                    <span style="color:blue">{[pj_tmp.status ]}</span>
+                  </div>
+            </td>
+
+            <td>{[ pj_tmp.mark ]}</td>
+            <td>{[ pj_tmp.check_mark ]}</td>
+            <td>{[ pj_tmp.up_time ]}</td>
+            <td class="td-manage">
+                <a title="编辑" :href="'/xuanxing/project_daily_edit/?pd_id=' + pj_tmp.id" class="pj_edit">
+                    <i class="layui-icon">&#xe642;</i>
+                </a>
+                <a title="删除" href="javascript:;" onclick="pj_delete(this)" class="pj_del">
+                    <i class="layui-icon">&#xe640;</i>
+                </a>
+            </td>
+        </tr>
+
+        </tbody>
+
+        <tbody v-for="count in daily_num" id="have_file">
+        <tr>
+            {#            <td>#}
+            {#                <div class="layui-unselect layui-form-checkbox" lay-skin="primary" onclick="change_cls(this)">#}
+            {#                    <i class="layui-icon">&#xe605;</i>#}
+            {#                </div>#}
+            {#            </td>#}
+
+            <td class="add_pj_td">
+                <input type="text" v-bind:value="now_select_id" class="add_pj" style="display: none;">
+                {[ now_select_name ]}
+            </td>
+            <td class="add_item_td"><input type="text" class="add_item_name" style="height: 36px;"></td>
+            <td class="add_type_td">
+                <select style="height: 38px;" class="add_item_type">
+                    {% for k, v in daily_type.items %}
+                        <option value="{{ k }}">{{ v }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td style="padding: 0;" class="file_select">
+                <input type="file" class="files" onchange="change_file(this)" style="display: none;">
+                <button type="button" class="layui-btn layui-btn-normal" onclick="chose(this)">选择文件</button>
+                <span class="file_name"></span>
+            </td>
+            <td></td>
+            <td style="padding: 0;" class="add_mark_td"><textarea cols="" rows="2"
+                                                                  style="border: 1px solid deepskyblue;"
+                                                                  class="mark_info"></textarea>
+            </td>
+            <td>
+                {#                <input type="date" value="{{ now_date }}" disabled="disabled">#}
+            </td>
+            <td></td>
+            <td class="td-manage">
+                <button class="layui-btn layui-btn-danger up_file" onclick="sub_all(this)">提交</button>
+            </td>
+        </tr>
+        </tbody>
+
+
+    </table>
+    <div style="text-align: center;">
+        <a title="添加" onclick="xuanxing_change('1')" href="javascript:;">
+            <i class="layui-icon">&#xe654;</i>
+        </a>
+    </div>
+    <div class="tcdPageCode">
+        <div class="pm_shows" v-for="(pp,index) in page_list">
+            <span v-if="(pp[1] == 0) && (pp[2] == 1)" class="current">{[ pp[0] ]}</span>
+            <span v-if="(pp[1] == 0) && (pp[2] == 0)">{[ pp[0] ]}</span>
+            <a href="javascript:return false;" v-if="pp[1] == 1"
+               onclick="change_page(this,'/xuanxing/project_daily/','{{ csrf_token }}')">{[ pp[0] ]}</a>
+        </div>
+        <span>共</span><span id="total_num">{[ total_page ]}</span><span>页</span>
+    </div>
+</div>
+<script>
+    let page_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#daily",
+        data: {
+            page_list: [],
+            current_list: [],
+            total_page: 1,
+            curr_page: 1,
+            page_jizhun: 1,
+            user_list: [],
+            daily_num: 0,
+            now_select_name: "",
+            now_select_id: ""
+        }
+    });
+
+    function xuanxing_change(change_option) {
+        if (change_option == "0") {
+            if (page_vue.daily_num > 0) {
+                page_vue.$set(page_vue, "daily_num", page_vue.daily_num - 1);
+            }
+        }
+        else {
+            if (page_vue.now_select_id == "") {
+                layer.msg("请选择项目");
+                return false;
+            }
+
+            if (page_vue.daily_num == 0) {
+                page_vue.$set(page_vue, "daily_num", page_vue.daily_num + 1);
+            }
+        }
+    }
+
+    $(function () {
+        // 权限限制
+        let opt_type_str = '{{ request.session.opt_type_list}}';
+        let opt_type_list = opt_type_str.split(";");
+        let del_flag = $.inArray($("#del_all").text().replace(/(^\s*)|(\s*$)/g, ""), opt_type_list); //判断菜单名是否在数组中
+        let modify_flag = $.inArray("修改日报(会议)", opt_type_list); //判断菜单名是否在数组中
+
+        if (del_flag != -1) {
+            $("#del_all").show()
+        }
+        else {
+            $("#del_all").hide()
+        }
+
+        $(".del_daily").each(function () {
+            if (del_flag != -1) {
+                $(this).show();
+            }
+            else {
+                $(this).hide();
+            }
+        });
+        $(".modify").each(function () {
+            if (modify_flag != -1) {
+                $(this).show();
+            }
+            else {
+                $(this).hide();
+            }
+        });
+    });
+
+    // 选择文件触发的函数
+    function chose(obj) {
+        $(obj).siblings(".files").click();
+    }
+
+    function change_file(obj) {
+        let file_name = $(obj)[0].files[0].name;
+        $(obj).siblings(".file_name").text(file_name)
+    }
+
+    function sub_all(obj) {
+        let select_pj_id = page_vue.now_select_id;
+        if (select_pj_id == "") {
+            layer.msg("请选择项目");
+            return false;
+        }
+        let formdata = new FormData;
+        let file_obj = $(obj).parent().siblings(".file_select").children(".files")[0].files[0];
+        if (null == file_obj || undefined == file_obj) {
+            file_obj = "";
+        }
+        formdata.append('file', file_obj);
+        formdata.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        let add_pj = $(obj).parent().parent().children(".add_pj_td").children(".add_pj").val();
+        let add_item_name = $(obj).parent().parent().children(".add_item_td").children(".add_item_name").val();
+        let add_item_type = $(obj).parent().parent().children(".add_type_td").find("option:selected").val();
+        let mark_info = $(obj).parent().parent().children(".add_mark_td").children(".mark_info").val();
+        formdata.append("add_pj", add_pj);
+        formdata.append("add_item_name", add_item_name);
+        formdata.append("add_item_type", add_item_type);
+        formdata.append("mark_info", mark_info);
+        console.log(formdata);
+        $.ajax({
+            url: '/xuanxing/project_daily_upload/',
+            type: 'post',
+            async: false,
+            processData: false,//必须设置
+            dataType: 'json',
+            contentType: false,
+            data: formdata,
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.msg('上传成功');
+                    window.location.href = "/xuanxing/project_daily/"
+                }
+                if (ReState["code"] == "0001") {
+                    layer.msg('参数不全');
+                }
+                if (ReState["code"] == "0002") {
+                    layer.msg('事项已存在');
+                }
+            }
+        });
+
+    }
+
+    function delAll(argument) {
+        let data = tableCheck.getData();
+        let vals = data.join(',');
+
+        layer.confirm('确认要删除吗？' + data, function (index) {
+            //捉到所有被选中的，发异步进行删除
+            $.post('/xuanxing/pro_delete_all/',
+                {
+                    val: vals,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                }, function (res) {
+                    layer.msg('已删除!', {icon: 1, time: 1000});
+                }
+            );
+            layer.msg('删除成功', {icon: 1});
+            $(".layui-form-checked").not('.header').parents('tr').remove();
+        });
+    }
+
+    function pj_delete(obj) {
+        let pd_id = $(obj).parent().siblings(".now_pj_id").text();
+        let url = '/xuanxing/project_daily_del/?pd_id=' + pd_id;
+        layer.confirm('确认要删除该日报吗', function () {
+            window.location.href = url;
+        });
+    }
+
+
+    change_page("", '/xuanxing/project_daily/', '{{ csrf_token }}');
+
+    function select_pj(obj) {
+        let select_name = $(obj).find("option:selected").text();
+        let select_id = $(obj).find("option:selected").val();
+        page_vue.$set(page_vue, "now_select_name", select_name);
+        page_vue.$set(page_vue, "now_select_id", select_id);
+        change_page("", '/xuanxing/project_daily/', '{{ csrf_token }}');
+    }
+
+</script>
+</body>
+</html>

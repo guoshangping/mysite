@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/xuanxing/css/font.css">
+    <link rel="stylesheet" href="/static/css/xuanxing/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    {#      <script type="text/javascript" src="/static/boot/boot.js"></script>#}
+    <script src="/static/layui2/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-async-data.js"></script>
+
+</head>
+<style>
+    .box_chk {
+        top: 0;
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        border: 1px solid #d2d2d2;
+        font-size: 12px;
+        display: inline-block;
+        border-radius: 2px;
+        cursor: pointer;
+    }
+
+    .bg_change {
+        background-color: #5FB878;
+        border-color: #5FB878;
+    }
+</style>
+
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>创建项目</legend>
+</fieldset>
+
+
+<div class="layui-form">
+
+    {% csrf_token %}
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">项目名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入项目名称"
+                       class="layui-input" id="pj_name" style="width: 217px;">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">负责人</label>
+            <div class="layui-input-block">
+                <select id="deal_user">
+                    {% for obj in list %}
+                        <option value="{{ obj.id }}">{{ obj.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">参与者</label>
+            <div class="layui-input-block">
+                {% for obj in list %}
+                    <input type="checkbox" name="members" title="{{ obj.username }}" value="{{ obj.id }}"
+                           lay-skin="primary" class="members_user">
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">项目进度</label>
+            <div class="layui-input-block">
+                <select id="pj_speed">
+                    {% for s in sp_list %}
+                        <option value="{{ s.id }}">{{ s.speed_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">选型类型</label>
+            <div class="layui-input-block">
+                <select id="sh_select">
+                    <option value="0">请选择选型类型</option>
+                    <option value="1">现场测试(上会)</option>
+                    <option value="2">现场测试(不上会)</option>
+                    <option value="3">选型评估</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">起始时间</label>
+            <div class="layui-input-inline">
+                <input type="date" name="s_time" lay-verify="title" autocomplete="off" class="layui-input"
+                       id="start_time" style="width: 217px;">
+            </div>
+            <label class="layui-form-label">结束时间</label>
+            <div class="layui-input-inline">
+                <input type="date" lay-verify="title" name="e_time" autocomplete="off" class="layui-input"
+                       id="end_time" style="width: 217px;">
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<div class="" id="select_prod">
+    <label class="layui-form-label">产品类型</label>
+    <div class="layui-input-inline" style="width: 217px;">
+        <select id="big_class">
+            <option>请选择大类</option>
+            {% for bg_cls in pro_list %}
+                <option>{{ bg_cls }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="layui-input-inline" style="width: 217px;">
+        <select name="class2" id="middle_class">
+            <option value="0" class="md_default">请选择类型</option>
+            <option value="" v-for="(pdt_msg, index) in pdt_list">{[ pdt_msg ]}</option>
+        </select>
+    </div>
+
+    <div class="layui-input-inline" style="width: 217px;">
+        <select id="small_class">
+            <option value="">请选择子类</option>
+            <option v-for="(chlid_type_msg, index) in child_type_list" v-bind:value=chlid_type_msg[1]>{[
+                chlid_type_msg[0] ]}
+            </option>
+        </select>
+    </div>
+
+
+    <br><br><br>
+    <div style="margin-left: 30px;">
+        <button type="button" class="layui-btn layui-btn-radius" id="pj_save">提交</button>
+    </div>
+</div>
+
+
+<script>
+
+    let pd_vue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: "#select_prod",
+        data: {
+            pdt_list: [],
+            child_type_list: [],
+        }
+    });
+
+    function liandong(opt_name, big_cls_name, mid_cls_name, sml_cls_name) {
+        let form = layui.form;
+        if (big_cls_name != opt_name) {
+            $.ajax({
+                url: '/xuanxing/prod_type_query/',
+                type: 'post',
+                data: {
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "big_cls_name": big_cls_name,
+                    "mid_cls_name": mid_cls_name,
+                    "sml_cls_name": sml_cls_name,
+                },
+                success: function (msg) {
+                    let ReState = eval("(" + JSON.stringify(msg) + ")");
+                    if (ReState["code"] == "0000") {
+                        // 清除已选中的
+                        pd_vue.$set(pd_vue, "pdt_list", ReState["pdt_list"]);
+                        pd_vue.$set(pd_vue, "child_type_list", ReState["child_type_list"]);
+                    }
+                    else if (ReState["code"] == "0002") {
+                        alert("未创建角色")
+                    }
+                }
+            });
+        }
+    }
+
+    $("#big_class").bind("change", function () {
+        let big_cls_name = $(this).find("option:selected").text();
+        liandong("请选择大类", big_cls_name, "", "");
+        $("#middle_class")[0].selectedIndex=0;
+        //$("#middle_class").val("0")
+
+    });
+
+    $("#middle_class").bind("change", function () {
+        let big_cls_name = $("#big_class").find("option:selected").text();
+        let mid_cls_name = $(this).find("option:selected").text();
+        liandong("请选择类型", big_cls_name, mid_cls_name, "")
+    });
+
+    $("#pj_save").click(function () {
+        let pj_name = $("#pj_name").val().replace(/(^\s*)|(\s*$)/g, "");
+        let deal_user = $("#deal_user").find("option:selected").val();
+        let member_list = [];
+        $(".members_user").each(function () {
+            if ($(this).next().hasClass("layui-form-checked")) {
+                member_list.push($(this).val());
+            }
+        });
+        let start_time = $("#start_time").val().replace(/(^\s*)|(\s*$)/g, "");
+        let end_time = $("#end_time").val().replace(/(^\s*)|(\s*$)/g, "");
+        if(start_time !== "" && end_time !== ""){
+            if(start_time > end_time){
+                layer.msg("起始时间大于结束时间");
+                return false;
+            }
+        }
+
+        let pj_speed = $("#pj_speed").find("option:selected").val();
+        // 大类
+        // let big_class = $("#big_class").find("option:selected").text();
+        // 中类
+        //let middle_class = $("#middle_class").find("option:selected").text();
+        // 小类
+        let small_class = $("#small_class").find("option:selected").val();
+        // 厂商
+        if (small_class == "" || pj_name == "" || pj_name == null || small_class == null) {
+            layer.msg("请补全项目名称与类型");
+            return false;
+        }
+        let sh_type = $("#sh_select").find("option:selected").val();
+        if (sh_type == "0"){
+            layer.msg("请选择选型类型");
+            return false;
+        }
+
+        $.ajax({
+            url: '/xuanxing/project_add_html/',
+            type: 'post',
+            data: {
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "pj_name": pj_name,
+                "deal_user": deal_user,
+                "member_list": JSON.stringify(member_list),
+                "pj_speed": pj_speed,
+                "small_class": small_class,
+                "s_time": start_time,
+                "e_time": end_time,
+                "sh_type": sh_type
+            },
+            success: function (msg) {
+                let ReState = eval("(" + JSON.stringify(msg) + ")");
+                if (ReState["code"] == "0000") {
+                    layer.msg("添加成功");
+                    window.location.href = "/xuanxing/task_manage";
+                    return false;
+                } else if (ReState["code"] == "0001") {
+                    layer.msg("项目已存在")
+                } else if (ReState["code"] == "0002") {
+                    layer.msg("项目添加失败")
+                }
+                else if (ReState["code"] == "0003") {
+                    layer.msg("该子类下已有项目，目前仅支持一个子类一个项目")
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
